@@ -1,4 +1,4 @@
-package sk.tuke.fei.kpi.smart.makac;
+package sk.tuke.smart.makac;
 
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;

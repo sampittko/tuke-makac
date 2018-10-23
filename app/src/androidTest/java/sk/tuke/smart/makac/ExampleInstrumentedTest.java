@@ -1,4 +1,4 @@
-package sk.tuke.fei.kpi.smart.makac;
+package sk.tuke.smart.makac;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("sk.tuke.fei.kpi.smart.makac", appContext.getPackageName());
+        assertEquals("sk.tuke.smart.makac", appContext.getPackageName());
     }
 }

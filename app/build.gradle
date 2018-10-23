@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "sk.tuke.fei.kpi.smart.makac"
+        applicationId "sk.tuke.smart.makac"
         minSdkVersion 23
         targetSdkVersion 27
         versionCode 1
