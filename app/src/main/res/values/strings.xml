@@ -17,11 +17,7 @@
         <string name="textview_stopwatch_calories">894</string>
         <string name="textview_stopwatch_unitcalories">kcal</string>
         <!-- SELECT SPORT -->
-        <string name="button_stopwatch_selectsport">Select sport</string>
-        <!-- START -->
-        <string name="button_stopwatch_start">Start</string>
-        <!-- STOP -->
-        <string name="button_stopwatch_endworkout">Stop</string>
+        <string name="textview_stopwatch_sportlabel">Sport</string>
 
     <!-- WORKOUT DETAIL -->
         <!-- MAP -->

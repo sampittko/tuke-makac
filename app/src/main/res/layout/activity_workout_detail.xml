@@ -2,177 +2,172 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraintlayout_workoutdetail_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="8dp"
     tools:context=".WorkoutDetailActivity">
-
-    <ScrollView
-        android:id="@+id/scrollview_workoutdetail_content"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/headingpack"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <LinearLayout
-                android:id="@+id/headingpack"
-                android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="12">
+            <RelativeLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:weightSum="12">
-                <RelativeLayout
-                    android:layout_width="0dp"
+                android:layout_weight="8">
+                <TextView
+                    android:id="@+id/textview_workoutdetail_workouttitle"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="8">
-                    <TextView
-                        android:id="@+id/textview_workoutdetail_workouttitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/textview_workoutdetail_workouttitle"
-                        android:textSize="35sp"
-                        android:layout_centerHorizontal="true" />
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/textview_workoutdetail_workouttitle"
-                        android:layout_marginTop="15dp">
-                        <TextView
-                            android:id="@+id/textview_workoutdetail_labelsport"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/textview_workoutdetail_labelsport"
-                            android:layout_centerHorizontal="true" />
-
-                        <TextView
-                            android:id="@+id/textview_workoutdetail_sportactivity"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="20sp"
-                            android:layout_below="@+id/textview_workoutdetail_labelsport"
-                            android:text="@string/textview_workoutdetail_sportactivity"
-                            android:layout_centerHorizontal="true" />
-
-                        <TextView
-                            android:id="@+id/textview_workoutdetail_activitydate"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/textview_workoutdetail_sportactivity"
-                            android:text="@string/textview_workoutdetail_activitydate"
-                            android:layout_centerHorizontal="true" />
-                    </RelativeLayout>
-                </RelativeLayout>
+                    android:text="@string/textview_workoutdetail_workouttitle"
+                    android:textSize="35sp"
+                    android:layout_centerHorizontal="true" />
 
                 <RelativeLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="4">
-
-                    <Button
-                        android:id="@+id/button_workoutdetail_showmap"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/textview_workoutdetail_workouttitle"
+                    android:layout_marginTop="15dp">
+                    <TextView
+                        android:id="@+id/textview_workoutdetail_labelsport"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/button_workoutdetail_showmap"
+                        android:text="@string/textview_workoutdetail_labelsport"
+                        android:layout_centerHorizontal="true" />
+
+                    <TextView
+                        android:id="@+id/textview_workoutdetail_sportactivity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:layout_below="@+id/textview_workoutdetail_labelsport"
+                        android:text="@string/textview_workoutdetail_sportactivity"
+                        android:layout_centerHorizontal="true" />
+
+                    <TextView
+                        android:id="@+id/textview_workoutdetail_activitydate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/textview_workoutdetail_sportactivity"
+                        android:text="@string/textview_workoutdetail_activitydate"
                         android:layout_centerHorizontal="true" />
                 </RelativeLayout>
-            </LinearLayout>
+            </RelativeLayout>
 
-            <!--<TextView-->
-                <!--android:id="@+id/textview_workoutdetail_labelsummary"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_below="@+id/textview_workoutdetail_activitydate"-->
-                <!--android:text="@string/textview_workoutdetail_labelsummary" />-->
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="4">
 
-            <!--<TextView-->
-                <!--android:id="@+id/textview_workoutdetail_labelduration"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_below="@+id/textview_workoutdetail_labelsummary"-->
-                <!--android:text="@string/textview_workoutdetail_labelduration" />-->
+                <Button
+                    android:id="@+id/button_workoutdetail_showmap"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/button_workoutdetail_showmap"
+                    android:layout_centerHorizontal="true" />
+            </RelativeLayout>
+        </LinearLayout>
 
-            <!--<TextView-->
-                <!--android:id="@+id/textview_workoutdetail_valueduration"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_below="@+id/textview_workoutdetail_labelduration"-->
-                <!--android:text="@string/textview_workoutdetail_valueduration" />-->
+        <!--<TextView-->
+            <!--android:id="@+id/textview_workoutdetail_labelsummary"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/textview_workoutdetail_activitydate"-->
+            <!--android:text="@string/textview_workoutdetail_labelsummary" />-->
 
-            <!--<TextView-->
-                <!--android:id="@+id/textview_workoutdetail_labelcalories"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_below="@+id/textview_workoutdetail_valueduration"-->
-                <!--android:text="@string/textview_workoutdetail_labelcalories" />-->
+        <!--<TextView-->
+            <!--android:id="@+id/textview_workoutdetail_labelduration"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/textview_workoutdetail_labelsummary"-->
+            <!--android:text="@string/textview_workoutdetail_labelduration" />-->
 
-            <!--<TextView-->
-                <!--android:id="@+id/textview_workoutdetail_valuecalories"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_below="@+id/textview_workoutdetail_labelcalories"-->
-                <!--android:text="@string/textview_workoutdetail_valuecalories" />-->
+        <!--<TextView-->
+            <!--android:id="@+id/textview_workoutdetail_valueduration"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/textview_workoutdetail_labelduration"-->
+            <!--android:text="@string/textview_workoutdetail_valueduration" />-->
 
-            <!--<TextView-->
-                <!--android:id="@+id/textview_workoutdetail_labeldistance"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_below="@+id/textview_workoutdetail_valuecalories"-->
-                <!--android:text="@string/textview_workoutdetail_labeldistance" />-->
+        <!--<TextView-->
+            <!--android:id="@+id/textview_workoutdetail_labelcalories"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/textview_workoutdetail_valueduration"-->
+            <!--android:text="@string/textview_workoutdetail_labelcalories" />-->
 
-            <!--<TextView-->
-                <!--android:id="@+id/textview_workoutdetail_valuedistance"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_below="@+id/textview_workoutdetail_labeldistance"-->
-                <!--android:text="@string/textview_workoutdetail_valuedistance" />-->
+        <!--<TextView-->
+            <!--android:id="@+id/textview_workoutdetail_valuecalories"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/textview_workoutdetail_labelcalories"-->
+            <!--android:text="@string/textview_workoutdetail_valuecalories" />-->
 
-            <!--<TextView-->
-                <!--android:id="@+id/textview_workoutdetail_labelavgpace"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_below="@+id/textview_workoutdetail_valuedistance"-->
-                <!--android:text="@string/textview_workoutdetail_labelavgpace" />-->
+        <!--<TextView-->
+            <!--android:id="@+id/textview_workoutdetail_labeldistance"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/textview_workoutdetail_valuecalories"-->
+            <!--android:text="@string/textview_workoutdetail_labeldistance" />-->
 
-            <!--<TextView-->
-                <!--android:id="@+id/textview_workoutdetail_valueavgpace"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_below="@+id/textview_workoutdetail_labelavgpace"-->
-                <!--android:text="@string/textview_workoutdetail_valueavgpace" />-->
+        <!--<TextView-->
+            <!--android:id="@+id/textview_workoutdetail_valuedistance"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/textview_workoutdetail_labeldistance"-->
+            <!--android:text="@string/textview_workoutdetail_valuedistance" />-->
 
-            <!--<TextView-->
-                <!--android:id="@+id/textview_workoutdetail_labelsocialshare"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_below="@+id/textview_workoutdetail_valueavgpace"-->
-                <!--android:text="@string/textview_workoutdetail_labelsocialshare" />-->
+        <!--<TextView-->
+            <!--android:id="@+id/textview_workoutdetail_labelavgpace"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/textview_workoutdetail_valuedistance"-->
+            <!--android:text="@string/textview_workoutdetail_labelavgpace" />-->
 
-            <!--<Button-->
-                <!--android:id="@+id/button_workoutdetail_gplusshare"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_below="@+id/textview_workoutdetail_labelsocialshare"-->
-                <!--android:text="@string/button_workoutdetail_gplusshare" />-->
+        <!--<TextView-->
+            <!--android:id="@+id/textview_workoutdetail_valueavgpace"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/textview_workoutdetail_labelavgpace"-->
+            <!--android:text="@string/textview_workoutdetail_valueavgpace" />-->
 
-            <!--<Button-->
-                <!--android:id="@+id/button_workoutdetail_twittershare"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_below="@+id/button_workoutdetail_gplusshare"-->
-                <!--android:text="@string/button_workoutdetail_twittershare" />-->
+        <!--<TextView-->
+            <!--android:id="@+id/textview_workoutdetail_labelsocialshare"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/textview_workoutdetail_valueavgpace"-->
+            <!--android:text="@string/textview_workoutdetail_labelsocialshare" />-->
 
-            <!--<Button-->
-                <!--android:id="@+id/button_workoutdetail_emailshare"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_below="@+id/button_workoutdetail_twittershare"-->
-                <!--android:text="@string/button_workoutdetail_emailshare" />-->
+        <!--<Button-->
+            <!--android:id="@+id/button_workoutdetail_gplusshare"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/textview_workoutdetail_labelsocialshare"-->
+            <!--android:text="@string/button_workoutdetail_gplusshare" />-->
 
-            <!--<Button-->
-                <!--android:id="@+id/button_workoutdetail_fbsharebtn"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_below="@+id/button_workoutdetail_emailshare"-->
-                <!--android:text="@string/button_workoutdetail_fbsharebtn" />-->
-        </RelativeLayout>
-    </ScrollView>
+        <!--<Button-->
+            <!--android:id="@+id/button_workoutdetail_twittershare"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/button_workoutdetail_gplusshare"-->
+            <!--android:text="@string/button_workoutdetail_twittershare" />-->
+
+        <!--<Button-->
+            <!--android:id="@+id/button_workoutdetail_emailshare"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/button_workoutdetail_twittershare"-->
+            <!--android:text="@string/button_workoutdetail_emailshare" />-->
+
+        <!--<Button-->
+            <!--android:id="@+id/button_workoutdetail_fbsharebtn"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/button_workoutdetail_emailshare"-->
+            <!--android:text="@string/button_workoutdetail_fbsharebtn" />-->
+    </RelativeLayout>
 </android.support.constraint.ConstraintLayout>
