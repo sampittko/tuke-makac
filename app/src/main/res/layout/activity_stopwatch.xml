@@ -159,6 +159,7 @@
                     android:layout_centerHorizontal="true"
                     android:id="@+id/button_stopwatch_selectsport"
                     android:text="@string/button_stopwatch_selectsport"
+                    android:textSize="20dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"/>
@@ -171,6 +172,7 @@
                     android:text="@string/button_stopwatch_start"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="20dp"
                     android:layout_marginBottom="10dp" />
 
                 <!-- STOP -->
