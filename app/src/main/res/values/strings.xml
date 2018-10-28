@@ -1,4 +1,55 @@
 <resources>
     <string name="app_name">Makač</string>
-    <string name="title_activity_maps">Map</string>
+    <!-- STOPWATCH -->
+        <!-- DURATION -->
+        <string name="textview_stopwatch_labelduration">Duration</string>
+        <string name="textview_stopwatch_duration">12:34:56</string>
+        <!-- DISTANCE -->
+        <string name="textview_stopwatch_labeldistance">Distance</string>
+        <string name="textview_stopwatch_distance">1.24</string>
+        <string name="textview_stopwatch_distanceunit">km</string>
+        <!-- PACE -->
+        <string name="textview_stopwatch_labelpace">Pace</string>
+        <string name="textview_stopwatch_pace">10.54</string>
+        <string name="textview_stopwatch_unitpace">min/km</string>
+        <!-- CALORIES -->
+        <string name="textview_stopwatch_labelcalories">Calories</string>
+        <string name="textview_stopwatch_calories">894</string>
+        <string name="textview_stopwatch_unitcalories">kcal</string>
+        <!-- SELECT SPORT -->
+        <string name="button_stopwatch_selectsport">Select sport</string>
+        <!-- START -->
+        <string name="button_stopwatch_start">Start</string>
+        <!-- STOP -->
+        <string name="button_stopwatch_endworkout">Stop</string>
+
+    <!-- WORKOUT DETAIL -->
+        <!-- MAP -->
+        <string name="button_workoutdetail_showmap">Map</string>
+        <!-- MY WORKOUT -->
+        <string name="textview_workoutdetail_workouttitle">My Workout</string>
+            <!-- SPORT -->
+            <string name="textview_workoutdetail_labelsport">Sport</string>
+            <string name="textview_workoutdetail_sportactivity">Running</string>
+            <string name="textview_workoutdetail_activitydate">Apr 24, 2017 6:10:52 PM</string>
+            <!-- SUMMARY -->
+            <string name="textview_workoutdetail_labelsummary">Summary</string>
+            <!-- DURATION -->
+            <string name="textview_workoutdetail_labelduration">Duration</string>
+            <string name="textview_workoutdetail_valueduration">12:34:56</string>
+            <!-- CALORIES -->
+            <string name="textview_workoutdetail_labelcalories">Calories</string>
+            <string name="textview_workoutdetail_valuecalories">0 kcal</string>
+            <!-- DISTANCE -->
+            <string name="textview_workoutdetail_labeldistance">Distance</string>
+            <string name="textview_workoutdetail_valuedistance">0.0 km</string>
+            <!-- AVG. PACE -->
+            <string name="textview_workoutdetail_labelavgpace">Avg. pace</string>
+            <string name="textview_workoutdetail_valueavgpace">0.0 min/km</string>
+        <!-- SOCIAL SHARE -->
+        <string name="textview_workoutdetail_labelsocialshare">Social share</string>
+        <string name="button_workoutdetail_gplusshare">Google Plus</string>
+        <string name="button_workoutdetail_twittershare">Twitter</string>
+        <string name="button_workoutdetail_emailshare">E-mail</string>
+        <string name="button_workoutdetail_fbsharebtn">Facebook</string>
 </resources>

@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="8dp"
     tools:context=".StopwatchActivity">
     <ScrollView
         android:id="@+id/scrollview_stopwatch_content"
@@ -21,7 +22,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_centerHorizontal="true"
-                android:text="Duration"
+                android:text="@string/textview_stopwatch_labelduration"
                 android:textSize="25sp" />
 
             <TextView
@@ -30,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/textview_stopwatch_labelduration"
                 android:layout_centerHorizontal="true"
-                android:text="12:34:56"
+                android:text="@string/textview_stopwatch_duration"
                 android:textSize="45sp" />
 
             <!-- DISTANCE -->
@@ -41,7 +42,7 @@
                 android:layout_below="@+id/textview_stopwatch_duration"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
-                android:text="Distance"
+                android:text="@string/textview_stopwatch_labeldistance"
                 android:textSize="25sp" />
 
             <RelativeLayout
@@ -59,14 +60,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="5dp"
-                        android:text="1.24"
+                        android:text="@string/textview_stopwatch_distance"
                         android:textSize="45sp" />
 
                     <TextView
                         android:id="@+id/textview_stopwatch_distanceunit"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="km"
+                        android:text="@string/textview_stopwatch_distanceunit"
                         android:textSize="45sp" />
                 </LinearLayout>
             </RelativeLayout>
@@ -88,7 +89,7 @@
                         <!-- PACE -->
                         <TextView
                             android:id="@+id/textview_stopwatch_labelpace"
-                            android:text="Pace"
+                            android:text="@string/textview_stopwatch_labelpace"
                             android:textSize="20sp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -99,7 +100,7 @@
                             android:layout_below="@+id/textview_stopwatch_labelpace"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="10.54"
+                            android:text="@string/textview_stopwatch_pace"
                             android:textSize="40sp"
                             android:layout_centerHorizontal="true"/>
 
@@ -107,7 +108,7 @@
                             android:id="@+id/textview_stopwatch_unitpace"
                             android:layout_below="@+id/textview_stopwatch_pace"
                             android:layout_centerHorizontal="true"
-                            android:text="min/km"
+                            android:text="@string/textview_stopwatch_unitpace"
                             android:textSize="20sp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
@@ -120,7 +121,7 @@
                         <!-- CALORIES -->
                         <TextView
                             android:id="@+id/textview_stopwatch_labelcalories"
-                            android:text="Calories"
+                            android:text="@string/textview_stopwatch_labelcalories"
                             android:textSize="20sp"
                             android:layout_centerHorizontal="true"
                             android:layout_width="wrap_content"
@@ -129,7 +130,7 @@
                         <TextView
                             android:id="@+id/textview_stopwatch_calories"
                             android:layout_below="@+id/textview_stopwatch_labelcalories"
-                            android:text="894"
+                            android:text="@string/textview_stopwatch_calories"
                             android:textSize="40sp"
                             android:layout_centerHorizontal="true"
                             android:layout_width="wrap_content"
@@ -139,7 +140,7 @@
                         <TextView
                             android:id="@+id/textview_stopwatch_unitcalories"
                             android:layout_below="@+id/textview_stopwatch_calories"
-                            android:text="kcal"
+                            android:text="@string/textview_stopwatch_unitcalories"
                             android:textSize="20sp"
                             android:layout_centerHorizontal="true"
                             android:layout_width="wrap_content"
@@ -157,7 +158,8 @@
                 <Button
                     android:layout_centerHorizontal="true"
                     android:id="@+id/button_stopwatch_selectsport"
-                    android:text="Select sport"
+                    android:text="@string/button_stopwatch_selectsport"
+                    android:textSize="20dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"/>
@@ -167,9 +169,10 @@
                     android:layout_centerHorizontal="true"
                     android:id="@+id/button_stopwatch_start"
                     android:layout_below="@+id/button_stopwatch_selectsport"
-                    android:text="Start"
+                    android:text="@string/button_stopwatch_start"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="20dp"
                     android:layout_marginBottom="10dp" />
 
                 <!-- STOP -->
@@ -177,7 +180,7 @@
                     android:layout_below="@+id/button_stopwatch_selectsport"
                     android:layout_centerHorizontal="true"
                     android:id="@+id/button_stopwatch_endworkout"
-                    android:text="Stop"
+                    android:text="@string/button_stopwatch_endworkout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
