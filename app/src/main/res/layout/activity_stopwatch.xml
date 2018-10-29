@@ -189,9 +189,6 @@
                     android:id="@+id/button_stopwatch_selectsport"
                     android:layout_marginTop="10dp"
                     android:layout_marginStart="6dp"
-                    android:textSize="25sp"
-                    android:textStyle="normal"
-                    android:textAllCaps="false"
                     android:layout_width="50dp"
                     android:layout_height="wrap_content"
                     android:background="@drawable/ic_launcher_foreground"/>

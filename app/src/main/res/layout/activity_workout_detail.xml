@@ -7,167 +7,209 @@
     android:layout_height="match_parent"
     android:layout_margin="8dp"
     tools:context=".WorkoutDetailActivity">
-    <RelativeLayout
+    <LinearLayout
+        android:baselineAligned="false"
+        android:id="@+id/headingpack"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <LinearLayout
-            android:id="@+id/headingpack"
-            android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="12">
+        <RelativeLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:weightSum="12">
-            <RelativeLayout
-                android:layout_width="0dp"
+            android:layout_weight="8">
+            <TextView
+                android:id="@+id/textview_workoutdetail_workouttitle"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="8">
-                <TextView
-                    android:id="@+id/textview_workoutdetail_workouttitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/textview_workoutdetail_workouttitle"
-                    android:textSize="35sp"
-                    android:layout_centerHorizontal="true" />
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/textview_workoutdetail_workouttitle"
-                    android:layout_marginTop="15dp">
-                    <TextView
-                        android:id="@+id/textview_workoutdetail_labelsport"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/textview_workoutdetail_labelsport"
-                        android:layout_centerHorizontal="true" />
-
-                    <TextView
-                        android:id="@+id/textview_workoutdetail_sportactivity"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="20sp"
-                        android:layout_below="@+id/textview_workoutdetail_labelsport"
-                        android:text="@string/textview_workoutdetail_sportactivity"
-                        android:layout_centerHorizontal="true" />
-
-                    <TextView
-                        android:id="@+id/textview_workoutdetail_activitydate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/textview_workoutdetail_sportactivity"
-                        android:text="@string/textview_workoutdetail_activitydate"
-                        android:layout_centerHorizontal="true" />
-                </RelativeLayout>
-            </RelativeLayout>
+                android:textStyle="bold|italic"
+                android:text="@string/textview_workoutdetail_workouttitle"
+                android:textSize="35sp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="11dp"/>
 
             <RelativeLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="4">
-
-                <Button
-                    android:id="@+id/button_workoutdetail_showmap"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textview_workoutdetail_workouttitle"
+                android:paddingStart="23dp"
+                android:paddingEnd="0dp">
+                <TextView
+                    android:id="@+id/textview_workoutdetail_labelsport"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/button_workoutdetail_showmap"
-                    android:layout_centerHorizontal="true" />
+                    android:textStyle="italic|bold"
+                    android:text="@string/textview_workoutdetail_labelsport"
+                    android:layout_marginTop="30dp"/>
+
+                <TextView
+                    android:id="@+id/textview_workoutdetail_sportactivity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textColor="#0CD6E7"
+                    android:textSize="20sp"
+                    android:layout_below="@+id/textview_workoutdetail_labelsport"
+                    android:text="@string/textview_workoutdetail_sportactivity" />
+
+                <TextView
+                    android:id="@+id/textview_workoutdetail_activitydate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textColor="#0CD6E7"
+                    android:layout_below="@+id/textview_workoutdetail_sportactivity"
+                    android:text="@string/textview_workoutdetail_activitydate" />
+
+                <TextView
+                    android:id="@+id/textview_workoutdetail_labelsummary"
+                    android:layout_marginTop="30dp"
+                    android:textSize="25sp"
+                    android:textStyle="bold|italic"
+                    android:layout_below="@id/textview_workoutdetail_activitydate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/textview_workoutdetail_labelsummary" />
+
+                <TextView
+                    android:id="@+id/textview_workoutdetail_labelduration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold|italic"
+                    android:layout_below="@+id/textview_workoutdetail_labelsummary"
+                    android:text="@string/textview_workoutdetail_labelduration" />
+
+                <TextView
+                    android:id="@+id/textview_workoutdetail_valueduration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textColor="#0CD6E7"
+                    android:textSize="20sp"
+                    android:layout_below="@+id/textview_workoutdetail_labelduration"
+                    android:text="@string/textview_workoutdetail_valueduration" />
+
+                <TextView
+                    android:id="@+id/textview_workoutdetail_labelcalories"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold|italic"
+                    android:layout_below="@+id/textview_workoutdetail_valueduration"
+                    android:text="@string/textview_workoutdetail_labelcalories" />
+
+                <TextView
+                    android:id="@+id/textview_workoutdetail_valuecalories"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textColor="#0CD6E7"
+                    android:textSize="20sp"
+                    android:layout_below="@+id/textview_workoutdetail_labelcalories"
+                    android:text="@string/textview_workoutdetail_valuecalories" />
+
+                <TextView
+                    android:id="@+id/textview_workoutdetail_labeldistance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold|italic"
+                    android:layout_below="@+id/textview_workoutdetail_valuecalories"
+                    android:text="@string/textview_workoutdetail_labeldistance" />
+
+                <TextView
+                    android:id="@+id/textview_workoutdetail_valuedistance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:textColor="#0CD6E7"
+                    android:layout_below="@+id/textview_workoutdetail_labeldistance"
+                    android:text="@string/textview_workoutdetail_valuedistance" />
+
+                <TextView
+                    android:id="@+id/textview_workoutdetail_labelavgpace"
+                    android:layout_width="wrap_content"
+                    android:textStyle="bold|italic"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textview_workoutdetail_valuedistance"
+                    android:text="@string/textview_workoutdetail_labelavgpace" />
+
+                <TextView
+                    android:id="@+id/textview_workoutdetail_valueavgpace"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textColor="#0CD6E7"
+                    android:textSize="20sp"
+                    android:layout_below="@+id/textview_workoutdetail_labelavgpace"
+                    android:text="@string/textview_workoutdetail_valueavgpace" />
             </RelativeLayout>
-        </LinearLayout>
+        </RelativeLayout>
 
-        <!--<TextView-->
-            <!--android:id="@+id/textview_workoutdetail_labelsummary"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@+id/textview_workoutdetail_activitydate"-->
-            <!--android:text="@string/textview_workoutdetail_labelsummary" />-->
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4">
 
-        <!--<TextView-->
-            <!--android:id="@+id/textview_workoutdetail_labelduration"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@+id/textview_workoutdetail_labelsummary"-->
-            <!--android:text="@string/textview_workoutdetail_labelduration" />-->
+            <Button
+                android:id="@+id/button_workoutdetail_showmap"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_map_blue_24dp"
+                android:layout_centerHorizontal="true" />
 
-        <!--<TextView-->
-            <!--android:id="@+id/textview_workoutdetail_valueduration"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@+id/textview_workoutdetail_labelduration"-->
-            <!--android:text="@string/textview_workoutdetail_valueduration" />-->
+            <TextView
+                android:layout_below="@id/button_workoutdetail_showmap"
+                android:id="@+id/button_workoutdetail_labelshowmap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textStyle="italic|bold"
+                android:text="@string/button_workoutdetail_labelshowmap"/>
 
-        <!--<TextView-->
-            <!--android:id="@+id/textview_workoutdetail_labelcalories"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@+id/textview_workoutdetail_valueduration"-->
-            <!--android:text="@string/textview_workoutdetail_labelcalories" />-->
+            <TextView
+                android:id="@+id/textview_workoutdetail_labelsocialshare"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold|italic"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/button_workoutdetail_labelshowmap"
+                android:text="@string/textview_workoutdetail_labelsocialshare" />
 
-        <!--<TextView-->
-            <!--android:id="@+id/textview_workoutdetail_valuecalories"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@+id/textview_workoutdetail_labelcalories"-->
-            <!--android:text="@string/textview_workoutdetail_valuecalories" />-->
+            <Button
+                android:id="@+id/button_workoutdetail_gplusshare"
+                android:layout_marginTop="10dp"
+                android:layout_height="45dp"
+                android:layout_width="45dp"
+                android:layout_below="@+id/textview_workoutdetail_labelsocialshare"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/gplus_logo"/>
 
-        <!--<TextView-->
-            <!--android:id="@+id/textview_workoutdetail_labeldistance"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@+id/textview_workoutdetail_valuecalories"-->
-            <!--android:text="@string/textview_workoutdetail_labeldistance" />-->
+            <Button
+                android:id="@+id/button_workoutdetail_twittershare"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/twitter_logo"
+                android:layout_below="@+id/button_workoutdetail_gplusshare"
+                android:layout_centerHorizontal="true" />
 
-        <!--<TextView-->
-            <!--android:id="@+id/textview_workoutdetail_valuedistance"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@+id/textview_workoutdetail_labeldistance"-->
-            <!--android:text="@string/textview_workoutdetail_valuedistance" />-->
+            <Button
+                android:id="@+id/button_workoutdetail_fbsharebtn"
+                android:layout_marginTop="10dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_below="@+id/button_workoutdetail_twittershare"
+                android:background="@drawable/facebook_logo"
+                android:layout_centerHorizontal="true" />
 
-        <!--<TextView-->
-            <!--android:id="@+id/textview_workoutdetail_labelavgpace"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@+id/textview_workoutdetail_valuedistance"-->
-            <!--android:text="@string/textview_workoutdetail_labelavgpace" />-->
-
-        <!--<TextView-->
-            <!--android:id="@+id/textview_workoutdetail_valueavgpace"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@+id/textview_workoutdetail_labelavgpace"-->
-            <!--android:text="@string/textview_workoutdetail_valueavgpace" />-->
-
-        <!--<TextView-->
-            <!--android:id="@+id/textview_workoutdetail_labelsocialshare"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@+id/textview_workoutdetail_valueavgpace"-->
-            <!--android:text="@string/textview_workoutdetail_labelsocialshare" />-->
-
-        <!--<Button-->
-            <!--android:id="@+id/button_workoutdetail_gplusshare"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@+id/textview_workoutdetail_labelsocialshare"-->
-            <!--android:text="@string/button_workoutdetail_gplusshare" />-->
-
-        <!--<Button-->
-            <!--android:id="@+id/button_workoutdetail_twittershare"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@+id/button_workoutdetail_gplusshare"-->
-            <!--android:text="@string/button_workoutdetail_twittershare" />-->
-
-        <!--<Button-->
-            <!--android:id="@+id/button_workoutdetail_emailshare"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@+id/button_workoutdetail_twittershare"-->
-            <!--android:text="@string/button_workoutdetail_emailshare" />-->
-
-        <!--<Button-->
-            <!--android:id="@+id/button_workoutdetail_fbsharebtn"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@+id/button_workoutdetail_emailshare"-->
-            <!--android:text="@string/button_workoutdetail_fbsharebtn" />-->
-    </RelativeLayout>
+            <Button
+                android:id="@+id/button_workoutdetail_emailshare"
+                android:layout_width="45dp"
+                android:layout_marginTop="10dp"
+                android:layout_height="45dp"
+                android:layout_below="@+id/button_workoutdetail_fbsharebtn"
+                android:background="@drawable/email_logo"
+                android:layout_centerHorizontal="true" />
+        </RelativeLayout>
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>

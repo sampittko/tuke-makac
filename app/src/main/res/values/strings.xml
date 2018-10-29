@@ -20,8 +20,8 @@
         <string name="textview_stopwatch_sportlabel">Sport</string>
 
     <!-- WORKOUT DETAIL -->
-        <!-- MAP -->
-        <string name="button_workoutdetail_showmap">Map</string>
+        <!-- Map -->
+        <string name="button_workoutdetail_labelshowmap">Map</string>
         <!-- MY WORKOUT -->
         <string name="textview_workoutdetail_workouttitle">My Workout</string>
             <!-- SPORT -->
@@ -44,8 +44,4 @@
             <string name="textview_workoutdetail_valueavgpace">0.0 min/km</string>
         <!-- SOCIAL SHARE -->
         <string name="textview_workoutdetail_labelsocialshare">Social share</string>
-        <string name="button_workoutdetail_gplusshare">Google Plus</string>
-        <string name="button_workoutdetail_twittershare">Twitter</string>
-        <string name="button_workoutdetail_emailshare">E-mail</string>
-        <string name="button_workoutdetail_fbsharebtn">Facebook</string>
 </resources>
