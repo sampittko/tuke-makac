@@ -119,6 +119,7 @@
                         android:layout_centerHorizontal="true"
                         android:text="@string/textview_stopwatch_unitpace"
                         android:textSize="20sp"
+                        android:textColor="#0CD6E7"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                 </RelativeLayout>
@@ -154,6 +155,7 @@
                         android:layout_below="@+id/textview_stopwatch_calories"
                         android:text="@string/textview_stopwatch_unitcalories"
                         android:textSize="20sp"
+                        android:textColor="#0CD6E7"
                         android:layout_centerHorizontal="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
