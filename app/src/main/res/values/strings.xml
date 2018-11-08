@@ -18,6 +18,10 @@
         <string name="textview_stopwatch_unitcalories">kcal</string>
         <!-- SELECT SPORT -->
         <string name="textview_stopwatch_sportlabel">Sport</string>
+        <!-- STOPWATCH STOP -->
+        <string name="stopwatch_start"></string>
+        <string name="stopwatch_stop"></string>
+        <string name="stopwatch_continue"></string>
 
     <!-- WORKOUT DETAIL -->
         <!-- Map -->

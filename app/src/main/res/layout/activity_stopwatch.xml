@@ -230,7 +230,10 @@
                             android:id="@+id/button_stopwatch_start"
                             android:background="@drawable/ic_play_circle_filled_green_24dp"
                             android:layout_width="70dp"
-                            android:layout_height="70dp"/>
+                            android:text="@string/stopwatch_start"
+                            android:textSize="-1sp"
+                            android:layout_height="70dp"
+                            android:onClick="toggleRecording"/>
 
                         <!-- STOP -->
                         <Button
@@ -239,7 +242,8 @@
                             android:background="@drawable/ic_pause_circle_filled_red_24dp"
                             android:layout_width="70dp"
                             android:layout_height="70dp"
-                            android:visibility="gone"/>
+                            android:visibility="gone"
+                            android:onClick="stopRecording"/>
                     </LinearLayout>
                 </RelativeLayout>
             </LinearLayout>
