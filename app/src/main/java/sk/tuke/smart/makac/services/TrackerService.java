@@ -11,33 +11,65 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import java.util.ArrayList;
 
+import sk.tuke.smart.makac.StopwatchActivity;
+import sk.tuke.smart.makac.helpers.IntentCommands;
+
 public class TrackerService extends Service implements LocationListener {
-    private int state, calories, sportActivity;
+    private int state;
+    private int calories;
+    private int sportActivity;
     private long duration;
-    private double distance, pace;
+    private double distance;
+    private double pace;
     private ArrayList<Location> positionList;
     private ArrayList<Integer> speedList;
 
+    private Thread intervalThread;
     private LocationManager locationManager;
 
-    private final String ACTION_TICK = "sk.tuke.smart.makac.TICK";
+    private TrackerService trackerService;
+    private final String TAG = "TrackerService";
 
     @Override
     public void onCreate() {
         super.onCreate();
+        trackerService = this;
+
+        // REQUEST LOCATION UPDATES
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10, this);
+
+        // CREATE THREAD FOR 1S INTERVAL
+        intervalThread = new Thread() {
+            @Override
+            public void run() {
+                super.run();
+
+                try {
+                    Thread.sleep(1000);
+                    Intent intent = new Intent(getApplicationContext(), StopwatchActivity.class);
+                    intent.setAction(IntentCommands.ACTION_TICK);
+                    sendBroadcast(intent);
+                }
+                catch(InterruptedException e) {
+                    //
+                }
+            }
+        };
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG, "Service running.");
         if (intent.getAction() != null) {
-            if (intent.getAction().equals("sk.tuke.smart.makac.COMMAND_START") || intent.getAction().equals("sk.tuke.smart.makac.COMMAND_CONTINUE")) {
-//                ACTION_TICK 1s interval broadcast
+            if (intent.getAction().equals(IntentCommands.ACTION_START) || intent.getAction().equals(IntentCommands.ACTION_CONTINUE)) {
+                intervalThread.run();
+                Log.i(TAG, "Interval thread is running.");
             }
         }
 
