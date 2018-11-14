@@ -222,12 +222,11 @@
                         <Button
                             style="?android:attr/buttonBarButtonStyle"
                             android:id="@+id/button_stopwatch_endworkout"
-                            android:background="@drawable/ic_pause_circle_filled_red_24dp"
+                            android:background="@drawable/ic_remove_circle_red_24dp"
                             android:layout_width="70dp"
                             android:text="@string/stopwatch_stop"
                             android:layout_height="70dp"
-                            android:visibility="gone"
-                            android:onClick="stopRecording"/>
+                            android:visibility="gone"/>
                     </LinearLayout>
                 </RelativeLayout>
 
@@ -253,8 +252,7 @@
                             android:background="@drawable/ic_play_circle_filled_green_24dp"
                             android:layout_width="70dp"
                             android:text="@string/stopwatch_start"
-                            android:layout_height="70dp"
-                            android:onClick="toggleRecording"/>
+                            android:layout_height="70dp"/>
                     </LinearLayout>
                 </RelativeLayout>
             </LinearLayout>
