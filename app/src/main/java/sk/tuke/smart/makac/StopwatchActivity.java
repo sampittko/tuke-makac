@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +35,12 @@ public class StopwatchActivity extends AppCompatActivity {
     @BindView(R.id.button_stopwatch_start) public Button startWorkoutButton;
     @BindView(R.id.button_stopwatch_endworkout) public Button endWorkoutButton;
     @BindView(R.id.textview_stopwatch_duration) public TextView durationTextView;
+    @BindView(R.id.textview_stopwatch_distance) public TextView distanceTextView;
+    @BindView(R.id.textview_stopwatch_pace) public TextView paceTextView;
+    @BindView(R.id.textview_stopwatch_calories) public TextView caloriesTextView;
 
-    @BindDrawable(R.drawable.ic_pause_circle_filled_green_24dp) public Drawable pauseDrawable;
-    @BindDrawable(R.drawable.ic_play_circle_filled_green_24dp) public Drawable playDrawable;
+    @BindDrawable(R.drawable.ic_pause_circle_filled_green) public Drawable pauseDrawable;
+    @BindDrawable(R.drawable.ic_play_circle_filled_green) public Drawable playDrawable;
 
     @BindString(R.string.stopwatch_stop) public String stopString;
     @BindString(R.string.stopwatch_continue) public String continueString;
@@ -60,50 +64,63 @@ public class StopwatchActivity extends AppCompatActivity {
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive(Context context, Intent broadcastIntent) {
             try {
-                if (!intent.getAction().equals(IntentHelper.ACTION_TICK)) {
+                if (!broadcastIntent.getAction().equals(IntentHelper.ACTION_TICK)) {
                     Log.e(TAG, "Broadcast intent does not contain accepted action.");
                     return;
                 }
 
                 Log.i(TAG, "Broadcast intent received.");
-                handleBroadcastIntent(intent);
+                renderValues(broadcastIntent);
             }
             catch(NullPointerException e) {
-                Log.e(TAG, "Intent does not have any action inside.");
+                Log.e(TAG, "Broadcast intent does not have any action inside.");
             }
-        }
-
-        private void handleBroadcastIntent(Intent intent) {
-            Log.i(TAG, "Handling intent.");
-            duration = String.valueOf(MainHelper.formatDuration(
-                    intent.getLongExtra(
-                            IntentHelper.DATA_DURATION, 0)
-            ));
-
-            durationTextView.setText(duration);
         }
     };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        stopwatchActivity = this;
-        setContentView(R.layout.activity_stopwatch);
-        createAlertDialog();
-        ButterKnife.bind(this);
 
+        try {
+            checkGPS();
+        }
+        catch(ExceptionInInitializerError e) {
+            finish();
+            return;
+        }
+
+        setContentView(R.layout.activity_stopwatch);
+        ButterKnife.bind(this);
+        stopwatchActivity = this;
+        createAlertDialog();
+
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(IntentHelper.ACTION_TICK);
+    }
+
+    private void checkGPS() throws ExceptionInInitializerError {
+        checkSensorPresence();
+        checkLocationPermissions();
+    }
+
+    private void checkSensorPresence() throws ExceptionInInitializerError {
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS)) {
+            Toast.makeText(this, "Missing GPS sensor in device. Application closing.", Toast.LENGTH_LONG).show();
+            throw new ExceptionInInitializerError();
+        }
+    }
+
+    private void checkLocationPermissions() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},0);
             Log.i(TAG, "Location permissions requested.");
-        } else {
-            Log.i(TAG, "Location permissions OK.");
         }
-
-        intentFilter = new IntentFilter();
-        intentFilter.addAction(IntentHelper.ACTION_TICK);
+        else
+            Log.i(TAG, "Location permissions OK.");
     }
 
     private void createAlertDialog() {
@@ -139,14 +156,6 @@ public class StopwatchActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        registerReceiver(broadcastReceiver, intentFilter);
-
-        Log.i(TAG, "Receiver registered.");
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
         unregisterReceiver(broadcastReceiver);
@@ -154,16 +163,24 @@ public class StopwatchActivity extends AppCompatActivity {
         Log.i(TAG, "Receiver unregistered.");
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(broadcastReceiver, intentFilter);
+
+        Log.i(TAG, "Receiver registered.");
+    }
+
     @OnClick(R.id.button_stopwatch_start)
     public void toggleRecordingHandler(View view) {
-        if (!workoutStarted)
-            toggleRecording(true, true, IntentHelper.ACTION_START, false, true);
-        else {
+        if (workoutStarted) {
             if (workoutPaused)
                 toggleRecording(true, true, IntentHelper.ACTION_CONTINUE, false, false);
             else
                 toggleRecording(false, false, IntentHelper.ACTION_PAUSE, true, false);
         }
+        else
+            toggleRecording(true, true, IntentHelper.ACTION_START, false, true);
     }
 
     private void toggleRecording(boolean useStopString, boolean usePauseDrawable, String intentAction, boolean endWorkoutButtonVisible, boolean changeWorkoutStarted) {
@@ -201,7 +218,50 @@ public class StopwatchActivity extends AppCompatActivity {
     }
 
     private void createNewLocationList() {
+        // TODO add List to ArrayList<List<Location>> after pause
         // finalPositionList.add(new List<Location>());
+    }
+
+    private void renderValues(Intent broadcastIntent) {
+        Log.i(TAG, "Handling broadcast intent.");
+
+        durationRenderer(broadcastIntent);
+        distanceRenderer(broadcastIntent);
+        paceRenderer(broadcastIntent);
+        caloriesRenderer(broadcastIntent);
+
+        Log.i(TAG, "UI updated.");
+    }
+
+    private void durationRenderer(Intent broadcastIntent) {
+        duration = String.valueOf(MainHelper.formatDuration(
+                broadcastIntent.getLongExtra(
+                        IntentHelper.DATA_DURATION, 0)
+        ));
+
+        durationTextView.setText(duration);
+        Log.i(TAG, "Duration value updated.");
+    }
+
+    private void distanceRenderer(Intent broadcastIntent) {
+
+        // TODO distanceRenderer()
+
+        Log.i(TAG, "Distance value updated.");
+    }
+
+    private void paceRenderer(Intent broadcastIntent) {
+
+        // TODO paceRenderer()
+
+        Log.i(TAG, "Pace value updated.");
+    }
+
+    private void caloriesRenderer(Intent broadcastIntent) {
+
+        // TODO caloriesRenderer()
+
+        Log.i(TAG, "Calories value updated.");
     }
 
     @OnClick(R.id.button_stopwatch_endworkout)
@@ -212,3 +272,5 @@ public class StopwatchActivity extends AppCompatActivity {
         Log.i(TAG, "Alert dialog is now visible.");
     }
 }
+
+// TODO Sport activity selection popup menu

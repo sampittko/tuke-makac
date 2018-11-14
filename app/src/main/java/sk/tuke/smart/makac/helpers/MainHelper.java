@@ -1,9 +1,5 @@
 package sk.tuke.smart.makac.helpers;
 
-import java.text.Format;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public final class MainHelper {
     private static final float MpS_TO_MIpH = 2.23694f;
     private static final float KM_TO_MI = 0.62137119223734f;
@@ -14,9 +10,25 @@ public final class MainHelper {
      * @param time - in seconds
      */
     public static String formatDuration(long time) {
-        Date date = new Date(time);
-        Format format = new SimpleDateFormat("HH:mm:ss");
-        return format.format(date);
+        long seconds = time %60;
+        time -= seconds;
+        String zeroSeconds = evaluateZero(seconds);
+
+        long minutesCount = time / 60;
+        long minutes = minutesCount % 60;
+        minutesCount -= minutes;
+        String zeroMinutes = evaluateZero(minutesCount);
+
+        long hoursCount = minutesCount / 60;
+        String zeroHours = evaluateZero(hoursCount);
+
+        return "" + zeroHours + hoursCount + ":" + zeroMinutes + minutes + ":" + zeroSeconds + seconds;
+    }
+
+    private static String evaluateZero(long timeCount) {
+        if (timeCount < 10)
+            return "0";
+        return "";
     }
 
     /**

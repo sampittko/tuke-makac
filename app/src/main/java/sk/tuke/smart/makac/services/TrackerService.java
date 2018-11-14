@@ -1,7 +1,6 @@
 package sk.tuke.smart.makac.services;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -60,11 +59,8 @@ public class TrackerService extends Service implements LocationListener {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10, this);
             Log.i(TAG, "Location updates requested.");
         }
-        else {
+        else
             Log.e(TAG, "Location updates not requested.");
-            Log.e(TAG, "Service cannot be ran.");
-            throw new IllegalStateException();
-        }
     }
 
     @Override
