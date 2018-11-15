@@ -6,6 +6,7 @@ public final class IntentHelper {
     public static final String ACTION_CONTINUE = "sk.tuke.smart.makac.COMMAND_CONTINUE";
     public static final String ACTION_STOP = "sk.tuke.smart.makac.COMMAND_STOP";
     public static final String ACTION_TICK = "sk.tuke.smart.makac.TICK";
+    public static final String ACTION_GPS = "sk.tuke.smart.makac.COMMAND_GPS";
 
     public static final String DATA_SPORT = "SPORT";
     public static final String DATA_DURATION = "DURATION";
@@ -13,6 +14,7 @@ public final class IntentHelper {
     public static final String DATA_PACE = "PACE";
     public static final String DATA_CALORIES = "CALORIES";
     public static final String DATA_POSITIONS = "POSITIONS";
+    public static final String DATA_STATE = "STATE";
 
     public static final int STATE_STOPPED = 1;
     public static final int STATE_RUNNING = 2;

@@ -10,6 +10,9 @@ public final class SportActivities {
      * @return
      */
     public static double getMET(int activityType, Float speed) {
+
+        // TODO getMET()
+
         return 0;
     }
 
@@ -22,6 +25,9 @@ public final class SportActivities {
      * @return
      */
     public static double countCalories(int sportActivity, float weight, List<Float> speedList, double timeFillingSpeedListInHours) {
+
+        // TODO countCalories()
+
         return 0;
     }
 }

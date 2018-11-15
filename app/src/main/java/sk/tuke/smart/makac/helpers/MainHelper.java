@@ -1,5 +1,7 @@
 package sk.tuke.smart.makac.helpers;
 
+import android.util.Log;
+
 public final class MainHelper {
     private static final float MpS_TO_MIpH = 2.23694f;
     private static final float KM_TO_MI = 0.62137119223734f;
@@ -17,7 +19,7 @@ public final class MainHelper {
         long minutesCount = time / 60;
         long minutes = minutesCount % 60;
         minutesCount -= minutes;
-        String zeroMinutes = evaluateZero(minutesCount);
+        String zeroMinutes = evaluateZero(minutes);
 
         long hoursCount = minutesCount / 60;
         String zeroHours = evaluateZero(hoursCount);
@@ -36,7 +38,7 @@ public final class MainHelper {
      */
     public static String formatDistance(double n) {
         double km = n / 1000;
-        return String.valueOf(Math.round(km * 100) / 100);
+        return String.valueOf(Math.round(km * 100) / 100) + "." + String.valueOf(String.valueOf(Math.round(km * 100) % 100));
     }
 
     /**
