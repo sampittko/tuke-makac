@@ -167,13 +167,13 @@ public class StopwatchActivity extends AppCompatActivity {
                         intent.setAction(IntentHelper.ACTION_STOP);
                         startService(intent);
 
-                        intent = new Intent(stopwatchActivity, WorkoutDetailActivity.class);
-                        intent.putExtra(IntentHelper.DATA_SPORT, sportActivity);
-                        intent.putExtra(IntentHelper.DATA_DURATION, duration);
-                        intent.putExtra(IntentHelper.DATA_DISTANCE, distance);
-                        intent.putExtra(IntentHelper.DATA_PACE, pace);
-                        intent.putExtra(IntentHelper.DATA_CALORIES, calories);
-                        intent.putExtra(IntentHelper.DATA_POSITIONS, finalPositionList);
+                        intent = new Intent(stopwatchActivity, WorkoutDetailActivity.class)
+                                .putExtra(IntentHelper.DATA_SPORT, sportActivity)
+                                .putExtra(IntentHelper.DATA_DURATION, duration)
+                                .putExtra(IntentHelper.DATA_DISTANCE, distance)
+                                .putExtra(IntentHelper.DATA_PACE, pace)
+                                .putExtra(IntentHelper.DATA_CALORIES, calories)
+                                .putExtra(IntentHelper.DATA_POSITIONS, finalPositionList);
                         startActivity(intent);
                         dialogInterface.dismiss();
                     }
