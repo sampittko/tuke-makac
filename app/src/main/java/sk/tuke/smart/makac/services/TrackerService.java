@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -15,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import sk.tuke.smart.makac.exceptions.InsufficientDistanceException;
 import sk.tuke.smart.makac.exceptions.NotEnoughLocationsException;
@@ -22,6 +24,7 @@ import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.SportActivities;
 
 public class TrackerService extends Service implements LocationListener {
+    private final float WEIGHT = 80;
     private int state = IntentHelper.STATE_STOPPED;
     private int sportActivity;
     private double calories;
@@ -43,13 +46,7 @@ public class TrackerService extends Service implements LocationListener {
     private int lastLocationUpdateBefore = 0;
     private boolean locationUpdateReceived;
 
-    /**
-     *
-     */
     private Runnable runnable = new Runnable() {
-        /**
-         *
-         */
         @Override
         public void run() {
             duration += 1;
@@ -64,24 +61,18 @@ public class TrackerService extends Service implements LocationListener {
             handler.postDelayed(this, 1000);
         }
 
-        /**
-         * @return
-         */
         private Intent createBroadcastIntent() {
             return new Intent().setAction(IntentHelper.ACTION_TICK)
                     .putExtra(IntentHelper.DATA_DURATION, duration)
                     .putExtra(IntentHelper.DATA_DISTANCE, distance)
                     .putExtra(IntentHelper.DATA_STATE, state)
-                    .putExtra(IntentHelper.DATA_POSITIONS, positionList) // TODO NullPointerException
+                    .putExtra(IntentHelper.DATA_POSITIONS, positionList)
                     .putExtra(IntentHelper.DATA_SPORT, sportActivity)
                     .putExtra(IntentHelper.DATA_PACE, pace)
                     .putExtra(IntentHelper.DATA_CALORIES, calories);
         }
     };
 
-    /**
-     *
-     */
     @Override
     public void onCreate() {
         super.onCreate();
@@ -89,12 +80,6 @@ public class TrackerService extends Service implements LocationListener {
         Log.i(TAG, "Service created.");
     }
 
-    /**
-     * @param intent
-     * @param flags
-     * @param startId
-     * @return
-     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Service is running.");
@@ -105,19 +90,17 @@ public class TrackerService extends Service implements LocationListener {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    /**
-     * @param intent
-     */
     private void handleIntent(Intent intent) {
         if (intent.getAction() != null) {
             switch (intent.getAction()) {
                 case IntentHelper.ACTION_START:
-                    Log.i(TAG, "Starting service.");
                     handler.postDelayed(runnable, 1000);
                     state = IntentHelper.STATE_RUNNING;
+
+                    Log.i(TAG, "Service started.");
                     break;
+
                 case IntentHelper.ACTION_CONTINUE:
-                    Log.i(TAG, "Continuing service.");
                     handler.postDelayed(runnable, 1000);
                     positionList = new ArrayList<>();
                     state = IntentHelper.STATE_CONTINUE;
@@ -126,25 +109,27 @@ public class TrackerService extends Service implements LocationListener {
                     broadcastIntent.setAction(IntentHelper.ACTION_GPS);
                     sendBroadcast(broadcastIntent);
                     Log.i(TAG, "Broadcast intent with action GPS sent.");
+
+                    Log.i(TAG, "Service is active again.");
                     break;
+
                 case IntentHelper.ACTION_PAUSE:
-                    Log.i(TAG, "Pausing service.");
                     handler.removeCallbacks(runnable);
                     state = IntentHelper.STATE_PAUSED;
+
+                    Log.i(TAG, "Service paused.");
                     break;
+
                 case IntentHelper.ACTION_STOP:
-                    Log.i(TAG, "Stopping service.");
                     handler.removeCallbacks(runnable);
                     state = IntentHelper.STATE_STOPPED;
+
+                    Log.i(TAG, "Stopping service.");
                     stopSelf();
-                    break;
             }
         }
     }
 
-    /**
-     *
-     */
     private void enableLocationUpdates() {
         if (state == IntentHelper.STATE_RUNNING || state == IntentHelper.STATE_CONTINUE) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
@@ -159,9 +144,6 @@ public class TrackerService extends Service implements LocationListener {
             Log.i(TAG, "Location updates not requested due to different state.");
     }
 
-    /**
-     *
-     */
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -170,31 +152,29 @@ public class TrackerService extends Service implements LocationListener {
         Log.i(TAG, "Service was destroyed.");
     }
 
-    /**
-     * @param intent
-     * @return
-     */
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+        return new Binder();
     }
 
-    /**
-     * @param location
-     */
     @Override
     public void onLocationChanged(Location location) {
         Log.i(TAG, "Location has changed.");
 
         if (state != IntentHelper.STATE_PAUSED) {
+            location.setTime(new Date().getTime());
             positionList.add(location);
 
             try {
                 countDistance();
                 countSpeed();
                 countPace();
-//                calories = SportActivities.countCalories(sportActivity, IntentHelper.DEFAULT_WEIGHT, speedList, null);
+                if (speedList.size() > 1) {
+                    Log.i(TAG, "Counting calories.");
+                    calories = SportActivities.countCalories(sportActivity, WEIGHT, speedList, duration / 60 / 60);
+                }
+                else
+                    Log.i(TAG, "Skipping calories calculation.");
             }
             catch (InsufficientDistanceException ide) {
                 Log.w(TAG, "Location not updated because distance between last 2 locations was less than 2 meters.");
@@ -204,17 +184,13 @@ public class TrackerService extends Service implements LocationListener {
             }
             catch (NotEnoughLocationsException nele) {
                 locationUpdateReceived = false;
-                Log.w(TAG, "Location not updated because there are not enough locations to count from.");
+                Log.w(TAG, "Distance not updated because there are not enough locations to count from.");
             }
         }
         else
             Log.i(TAG, "Location ignored because of the current state.");
     }
 
-    /**
-     * @throws InsufficientDistanceException
-     * @throws NotEnoughLocationsException
-     */
     private void countDistance() throws InsufficientDistanceException, NotEnoughLocationsException {
         if (positionList.size() > 1) {
             double newDistance = calculateNewDistance();
@@ -225,9 +201,6 @@ public class TrackerService extends Service implements LocationListener {
         throw new NotEnoughLocationsException();
     }
 
-    /**
-     * @return
-     */
     private float calculateNewDistance() {
         Location currentLocation = positionList.get(positionList.size() - 1);
         Location lastLocation = positionList.get(positionList.size() - 2);
@@ -241,10 +214,6 @@ public class TrackerService extends Service implements LocationListener {
         return lastLocation.distanceTo(currentLocation);
     }
 
-    /**
-     * @param newDistance
-     * @throws InsufficientDistanceException
-     */
     private void validateNewDistance(double newDistance) throws InsufficientDistanceException {
         if (newDistance >= 2) {
             distance += newDistance;
@@ -256,18 +225,12 @@ public class TrackerService extends Service implements LocationListener {
         throw new InsufficientDistanceException();
     }
 
-    /**
-     *
-     */
     private void countSpeed() {
         speed = (float)distance / (float)duration;
         speedList.add(speed);
         Log.i(TAG, "Speed counted. (" + speed + "m/s)");
     }
 
-    /**
-     *
-     */
     private void verifyPace() {
         if (!locationUpdateReceived && lastLocationUpdateBefore > PACE_UPDATE_LIMIT) {
             pace = 0.0;
@@ -280,64 +243,38 @@ public class TrackerService extends Service implements LocationListener {
         }
     }
 
-    /**
-     *
-     */
     private void countPace() {
         pace = speed * 60 / 1000;
         Log.i(TAG, "Pace counted. (" + pace + "km/min)");
     }
 
-    /**
-     * @param s
-     * @param i
-     * @param bundle
-     */
     @Override
     public void onStatusChanged(String s, int i, Bundle bundle) {
 
     }
 
-    /**
-     * @param s
-     */
     @Override
     public void onProviderEnabled(String s) {
 
     }
 
-    /**
-     * @param s
-     */
     @Override
     public void onProviderDisabled(String s) {
 
     }
 
-    /**
-     * @return
-     */
     public int getState() {
         return state;
     }
 
-    /**
-     * @return
-     */
     public long getDuration() {
         return duration;
     }
 
-    /**
-     * @return
-     */
     public double getDistance() {
         return distance;
     }
 
-    /**
-     * @return
-     */
     public double getPace() {
         return pace;
     }

@@ -58,23 +58,23 @@ public class StopwatchActivity extends AppCompatActivity {
     private String pace;
     private double calories;
 
+    private ArrayList<Location> latestPositionList = new ArrayList<>();
     private ArrayList<List<Location>> finalPositionList = new ArrayList<>();
 
     private IntentFilter intentFilter;
     private StopwatchActivity stopwatchActivity;
     private final String TAG = "StopwatchActivity";
 
-    /**
-     *
-     */
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent broadcastIntent) {
             try {
-                if (broadcastIntent.getAction().equals(IntentHelper.ACTION_TICK))
+                if (broadcastIntent.getAction().equals(IntentHelper.ACTION_TICK)) {
                     renderValues(broadcastIntent);
+                    verifyLatestPositionList(broadcastIntent.<Location>getParcelableArrayListExtra(IntentHelper.DATA_POSITIONS));
+                }
                 else if (broadcastIntent.getAction().equals(IntentHelper.ACTION_GPS))
-                    createNewLocationsList(broadcastIntent);
+                    saveLatestPositionList();
                 else
                     Log.e(TAG, "Broadcast intent does not contain accepted action.");
             }
@@ -84,9 +84,6 @@ public class StopwatchActivity extends AppCompatActivity {
         }
     };
 
-    /**
-     * @param savedInstanceState
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,17 +111,11 @@ public class StopwatchActivity extends AppCompatActivity {
         intentFilter.addAction(IntentHelper.ACTION_GPS);
     }
 
-    /**
-     * @throws ExceptionInInitializerError
-     */
     private void checkGPS() throws SensorNotPresentException, InterruptedException {
         checkSensorPresence();
         checkLocationPermissions();
     }
 
-    /**
-     * @throws SensorNotPresentException
-     */
     private void checkSensorPresence() throws SensorNotPresentException {
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS)) {
             Toast.makeText(this, "Missing GPS sensor in device. Application closing.", Toast.LENGTH_LONG).show();
@@ -132,9 +123,6 @@ public class StopwatchActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     *
-     */
     private void checkLocationPermissions() throws InterruptedException {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
@@ -151,9 +139,6 @@ public class StopwatchActivity extends AppCompatActivity {
         Log.i(TAG, "Location permissions OK.");
     }
 
-    /**
-     *
-     */
     private void createAlertDialog() {
         alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Stop workout")
@@ -186,9 +171,6 @@ public class StopwatchActivity extends AppCompatActivity {
                 });
     }
 
-    /**
-     *
-     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -197,9 +179,6 @@ public class StopwatchActivity extends AppCompatActivity {
         Log.i(TAG, "Receiver unregistered.");
     }
 
-    /**
-     *
-     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -208,9 +187,6 @@ public class StopwatchActivity extends AppCompatActivity {
         Log.i(TAG, "Receiver registered.");
     }
 
-    /**
-     * @param view
-     */
     @OnClick(R.id.button_stopwatch_start)
     public void toggleRecordingHandler(View view) {
         if (workoutStarted) {
@@ -223,13 +199,6 @@ public class StopwatchActivity extends AppCompatActivity {
             toggleRecording(true, true, IntentHelper.ACTION_START, false, true);
     }
 
-    /**
-     * @param useStopString
-     * @param usePauseDrawable
-     * @param intentAction
-     * @param endWorkoutButtonVisible
-     * @param changeWorkoutStarted
-     */
     private void toggleRecording(boolean useStopString, boolean usePauseDrawable, String intentAction, boolean endWorkoutButtonVisible, boolean changeWorkoutStarted) {
         // START SERVICE WITH CORRESPONDING ACTION
         Intent intent = new Intent(this, TrackerService.class);
@@ -261,40 +230,30 @@ public class StopwatchActivity extends AppCompatActivity {
             workoutPaused = !workoutPaused;
     }
 
-    /**
-     * @param broadcastIntent
-     */
     private void renderValues(Intent broadcastIntent) {
         Log.i(TAG, "Broadcast intent received with action TICK.");
 
-        durationRenderer(broadcastIntent);
-        distanceRenderer(broadcastIntent);
-        paceRenderer(broadcastIntent);
-        caloriesRenderer(broadcastIntent);
+        durationRenderer(broadcastIntent.getLongExtra(
+                IntentHelper.DATA_DURATION, 0));
+        distanceRenderer(broadcastIntent.getDoubleExtra(
+                IntentHelper.DATA_DISTANCE, 0));
+        paceRenderer(broadcastIntent.getDoubleExtra(
+                IntentHelper.DATA_PACE, 0));
+        caloriesRenderer(broadcastIntent.getDoubleExtra(
+                IntentHelper.DATA_CALORIES, 0));
 
         Log.i(TAG, "UI updated.");
     }
 
-    /**
-     * @param broadcastIntent
-     */
-    private void durationRenderer(Intent broadcastIntent) {
-        duration = String.valueOf(MainHelper.formatDuration(
-                broadcastIntent.getLongExtra(
-                        IntentHelper.DATA_DURATION, 0)
-        ));
+    private void durationRenderer(long broadcastIntentDuration) {
+        duration = String.valueOf(MainHelper.formatDuration(broadcastIntentDuration));
 
         durationTextView.setText(duration);
-        Log.i(TAG, "Duration value updated. (" + duration + "s)");
+        Log.i(TAG, "Duration value updated. (" + duration + ")");
     }
 
-    /**
-     * @param broadcastIntent
-     */
-    private void distanceRenderer(Intent broadcastIntent) {
-        String newDistance = MainHelper.formatDistance(
-                broadcastIntent.getDoubleExtra(
-                        IntentHelper.DATA_DISTANCE, 0));
+    private void distanceRenderer(double broadcastIntentDistance) {
+        String newDistance = MainHelper.formatDistance(broadcastIntentDistance);
 
         if (!newDistance.equals(distance)) {
             distanceTextView.setText(newDistance);
@@ -305,13 +264,8 @@ public class StopwatchActivity extends AppCompatActivity {
             Log.i(TAG, "Distance did not need an update.");
     }
 
-    /**
-     * @param broadcastIntent
-     */
-    private void paceRenderer(Intent broadcastIntent) {
-        String newPace = MainHelper.formatPace(
-                broadcastIntent.getDoubleExtra(
-                        IntentHelper.DATA_PACE, 0));
+    private void paceRenderer(double broadcastIntentPace) {
+        String newPace = MainHelper.formatPace(broadcastIntentPace);
 
         if (!newPace.equals(pace)) {
             paceTextView.setText(newPace);
@@ -322,19 +276,13 @@ public class StopwatchActivity extends AppCompatActivity {
             Log.i(TAG, "Pace did not need an update.");
     }
 
-    /**
-     * @param broadcastIntent
-     */
-    private void caloriesRenderer(Intent broadcastIntent) {
+    private void caloriesRenderer(double broadcastIntentCalories) {
 
         // TODO caloriesRenderer()
 
         Log.i(TAG, "Calories value updated.");
     }
 
-    /**
-     * @param view
-     */
     @OnClick(R.id.button_stopwatch_endworkout)
     public void stopRecordingHandler(View view) {
         alertDialog = alertDialogBuilder.create();
@@ -343,16 +291,31 @@ public class StopwatchActivity extends AppCompatActivity {
         Log.i(TAG, "Alert dialog is now visible.");
     }
 
-    /**
-     *
-     */
-    private void createNewLocationsList(Intent broadcastIntent) {
+    private void verifyLatestPositionList(List<Location> newPositionList) {
+        if (newPositionList.size() == 0) {
+            Log.i(TAG, "There are no locations inside the list.");
+            return;
+        }
+
+        Location newPositionListNewestLocation = newPositionList.get(newPositionList.size() - 1);
+        Location latestPositionListNewestLocation = latestPositionList.size() == 0 ? new Location("") : latestPositionList.get(latestPositionList.size() - 1);
+
+        if (newPositionListNewestLocation.getTime() != latestPositionListNewestLocation.getTime()) {
+            latestPositionList.add(newPositionListNewestLocation);
+            Log.i(TAG, "Position list updated.");
+            return;
+        }
+
+        Log.i(TAG, "Position list did not need an update.");
+    }
+
+    private void saveLatestPositionList() {
         Log.i(TAG, "Broadcast intent received with action GPS.");
 
-        List<Location> locationsList = broadcastIntent.getParcelableArrayListExtra(IntentHelper.DATA_POSITIONS);
-        finalPositionList.add(locationsList);
-        for (List<Location> list : finalPositionList)
-            Log.i(TAG, list.toString());
+        if (!latestPositionList.isEmpty()) {
+            finalPositionList.add(latestPositionList);
+            latestPositionList = new ArrayList<>();
+        }
 
         Log.i(TAG, "Location list saved after unpausing.");
     }

@@ -14,7 +14,7 @@
         <string name="textview_stopwatch_unitpace">km/min</string>
         <!-- CALORIES -->
         <string name="textview_stopwatch_labelcalories">Calories</string>
-        <string name="textview_stopwatch_calories">0</string>
+        <string name="textview_stopwatch_calories">0.0</string>
         <string name="textview_stopwatch_unitcalories">kcal</string>
         <!-- SELECT SPORT -->
         <string name="textview_stopwatch_sportlabel">Sport</string>

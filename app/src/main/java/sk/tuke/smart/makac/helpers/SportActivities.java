@@ -1,5 +1,7 @@
 package sk.tuke.smart.makac.helpers;
 
+import android.util.Log;
+
 import java.util.List;
 
 public final class SportActivities {
