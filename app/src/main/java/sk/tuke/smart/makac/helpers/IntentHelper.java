@@ -20,4 +20,8 @@ public final class IntentHelper {
     public static final int STATE_RUNNING = 2;
     public static final int STATE_PAUSED = 3;
     public static final int STATE_CONTINUE = 4;
+
+    public static final int ACTIVITY_RUNNING = 0;
+    public static final int ACTIVITY_WALKING = 1;
+    public static final int ACTIVITY_CYCLING = 2;
 }

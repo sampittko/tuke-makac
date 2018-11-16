@@ -52,7 +52,7 @@ public class StopwatchActivity extends AppCompatActivity {
     private AlertDialog.Builder alertDialogBuilder;
     private AlertDialog alertDialog;
 
-    private int sportActivity;
+    private int sportActivity = IntentHelper.ACTIVITY_RUNNING;
     private String duration;
     private String distance;
     private String pace;
@@ -203,8 +203,6 @@ public class StopwatchActivity extends AppCompatActivity {
         // START SERVICE WITH CORRESPONDING ACTION
         Intent intent = new Intent(this, TrackerService.class);
         intent.setAction(intentAction);
-//        if (intentAction.equals(IntentHelper.ACTION_CONTINUE) && !latestPositionList.isEmpty())
-//            intent.putExtra(IntentHelper.DATA_POSITIONS, latestPositionList.get(latestPositionList.size() - 1));
         startService(intent);
 
         // CHANGE BUTTON STRING
@@ -322,3 +320,5 @@ public class StopwatchActivity extends AppCompatActivity {
         Log.i(TAG, "Location list saved after unpausing.");
     }
 }
+
+// TODO choose sport activity

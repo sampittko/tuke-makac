@@ -36,14 +36,14 @@ public final class MainHelper {
      */
     public static String formatDistance(double n) {
         double km = n / 1000;
-        return String.valueOf(Math.round(km * 100) / 100) + "." + String.valueOf(String.valueOf(Math.round(km * 100) % 100));
+        return String.valueOf(Math.round(km * 100) / 100) + "." + String.valueOf(Math.round(km * 100) % 100);
     }
 
     /**
      * round number to 2 decimal places and return as string
      */
     public static String formatPace(double n) {
-        return String.valueOf(Math.round(n * 100) / 100) + "." + String.valueOf(String.valueOf(Math.round(n * 100) % 100));
+        return String.valueOf(Math.round(n * 100) / 100) + "." + String.valueOf(Math.round(n * 100) % 100);
     }
 
     /**

@@ -26,7 +26,7 @@ import sk.tuke.smart.makac.helpers.SportActivities;
 public class TrackerService extends Service implements LocationListener {
     private final float WEIGHT = 80;
     private int state = IntentHelper.STATE_STOPPED;
-    private int sportActivity;
+    private int sportActivity = IntentHelper.ACTIVITY_RUNNING;
     private double calories;
     private long duration;
     private double distance;
@@ -105,7 +105,6 @@ public class TrackerService extends Service implements LocationListener {
 
                 case IntentHelper.ACTION_CONTINUE:
                     handler.postDelayed(runnable, 1000);
-//                    previousPosition = intent.getParcelableExtra(IntentHelper.DATA_POSITIONS);
                     previousPosition = positionList.isEmpty() ? null : positionList.get(positionList.size() - 1);
                     positionList = new ArrayList<>();
                     hasContinued = true;
@@ -226,11 +225,6 @@ public class TrackerService extends Service implements LocationListener {
     }
 
     private float calculateNewDistance(Location a, Location b) {
-//        a.setLatitude(a.getLatitude());
-//        a.setLongitude(a.getLongitude());
-//
-//        b.setLatitude(b.getLatitude());
-//        b.setLongitude(b.getLongitude());
         return a.distanceTo(b);
     }
 
