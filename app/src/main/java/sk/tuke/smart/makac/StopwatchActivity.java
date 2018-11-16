@@ -55,7 +55,7 @@ public class StopwatchActivity extends AppCompatActivity {
     private int sportActivity;
     private String duration;
     private String distance;
-    private double pace;
+    private String pace;
     private double calories;
 
     private ArrayList<List<Location>> finalPositionList = new ArrayList<>();
@@ -142,11 +142,11 @@ public class StopwatchActivity extends AppCompatActivity {
             Log.i(TAG, "Location permissions requested.");
         }
 
-//        TODO check if permissions were granted, otherwise take required actions
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED ||
-//                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-//            throw new InterruptedException();
-//        }
+            // TODO check if permissions were granted, otherwise take required actions
+            // if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED ||
+            // ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            // throw new InterruptedException();
+            // }
 
         Log.i(TAG, "Location permissions OK.");
     }
@@ -285,7 +285,7 @@ public class StopwatchActivity extends AppCompatActivity {
         ));
 
         durationTextView.setText(duration);
-        Log.i(TAG, "Duration value updated. (" + duration + ")");
+        Log.i(TAG, "Duration value updated. (" + duration + "s)");
     }
 
     /**
@@ -299,20 +299,27 @@ public class StopwatchActivity extends AppCompatActivity {
         if (!newDistance.equals(distance)) {
             distanceTextView.setText(newDistance);
             distance = newDistance;
-            Log.i(TAG, "Distance value updated. (" + distance + ")");
+            Log.i(TAG, "Distance value updated. (" + distance + "km)");
         }
         else
-            Log.i(TAG, "Distance did not need update.");
+            Log.i(TAG, "Distance did not need an update.");
     }
 
     /**
      * @param broadcastIntent
      */
     private void paceRenderer(Intent broadcastIntent) {
+        String newPace = MainHelper.formatPace(
+                broadcastIntent.getDoubleExtra(
+                        IntentHelper.DATA_PACE, 0));
 
-        // TODO paceRenderer()
-
-        Log.i(TAG, "Pace value updated.");
+        if (!newPace.equals(pace)) {
+            paceTextView.setText(newPace);
+            pace = newPace;
+            Log.i(TAG, "Pace value updated. (" + pace + "km/min)");
+        }
+        else
+            Log.i(TAG, "Pace did not need an update.");
     }
 
     /**
@@ -350,5 +357,3 @@ public class StopwatchActivity extends AppCompatActivity {
         Log.i(TAG, "Location list saved after unpausing.");
     }
 }
-
-// TODO Sport activity selection popup menu

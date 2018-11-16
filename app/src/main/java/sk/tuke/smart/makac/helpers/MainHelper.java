@@ -1,7 +1,5 @@
 package sk.tuke.smart.makac.helpers;
 
-import android.util.Log;
-
 public final class MainHelper {
     private static final float MpS_TO_MIpH = 2.23694f;
     private static final float KM_TO_MI = 0.62137119223734f;
@@ -45,7 +43,7 @@ public final class MainHelper {
      * round number to 2 decimal places and return as string
      */
     public static String formatPace(double n) {
-        return String.valueOf(Math.round(n * 100) / 100);
+        return String.valueOf(Math.round(n * 100) / 100) + "." + String.valueOf(String.valueOf(Math.round(n * 100) % 100));
     }
 
     /**

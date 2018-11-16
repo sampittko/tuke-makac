@@ -6,12 +6,12 @@
         <string name="textview_stopwatch_duration">00:00:00</string>
         <!-- DISTANCE -->
         <string name="textview_stopwatch_labeldistance">Distance</string>
-        <string name="textview_stopwatch_distance">0</string>
+        <string name="textview_stopwatch_distance">0.0</string>
         <string name="textview_stopwatch_distanceunit">km</string>
         <!-- PACE -->
         <string name="textview_stopwatch_labelpace">Pace</string>
-        <string name="textview_stopwatch_pace">0</string>
-        <string name="textview_stopwatch_unitpace">min/km</string>
+        <string name="textview_stopwatch_pace">0.0</string>
+        <string name="textview_stopwatch_unitpace">km/min</string>
         <!-- CALORIES -->
         <string name="textview_stopwatch_labelcalories">Calories</string>
         <string name="textview_stopwatch_calories">0</string>
@@ -48,7 +48,7 @@
             <string name="textview_workoutdetail_valuedistance">0.0 km</string>
             <!-- AVG. PACE -->
             <string name="textview_workoutdetail_labelavgpace">Avg. pace</string>
-            <string name="textview_workoutdetail_valueavgpace">0.0 min/km</string>
+            <string name="textview_workoutdetail_valueavgpace">0.0 km/min</string>
         <!-- SOCIAL SHARE -->
         <string name="textview_workoutdetail_labelsocialshare">Social share</string>
 </resources>

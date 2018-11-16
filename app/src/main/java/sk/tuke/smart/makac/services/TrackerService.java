@@ -23,17 +23,20 @@ import sk.tuke.smart.makac.helpers.SportActivities;
 
 public class TrackerService extends Service implements LocationListener {
     private int state = IntentHelper.STATE_STOPPED;
-    private int calories = 0;
-    private int sportActivity = IntentHelper.ACTIVITY_RUNNING;
-    private long duration = 0;
-    private double distance = 0.0;
-    private double pace = 0.0;
+    private int sportActivity;
+    private double calories;
+    private long duration;
+    private double distance;
+    private double pace;
+    private Float speed;
+
     private ArrayList<Location> positionList = new ArrayList<>();
-    private ArrayList<Integer> speedList = new ArrayList<>();
+    private ArrayList<Float> speedList = new ArrayList<>();
 
     private LocationManager locationManager;
     private Handler handler = new Handler();
     private final String TAG = "TrackerService";
+
     private final int MIN_TIME_BTW_UPDATES = 3000;
     private final int MIN_DISTANCE = 10;
     private final int PACE_UPDATE_LIMIT = MIN_TIME_BTW_UPDATES / 1000 * 2;
@@ -50,6 +53,7 @@ public class TrackerService extends Service implements LocationListener {
         @Override
         public void run() {
             duration += 1;
+            lastLocationUpdateBefore += 1;
 
             verifyPace();
 
@@ -187,10 +191,10 @@ public class TrackerService extends Service implements LocationListener {
             positionList.add(location);
 
             try {
-                double newDistance = countDistance();
-                countSpeed(newDistance);
+                countDistance();
+                countSpeed();
                 countPace();
-//                SportActivities.countCalories(null, null, null, null);
+//                calories = SportActivities.countCalories(sportActivity, IntentHelper.DEFAULT_WEIGHT, speedList, null);
             }
             catch (InsufficientDistanceException ide) {
                 Log.w(TAG, "Location not updated because distance between last 2 locations was less than 2 meters.");
@@ -211,11 +215,11 @@ public class TrackerService extends Service implements LocationListener {
      * @throws InsufficientDistanceException
      * @throws NotEnoughLocationsException
      */
-    private double countDistance() throws InsufficientDistanceException, NotEnoughLocationsException {
+    private void countDistance() throws InsufficientDistanceException, NotEnoughLocationsException {
         if (positionList.size() > 1) {
             double newDistance = calculateNewDistance();
             validateNewDistance(newDistance);
-            return newDistance;
+            return;
         }
 
         throw new NotEnoughLocationsException();
@@ -245,8 +249,7 @@ public class TrackerService extends Service implements LocationListener {
         if (newDistance >= 2) {
             distance += newDistance;
             locationUpdateReceived = true;
-            lastLocationUpdateBefore = 0;
-            Log.i(TAG, "Distance counted. (" + distance + ")");
+            Log.i(TAG, "Distance counted. (" + distance + "m)");
             return;
         }
 
@@ -256,23 +259,24 @@ public class TrackerService extends Service implements LocationListener {
     /**
      *
      */
-    private void countSpeed(double newDistance) {
-
-        // TODO countSpeed()
-
+    private void countSpeed() {
+        speed = (float)distance / (float)duration;
+        speedList.add(speed);
+        Log.i(TAG, "Speed counted. (" + speed + "m/s)");
     }
 
     /**
-     * TODO correct pace verification
+     *
      */
     private void verifyPace() {
         if (!locationUpdateReceived && lastLocationUpdateBefore > PACE_UPDATE_LIMIT) {
-            Log.e(TAG, "Pace is 0.");
             pace = 0.0;
+            Log.i(TAG, "Pace set to 0.0km/h due to overcome time limit.");
         }
-        else {
-
-            lastLocationUpdateBefore += 1;
+        else if (locationUpdateReceived) {
+            locationUpdateReceived = false;
+            lastLocationUpdateBefore = 0;
+            Log.i(TAG, "Location received. Variables reset.");
         }
     }
 
@@ -280,10 +284,8 @@ public class TrackerService extends Service implements LocationListener {
      *
      */
     private void countPace() {
-
-        // TODO countPace()
-
-        Log.i(TAG, "Pace counted.");
+        pace = speed * 60 / 1000;
+        Log.i(TAG, "Pace counted. (" + pace + "km/min)");
     }
 
     /**
