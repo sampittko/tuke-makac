@@ -203,6 +203,8 @@ public class StopwatchActivity extends AppCompatActivity {
         // START SERVICE WITH CORRESPONDING ACTION
         Intent intent = new Intent(this, TrackerService.class);
         intent.setAction(intentAction);
+//        if (intentAction.equals(IntentHelper.ACTION_CONTINUE) && !latestPositionList.isEmpty())
+//            intent.putExtra(IntentHelper.DATA_POSITIONS, latestPositionList.get(latestPositionList.size() - 1));
         startService(intent);
 
         // CHANGE BUTTON STRING

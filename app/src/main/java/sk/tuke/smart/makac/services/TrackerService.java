@@ -33,6 +33,9 @@ public class TrackerService extends Service implements LocationListener {
     private double pace;
     private Float speed;
 
+    private boolean hasContinued;
+    private Location previousPosition;
+
     private ArrayList<Location> positionList = new ArrayList<>();
     private ArrayList<Float> speedList = new ArrayList<>();
 
@@ -102,7 +105,10 @@ public class TrackerService extends Service implements LocationListener {
 
                 case IntentHelper.ACTION_CONTINUE:
                     handler.postDelayed(runnable, 1000);
+//                    previousPosition = intent.getParcelableExtra(IntentHelper.DATA_POSITIONS);
+                    previousPosition = positionList.isEmpty() ? null : positionList.get(positionList.size() - 1);
                     positionList = new ArrayList<>();
+                    hasContinued = true;
                     state = IntentHelper.STATE_CONTINUE;
 
                     Intent broadcastIntent = new Intent();
@@ -193,25 +199,19 @@ public class TrackerService extends Service implements LocationListener {
 
     private void countDistance() throws InsufficientDistanceException, NotEnoughLocationsException {
         if (positionList.size() > 1) {
-            double newDistance = calculateNewDistance();
+            double newDistance = calculateNewDistance(positionList.get(positionList.size() - 1), positionList.get(positionList.size() - 2));
             validateNewDistance(newDistance);
             return;
         }
+        else if (hasContinued) {
+            if (previousPosition != null)
+                distance += additionalDistanceAfterContinue();
+            else
+                Log.i(TAG, "There was no previous position. Skipping additional distance.");
+            hasContinued = false;
+        }
 
         throw new NotEnoughLocationsException();
-    }
-
-    private float calculateNewDistance() {
-        Location currentLocation = positionList.get(positionList.size() - 1);
-        Location lastLocation = positionList.get(positionList.size() - 2);
-
-        lastLocation.setLatitude(lastLocation.getLatitude());
-        lastLocation.setLongitude(lastLocation.getLongitude());
-
-        currentLocation.setLatitude(currentLocation.getLatitude());
-        currentLocation.setLongitude(currentLocation.getLongitude());
-
-        return lastLocation.distanceTo(currentLocation);
     }
 
     private void validateNewDistance(double newDistance) throws InsufficientDistanceException {
@@ -223,6 +223,26 @@ public class TrackerService extends Service implements LocationListener {
         }
 
         throw new InsufficientDistanceException();
+    }
+
+    private float calculateNewDistance(Location a, Location b) {
+//        a.setLatitude(a.getLatitude());
+//        a.setLongitude(a.getLongitude());
+//
+//        b.setLatitude(b.getLatitude());
+//        b.setLongitude(b.getLongitude());
+        return a.distanceTo(b);
+    }
+
+    private double additionalDistanceAfterContinue() {
+        double newDistance = calculateNewDistance(positionList.get(positionList.size() - 1), previousPosition);
+        if (newDistance <= 100) {
+            Log.i(TAG, "Distance was added after unpausing.");
+            return newDistance;
+        }
+
+        Log.i(TAG, "Distance is too big to be added after unpausing.");
+        return 0;
     }
 
     private void countSpeed() {
@@ -250,6 +270,8 @@ public class TrackerService extends Service implements LocationListener {
 
     @Override
     public void onStatusChanged(String s, int i, Bundle bundle) {
+
+        // TODO onStatusChanged()
 
     }
 
