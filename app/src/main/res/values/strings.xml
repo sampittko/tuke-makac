@@ -10,11 +10,11 @@
         <string name="textview_stopwatch_distanceunit">km</string>
         <!-- PACE -->
         <string name="textview_stopwatch_labelpace">Pace</string>
-        <string name="textview_stopwatch_pace">0.0</string>
-        <string name="textview_stopwatch_unitpace">km/min</string>
+        <string name="textview_stopwatch_pace">00:00</string>
+        <string name="textview_stopwatch_unitpace">min/km</string>
         <!-- CALORIES -->
         <string name="textview_stopwatch_labelcalories">Calories</string>
-        <string name="textview_stopwatch_calories">0.0</string>
+        <string name="textview_stopwatch_calories">0</string>
         <string name="textview_stopwatch_unitcalories">kcal</string>
         <!-- SELECT SPORT -->
         <string name="textview_stopwatch_sportlabel">Sport</string>
@@ -30,7 +30,7 @@
         <!-- Map -->
         <string name="button_workoutdetail_labelshowmap">Map</string>
         <!-- MY WORKOUT -->
-        <string name="textview_workoutdetail_workouttitle">My Workout</string>
+        <string name="workoutdetail_workoutname">My Workout</string>
             <!-- SPORT -->
             <string name="textview_workoutdetail_labelsport">Sport</string>
             <string name="textview_workoutdetail_sportactivity">Running</string>
@@ -48,7 +48,7 @@
             <string name="textview_workoutdetail_valuedistance">0.0 km</string>
             <!-- AVG. PACE -->
             <string name="textview_workoutdetail_labelavgpace">Avg. pace</string>
-            <string name="textview_workoutdetail_valueavgpace">0.0 km/min</string>
+            <string name="textview_workoutdetail_valueavgpace">00:00 min/km</string>
         <!-- SOCIAL SHARE -->
         <string name="textview_workoutdetail_labelsocialshare">Social share</string>
 </resources>

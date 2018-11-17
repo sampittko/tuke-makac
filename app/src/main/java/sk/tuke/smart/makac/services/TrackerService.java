@@ -176,7 +176,9 @@ public class TrackerService extends Service implements LocationListener {
                 countPace();
                 if (speedList.size() > 1) {
                     Log.i(TAG, "Counting calories.");
-                    calories = SportActivities.countCalories(sportActivity, WEIGHT, speedList, duration / 60 / 60);
+                    // TODO fix time
+                    calories += SportActivities.countCalories(sportActivity, WEIGHT, speedList, duration / 60 / 60);
+                    Log.i(TAG, "Calories returned from helper are: " + calories);
                 }
                 else
                     Log.i(TAG, "Skipping calories calculation.");
@@ -196,6 +198,7 @@ public class TrackerService extends Service implements LocationListener {
             Log.i(TAG, "Location ignored because of the current state.");
     }
 
+    // TODO intro 3km distance
     private void countDistance() throws InsufficientDistanceException, NotEnoughLocationsException {
         if (positionList.size() > 1) {
             double newDistance = calculateNewDistance(positionList.get(positionList.size() - 1), positionList.get(positionList.size() - 2));
@@ -258,8 +261,8 @@ public class TrackerService extends Service implements LocationListener {
     }
 
     private void countPace() {
-        pace = speed * 60 / 1000;
-        Log.i(TAG, "Pace counted. (" + pace + "km/min)");
+        pace = 1000 / speed;
+        Log.i(TAG, "Pace counted. (" + pace + "min/km)");
     }
 
     @Override

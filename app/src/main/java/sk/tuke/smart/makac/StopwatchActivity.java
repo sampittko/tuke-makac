@@ -56,7 +56,9 @@ public class StopwatchActivity extends AppCompatActivity {
     private String duration;
     private String distance;
     private String pace;
-    private double calories;
+    private String calories;
+
+    private ArrayList<Double> paceList = new ArrayList<>();
 
     private ArrayList<Location> latestPositionList = new ArrayList<>();
     private ArrayList<List<Location>> finalPositionList = new ArrayList<>();
@@ -146,20 +148,21 @@ public class StopwatchActivity extends AppCompatActivity {
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        saveLatestPositionList();
                         endWorkoutButton.setText(stopString);
 
-                        Intent intent = new Intent(stopwatchActivity, TrackerService.class);
-                        intent.setAction(IntentHelper.ACTION_STOP);
-                        startService(intent);
+                        Intent intent1 = new Intent(stopwatchActivity, TrackerService.class);
+                        intent1.setAction(IntentHelper.ACTION_STOP);
+                        startService(intent1);
 
-                        intent = new Intent(stopwatchActivity, WorkoutDetailActivity.class)
+                        Intent intent2 = new Intent(stopwatchActivity, WorkoutDetailActivity.class)
                                 .putExtra(IntentHelper.DATA_SPORT, sportActivity)
                                 .putExtra(IntentHelper.DATA_DURATION, duration)
                                 .putExtra(IntentHelper.DATA_DISTANCE, distance)
-                                .putExtra(IntentHelper.DATA_PACE, pace)
+                                .putExtra(IntentHelper.DATA_PACE, countAvgPace())
                                 .putExtra(IntentHelper.DATA_CALORIES, calories)
                                 .putExtra(IntentHelper.DATA_POSITIONS, finalPositionList);
-                        startActivity(intent);
+                        startActivity(intent2);
                         dialogInterface.dismiss();
                     }
                 })
@@ -270,6 +273,7 @@ public class StopwatchActivity extends AppCompatActivity {
         if (!newPace.equals(pace)) {
             paceTextView.setText(newPace);
             pace = newPace;
+            paceList.add(broadcastIntentPace);
             Log.i(TAG, "Pace value updated. (" + pace + "km/min)");
         }
         else
@@ -277,10 +281,15 @@ public class StopwatchActivity extends AppCompatActivity {
     }
 
     private void caloriesRenderer(double broadcastIntentCalories) {
+        String newCalories = MainHelper.formatCalories(broadcastIntentCalories);
 
-        // TODO caloriesRenderer()
-
-        Log.i(TAG, "Calories value updated.");
+        if (!newCalories.equals(calories)) {
+            caloriesTextView.setText(newCalories);
+            calories = newCalories;
+            Log.i(TAG, "Calories value updated. (" + calories + "kcal)");
+        }
+        else
+            Log.i(TAG, "Calories did not need an update.");
     }
 
     @OnClick(R.id.button_stopwatch_endworkout)
@@ -319,6 +328,13 @@ public class StopwatchActivity extends AppCompatActivity {
 
         Log.i(TAG, "Location list saved after unpausing.");
     }
-}
 
-// TODO choose sport activity
+    private double countAvgPace() {
+        double paceCount = 0;
+
+        for (Double pace : paceList)
+            paceCount += pace;
+
+        return paceCount / paceList.size();
+    }
+}

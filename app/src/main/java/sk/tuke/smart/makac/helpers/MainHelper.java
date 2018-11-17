@@ -35,22 +35,24 @@ public final class MainHelper {
      * convert m to km and round to 2 decimal places and return as string
      */
     public static String formatDistance(double n) {
-        double km = n / 1000;
-        return String.valueOf(Math.round(km * 100) / 100) + "." + String.valueOf(Math.round(km * 100) % 100);
+        double roundedKm = Math.round(n / 10.0) / 100.0;
+        return String.valueOf(roundedKm);
     }
 
     /**
      * round number to 2 decimal places and return as string
      */
     public static String formatPace(double n) {
-        return String.valueOf(Math.round(n * 100) / 100) + "." + String.valueOf(Math.round(n * 100) % 100);
+        int MM = (int) (n / 60);
+        int SS = (int) Math.round(n % 60);
+        return (String.format("%02d:%02d", MM, SS));
     }
 
     /**
      * round number to integer
      */
     public static String formatCalories(double n) {
-        return String.valueOf((int) Math.round(n));
+        return String.valueOf((int) Math.ceil(n));
     }
 
     /* convert km to mi (multiply with corresponding constant) */
