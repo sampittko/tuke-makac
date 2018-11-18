@@ -14,11 +14,13 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
 
 import sk.tuke.smart.makac.exceptions.InsufficientDistanceException;
+import sk.tuke.smart.makac.exceptions.MissingPermissionsException;
 import sk.tuke.smart.makac.exceptions.NotEnoughLocationsException;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.SportActivities;
@@ -27,29 +29,29 @@ public class TrackerService extends Service implements LocationListener {
     private final float WEIGHT = 80;
     private int state = IntentHelper.STATE_STOPPED;
     private int sportActivity = IntentHelper.ACTIVITY_RUNNING;
-    private double calories;
+    private double calories, distance, pace;
     private long duration;
-    private double distance;
-    private double pace;
-    private Float speed;
+    private float speed;
 
-    private boolean hasContinued;
+    private boolean hasContinued, locationUpdateReceived;
+
     private Location previousPosition;
+
+    private Date firstSpeedTime, lastSpeedTime;
+
+    private ArrayList<Float> speedList = new ArrayList<>();
     private ArrayList<Location> positionList = new ArrayList<>();
 
-    private Date firstSpeedTime;
-    private Date lastSpeedTime;
-    private ArrayList<Float> speedList = new ArrayList<>();
-
     private LocationManager locationManager;
+
     private Handler handler = new Handler();
+
     private final String TAG = "TrackerService";
 
     private final int MIN_TIME_BTW_UPDATES = 3000;
     private final int MIN_DISTANCE = 10;
     private final int PACE_UPDATE_LIMIT = MIN_TIME_BTW_UPDATES / 1000 * 2;
     private int lastLocationUpdateBefore = 0;
-    private boolean locationUpdateReceived;
 
     private Runnable runnable = new Runnable() {
         @Override
@@ -79,8 +81,24 @@ public class TrackerService extends Service implements LocationListener {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        try {
+            checkLocationPermissions();
+        }
+        catch(MissingPermissionsException e) {
+            Log.w(TAG, "Creating service with missing permissions.");
+            Toast.makeText(this, "Permissions for GPS are missing.", Toast.LENGTH_LONG).show();
+        }
+
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         Log.i(TAG, "Service created.");
+    }
+
+    private void checkLocationPermissions() throws MissingPermissionsException {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED ||
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            throw new MissingPermissionsException();
+        }
     }
 
     @Override

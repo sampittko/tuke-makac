@@ -97,10 +97,6 @@ public class StopwatchActivity extends AppCompatActivity {
             Log.e(TAG, "GPS sensor is missing so application cannot be started.");
             finish();
         }
-        catch(InterruptedException e) {
-            Log.e(TAG, "Application could not be started because of missing permissions.");
-            finish();
-        }
 
         setContentView(R.layout.activity_stopwatch);
         ButterKnife.bind(this);
@@ -113,7 +109,7 @@ public class StopwatchActivity extends AppCompatActivity {
         intentFilter.addAction(IntentHelper.ACTION_GPS);
     }
 
-    private void checkGPS() throws SensorNotPresentException, InterruptedException {
+    private void checkGPS() throws SensorNotPresentException {
         checkSensorPresence();
         checkLocationPermissions();
     }
@@ -125,20 +121,14 @@ public class StopwatchActivity extends AppCompatActivity {
         }
     }
 
-    private void checkLocationPermissions() throws InterruptedException {
+    private void checkLocationPermissions() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},0);
             Log.i(TAG, "Location permissions requested.");
         }
-
-        // TODO check if permissions were granted, otherwise take required actions
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED ||
-//            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-//            throw new InterruptedException();
-//        }
-
-        Log.i(TAG, "Location permissions OK.");
+        else
+            Log.i(TAG, "Location permissions OK.");
     }
 
     private void createAlertDialog() {
