@@ -21,7 +21,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
-import sk.tuke.smart.makac.services.TrackerService;
 
 public class WorkoutDetailActivity extends AppCompatActivity {
     @BindView(R.id.textview_workoutdetail_workouttitle) TextView workoutTitleTextView;

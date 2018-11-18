@@ -55,7 +55,7 @@ public class StopwatchActivity extends AppCompatActivity {
 
     private long duration;
 
-    private double distance, pace, calories;
+    private double distance, pace, calories, caloriesDiff;
 
     private final String TAG = "StopwatchActivity";
 
