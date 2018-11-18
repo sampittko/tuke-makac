@@ -50,7 +50,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
 
         intent = getIntent();
         extrasRenderer(intent.getBundleExtra(IntentHelper.DATA_BUNDLE));
-//        createAlertDialog();
+        createAlertDialog();
     }
 
     private void extrasRenderer(Bundle bundle) {
@@ -106,40 +106,41 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         valueCaloriesTextView.setText(caloriesString);
     }
 
-//    private void createAlertDialog() {
-////        String shareMessage = "I was out for " + getSportActivityString(intent.getBundleExtra(IntentHelper.DATA_BUNDLE).getInt(IntentHelper.DATA_SPORT, 0)).toLowerCase() + ". " +
-////                "I tracked " + MainHelper.formatDistance(intent.getBundleExtra(IntentHelper.DATA_BUNDLE).getDouble(IntentHelper.DATA_DISTANCE, 0)) + " km " +
-////                "in " + MainHelper.formatDuration(intent.getBundleExtra(IntentHelper.DATA_BUNDLE).getLong(IntentHelper.DATA_DURATION, 0)) + ".";
-//        String shareMessage = this.shareMessage;
-//        shareMessage = shareMessage
-//                .replace("WORKOUT_TYPE", getSportActivityString(intent.getBundleExtra(IntentHelper.DATA_BUNDLE).getInt(IntentHelper.DATA_SPORT, 0)).toLowerCase())
-//                .replace("DISTANCE", MainHelper.formatDistance(intent.getBundleExtra(IntentHelper.DATA_BUNDLE).getDouble(IntentHelper.DATA_DISTANCE, 0)))
-//                .replace("UNIT", "km")
-//                .replace("DURATION", MainHelper.formatDuration(intent.getBundleExtra(IntentHelper.DATA_BUNDLE).getLong(IntentHelper.DATA_DURATION, 0)));
-//
-//        EditText editText = new EditText(this);
-//        editText.setText(shareMessage);
-//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-//        editText.setLayoutParams(lp);
-//
-//        alertDialogBuilder = new AlertDialog.Builder(this);
-//        alertDialogBuilder
-//                .setView(editText)
-//                .setTitle("Share results")
-//                .setPositiveButton(R.string.share, new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        new Intent(Intent.ACTION_SENDTO).setData(Uri.parse("mailto:"))
-//                        dialogInterface.dismiss();
-//                    }
-//                })
-//                .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        dialogInterface.dismiss();
-//                    }
-//                });
-//    }
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    private void createAlertDialog() {
+        String shareMessage = this.shareMessage;
+        shareMessage = shareMessage
+                .replace("WORKOUT_TYPE", getSportActivityString(intent.getBundleExtra(IntentHelper.DATA_BUNDLE).getInt(IntentHelper.DATA_SPORT, 0)).toLowerCase())
+                .replace("DISTANCE", MainHelper.formatDistance(intent.getBundleExtra(IntentHelper.DATA_BUNDLE).getDouble(IntentHelper.DATA_DISTANCE, 0)))
+                .replace("UNIT", "km")
+                .replace("DURATION", MainHelper.formatDuration(intent.getBundleExtra(IntentHelper.DATA_BUNDLE).getLong(IntentHelper.DATA_DURATION, 0)));
+
+        EditText editText = new EditText(this);
+        editText.setText(shareMessage);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        editText.setLayoutParams(lp);
+
+        alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder
+                .setView(editText)
+                .setTitle("Share results")
+                .setPositiveButton(R.string.share, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+    }
 
     @OnClick(R.id.button_workoutdetail_showmap)
     public void showMapsActivity(View view) {
@@ -150,9 +151,9 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         startActivity(mapsIntent);
     }
 
-//    @OnClick(R.id.button_workoutdetail_emailshare)
-//    public void showAlertDialogEmail(View view) {
-//        alertDialog = alertDialogBuilder.create();
-//        alertDialog.show();
-//    }
+    @OnClick({ R.id.button_workoutdetail_emailshare, R.id.button_workoutdetail_fbsharebtn, R.id.button_workoutdetail_twittershare, R.id.button_workoutdetail_gplusshare })
+    public void showAlertDialogEmail(View view) {
+        alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
 }

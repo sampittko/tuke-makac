@@ -52,6 +52,19 @@ public class TrackerService extends Service implements LocationListener {
     private final int PACE_UPDATE_LIMIT = MIN_TIME_BTW_UPDATES / 1000 * 2;
     private int lastLocationUpdateBefore = 0;
 
+    private final IBinder mBinder = new LocalBinder();
+
+    /**
+     * Class used for the client Binder.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with IPC.
+     */
+    public class LocalBinder extends Binder {
+        public TrackerService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return TrackerService.this;
+        }
+    }
+
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
@@ -272,7 +285,7 @@ public class TrackerService extends Service implements LocationListener {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return new Binder();
+        return mBinder;
     }
 
     @Override
