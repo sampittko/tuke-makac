@@ -28,7 +28,7 @@ public class TrackerService extends Service implements LocationListener {
     private final float WEIGHT = 80;
     private int state = IntentHelper.STATE_STOPPED;
     private int sportActivity = IntentHelper.ACTIVITY_RUNNING;
-    private double totalCalories, calories, distance, pace;
+    private double calories, distance, pace;
     private long duration;
     private float speed;
 

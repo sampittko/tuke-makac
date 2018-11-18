@@ -45,4 +45,7 @@
             <string name="textview_workoutdetail_labelavgpace">Average pace</string>
         <!-- SOCIAL SHARE -->
         <string name="textview_workoutdetail_labelsocialshare">Social share</string>
+        <string name="share">Share</string>
+        <string name="close">Close</string>
+        <string name="share_message">I was out for WORKOUT_TYPE. I tracked DISTANCE UNIT in DURATION.</string>
 </resources>
