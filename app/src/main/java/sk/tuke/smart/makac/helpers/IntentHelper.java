@@ -8,6 +8,7 @@ public final class IntentHelper {
     public static final String ACTION_TICK = "sk.tuke.smart.makac.TICK";
     public static final String ACTION_GPS = "sk.tuke.smart.makac.COMMAND_GPS";
 
+    public static final String DATA_BUNDLE = "BUNDLE";
     public static final String DATA_SPORT = "SPORT";
     public static final String DATA_DURATION = "DURATION";
     public static final String DATA_DISTANCE = "DISTANCE";

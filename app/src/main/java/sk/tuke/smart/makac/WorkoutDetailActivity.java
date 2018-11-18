@@ -3,6 +3,8 @@ package sk.tuke.smart.makac;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -11,6 +13,7 @@ import java.util.Date;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
 
@@ -25,24 +28,26 @@ public class WorkoutDetailActivity extends AppCompatActivity {
 
     @BindString(R.string.workoutdetail_workoutname) String workoutTitle;
 
+    private Intent intent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workout_detail);
         ButterKnife.bind(this);
 
-        extrasRenderer(getIntent());
+        intent = getIntent();
+        extrasRenderer(intent.getBundleExtra(IntentHelper.DATA_BUNDLE));
     }
 
-    private void extrasRenderer(Intent intent) {
+    private void extrasRenderer(Bundle bundle) {
         workoutTitleRenderer();
-        sportActivityRenderer(intent.getIntExtra(IntentHelper.DATA_SPORT, 0));
+        sportActivityRenderer(bundle.getInt(IntentHelper.DATA_SPORT, 0));
         activityDateRenderer();
-        durationRenderer(intent.getLongExtra(IntentHelper.DATA_DURATION, 0));
-        distanceRenderer(intent.getDoubleExtra(IntentHelper.DATA_DISTANCE, 0));
-        avgPaceRenderer(intent.getDoubleExtra(IntentHelper.DATA_PACE, 0));
-        caloriesRenderer(intent.getDoubleExtra(IntentHelper.DATA_CALORIES, 0));
-        // TODO parceableArrayList
+        durationRenderer(bundle.getLong(IntentHelper.DATA_DURATION, 0));
+        distanceRenderer(bundle.getDouble(IntentHelper.DATA_DISTANCE, 0));
+        avgPaceRenderer(bundle.getDouble(IntentHelper.DATA_PACE, 0));
+        caloriesRenderer(bundle.getDouble(IntentHelper.DATA_CALORIES, 0));
     }
 
     private void workoutTitleRenderer() {
@@ -85,5 +90,14 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     private void caloriesRenderer(double calories) {
         String caloriesString = MainHelper.formatCalories(calories) + " kcal";
         valueCaloriesTextView.setText(caloriesString);
+    }
+
+    @OnClick(R.id.button_workoutdetail_showmap)
+    public void showMapsActivity(View view) {
+        Intent mapsIntent = new Intent(this, MapsActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(IntentHelper.DATA_POSITIONS, intent.getBundleExtra(IntentHelper.DATA_BUNDLE).getSerializable(IntentHelper.DATA_POSITIONS));
+        mapsIntent.putExtra(IntentHelper.DATA_BUNDLE, bundle);
+        startActivity(mapsIntent);
     }
 }

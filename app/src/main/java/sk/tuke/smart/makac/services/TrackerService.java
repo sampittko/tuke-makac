@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import sk.tuke.smart.makac.exceptions.InsufficientDistanceException;
-import sk.tuke.smart.makac.exceptions.MissingPermissionsException;
 import sk.tuke.smart.makac.exceptions.NotEnoughLocationsException;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.SportActivities;
@@ -29,7 +28,7 @@ public class TrackerService extends Service implements LocationListener {
     private final float WEIGHT = 80;
     private int state = IntentHelper.STATE_STOPPED;
     private int sportActivity = IntentHelper.ACTIVITY_RUNNING;
-    private double calories, distance, pace;
+    private double totalCalories, calories, distance, pace;
     private long duration;
     private float speed;
 
@@ -82,22 +81,17 @@ public class TrackerService extends Service implements LocationListener {
     public void onCreate() {
         super.onCreate();
 
-        try {
-            checkLocationPermissions();
-        }
-        catch(MissingPermissionsException e) {
-            Log.w(TAG, "Creating service with missing permissions.");
-            Toast.makeText(this, "Permissions for GPS are missing.", Toast.LENGTH_LONG).show();
-        }
-
+        checkLocationPermissions();
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
         Log.i(TAG, "Service created.");
     }
 
-    private void checkLocationPermissions() throws MissingPermissionsException {
+    private void checkLocationPermissions() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED ||
             ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-            throw new MissingPermissionsException();
+            Log.w(TAG, "Creating service with missing permissions.");
+            Toast.makeText(this, "Permissions for GPS are missing.", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -176,11 +170,6 @@ public class TrackerService extends Service implements LocationListener {
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        return new Binder();
-    }
-
-    @Override
     public void onLocationChanged(Location location) {
         Log.i(TAG, "Location has changed.");
 
@@ -253,9 +242,9 @@ public class TrackerService extends Service implements LocationListener {
 
     private void countSpeed() {
         speed = (float)distance / (float)duration;
-        if (speedList.size() == 0)
-            firstSpeedTime = new Date();
         speedList.add(speed);
+        if (speedList.size() == 1)
+            firstSpeedTime = new Date();
         Log.i(TAG, "Speed counted. (" + speed + "m/s)");
     }
 
@@ -279,6 +268,11 @@ public class TrackerService extends Service implements LocationListener {
     private void countPace() {
         pace = 1000 / speed;
         Log.i(TAG, "Pace counted. (" + pace + "min/km)");
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return new Binder();
     }
 
     @Override
