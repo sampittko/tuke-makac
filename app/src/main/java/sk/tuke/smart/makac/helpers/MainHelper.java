@@ -12,17 +12,14 @@ public final class MainHelper {
     public static String formatDuration(long time) {
         long seconds = time %60;
         time -= seconds;
-        String zeroSeconds = evaluateZero(seconds);
 
         long minutesCount = time / 60;
         long minutes = minutesCount % 60;
         minutesCount -= minutes;
-        String zeroMinutes = evaluateZero(minutes);
 
         long hoursCount = minutesCount / 60;
-        String zeroHours = evaluateZero(hoursCount);
 
-        return "" + zeroHours + hoursCount + ":" + zeroMinutes + minutes + ":" + zeroSeconds + seconds;
+        return evaluateZero(hoursCount) + hoursCount + ":" + evaluateZero(minutes) + minutes + ":" + evaluateZero(seconds) + seconds;
     }
 
     private static String evaluateZero(long timeCount) {
@@ -35,8 +32,7 @@ public final class MainHelper {
      * convert m to km and round to 2 decimal places and return as string
      */
     public static String formatDistance(double n) {
-        double roundedKm = Math.round(n / 10.0) / 100.0;
-        return String.valueOf(roundedKm);
+        return String.valueOf(Math.round(n / 10.0) / 100.0);
     }
 
     /**
@@ -52,7 +48,7 @@ public final class MainHelper {
      * round number to integer
      */
     public static String formatCalories(double n) {
-        return String.valueOf((int) Math.ceil(n));
+        return String.valueOf((int) Math.round(n));
     }
 
     /* convert km to mi (multiply with corresponding constant) */

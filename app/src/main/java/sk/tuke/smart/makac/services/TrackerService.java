@@ -35,8 +35,10 @@ public class TrackerService extends Service implements LocationListener {
 
     private boolean hasContinued;
     private Location previousPosition;
-
     private ArrayList<Location> positionList = new ArrayList<>();
+
+    private Date firstSpeedTime;
+    private Date lastSpeedTime;
     private ArrayList<Float> speedList = new ArrayList<>();
 
     private LocationManager locationManager;
@@ -54,11 +56,9 @@ public class TrackerService extends Service implements LocationListener {
         public void run() {
             duration += 1;
             lastLocationUpdateBefore += 1;
-
             verifyPace();
 
-            Intent intent = createBroadcastIntent();
-            sendBroadcast(intent);
+            sendBroadcast(createBroadcastIntent());
             Log.i(TAG, "Broadcast intent with action TICK sent.");
 
             handler.postDelayed(this, 1000);
@@ -174,14 +174,7 @@ public class TrackerService extends Service implements LocationListener {
                 countDistance();
                 countSpeed();
                 countPace();
-                if (speedList.size() > 1) {
-                    Log.i(TAG, "Counting calories.");
-                    // TODO fix time
-                    calories += SportActivities.countCalories(sportActivity, WEIGHT, speedList, duration / 60 / 60);
-                    Log.i(TAG, "Calories returned from helper are: " + calories);
-                }
-                else
-                    Log.i(TAG, "Skipping calories calculation.");
+                calories = SportActivities.countCalories(sportActivity, WEIGHT, speedList, getTimeFillingSpeedListInHours());
             }
             catch (InsufficientDistanceException ide) {
                 Log.w(TAG, "Location not updated because distance between last 2 locations was less than 2 meters.");
@@ -198,12 +191,10 @@ public class TrackerService extends Service implements LocationListener {
             Log.i(TAG, "Location ignored because of the current state.");
     }
 
-    // TODO intro 3km distance
     private void countDistance() throws InsufficientDistanceException, NotEnoughLocationsException {
         if (positionList.size() > 1) {
             double newDistance = calculateNewDistance(positionList.get(positionList.size() - 1), positionList.get(positionList.size() - 2));
             validateNewDistance(newDistance);
-            return;
         }
         else if (hasContinued) {
             if (previousPosition != null)
@@ -212,8 +203,8 @@ public class TrackerService extends Service implements LocationListener {
                 Log.i(TAG, "There was no previous position. Skipping additional distance.");
             hasContinued = false;
         }
-
-        throw new NotEnoughLocationsException();
+        else
+            throw new NotEnoughLocationsException();
     }
 
     private void validateNewDistance(double newDistance) throws InsufficientDistanceException {
@@ -234,7 +225,7 @@ public class TrackerService extends Service implements LocationListener {
     private double additionalDistanceAfterContinue() {
         double newDistance = calculateNewDistance(positionList.get(positionList.size() - 1), previousPosition);
         if (newDistance <= 100) {
-            Log.i(TAG, "Distance was added after unpausing.");
+            Log.i(TAG, "Distance was updated after unpausing.");
             return newDistance;
         }
 
@@ -244,8 +235,15 @@ public class TrackerService extends Service implements LocationListener {
 
     private void countSpeed() {
         speed = (float)distance / (float)duration;
+        if (speedList.size() == 0)
+            firstSpeedTime = new Date();
         speedList.add(speed);
         Log.i(TAG, "Speed counted. (" + speed + "m/s)");
+    }
+
+    private double getTimeFillingSpeedListInHours() {
+        lastSpeedTime = new Date();
+        return ((lastSpeedTime.getTime() - firstSpeedTime.getTime()) / 3.6) / 1000000;
     }
 
     private void verifyPace() {

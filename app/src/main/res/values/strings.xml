@@ -33,22 +33,16 @@
         <string name="workoutdetail_workoutname">My Workout</string>
             <!-- SPORT -->
             <string name="textview_workoutdetail_labelsport">Sport</string>
-            <string name="textview_workoutdetail_sportactivity">Running</string>
-            <string name="textview_workoutdetail_activitydate">Apr 24, 2017 6:10:52 PM</string>
             <!-- SUMMARY -->
             <string name="textview_workoutdetail_labelsummary">Summary</string>
             <!-- DURATION -->
             <string name="textview_workoutdetail_labelduration">Duration</string>
-            <string name="textview_workoutdetail_valueduration">12:34:56</string>
             <!-- CALORIES -->
             <string name="textview_workoutdetail_labelcalories">Calories</string>
-            <string name="textview_workoutdetail_valuecalories">0 kcal</string>
             <!-- DISTANCE -->
             <string name="textview_workoutdetail_labeldistance">Distance</string>
-            <string name="textview_workoutdetail_valuedistance">0.0 km</string>
             <!-- AVG. PACE -->
-            <string name="textview_workoutdetail_labelavgpace">Avg. pace</string>
-            <string name="textview_workoutdetail_valueavgpace">00:00 min/km</string>
+            <string name="textview_workoutdetail_labelavgpace">Average pace</string>
         <!-- SOCIAL SHARE -->
         <string name="textview_workoutdetail_labelsocialshare">Social share</string>
 </resources>

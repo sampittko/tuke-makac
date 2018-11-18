@@ -90,9 +90,9 @@ public final class SportActivities {
         double MET = getMET(sportActivity, averageSpeed);
         Log.i(TAG, "MET: " + MET);
 
-        Log.i(TAG, "Weight: " + weight);
+        Log.i(TAG, "Weight: " + weight + "kg");
 
-        Log.i(TAG, "Time: " + timeFillingSpeedListInHours);
+        Log.i(TAG, "Time: " + timeFillingSpeedListInHours + "h");
 
         double calories = MET * weight * timeFillingSpeedListInHours;
         Log.i(TAG, "Calories calculated. (" + calories + "kcal)");

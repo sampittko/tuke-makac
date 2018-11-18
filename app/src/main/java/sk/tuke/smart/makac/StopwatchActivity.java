@@ -46,26 +46,26 @@ public class StopwatchActivity extends AppCompatActivity {
     @BindString(R.string.stopwatch_stop) public String stopString;
     @BindString(R.string.stopwatch_continue) public String continueString;
 
-    private boolean workoutStarted;
-    private boolean workoutPaused;
+    private boolean workoutStarted, workoutPaused;
 
     private AlertDialog.Builder alertDialogBuilder;
     private AlertDialog alertDialog;
 
     private int sportActivity = IntentHelper.ACTIVITY_RUNNING;
-    private String duration;
-    private String distance;
-    private String pace;
-    private String calories;
+
+    private long duration;
+
+    private double distance, pace, calories;
+
+    private final String TAG = "StopwatchActivity";
 
     private ArrayList<Double> paceList = new ArrayList<>();
-
     private ArrayList<Location> latestPositionList = new ArrayList<>();
     private ArrayList<List<Location>> finalPositionList = new ArrayList<>();
 
     private IntentFilter intentFilter;
+
     private StopwatchActivity stopwatchActivity;
-    private final String TAG = "StopwatchActivity";
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -132,11 +132,11 @@ public class StopwatchActivity extends AppCompatActivity {
             Log.i(TAG, "Location permissions requested.");
         }
 
-            // TODO check if permissions were granted, otherwise take required actions
-            // if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED ||
-            // ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-            // throw new InterruptedException();
-            // }
+        // TODO check if permissions were granted, otherwise take required actions
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED ||
+//            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+//            throw new InterruptedException();
+//        }
 
         Log.i(TAG, "Location permissions OK.");
     }
@@ -164,6 +164,7 @@ public class StopwatchActivity extends AppCompatActivity {
                                 .putExtra(IntentHelper.DATA_POSITIONS, finalPositionList);
                         startActivity(intent2);
                         dialogInterface.dismiss();
+                        finish();
                     }
                 })
                 .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -188,6 +189,13 @@ public class StopwatchActivity extends AppCompatActivity {
         registerReceiver(broadcastReceiver, intentFilter);
 
         Log.i(TAG, "Receiver registered.");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Intent intent = new Intent(this, TrackerService.class);
+        stopService(intent);
     }
 
     @OnClick(R.id.button_stopwatch_start)
@@ -249,44 +257,45 @@ public class StopwatchActivity extends AppCompatActivity {
     }
 
     private void durationRenderer(long broadcastIntentDuration) {
-        duration = String.valueOf(MainHelper.formatDuration(broadcastIntentDuration));
+        duration = broadcastIntentDuration;
 
-        durationTextView.setText(duration);
-        Log.i(TAG, "Duration value updated. (" + duration + ")");
+        String newDuration = String.valueOf(MainHelper.formatDuration(duration));
+        durationTextView.setText(newDuration);
+        Log.i(TAG, "Duration value updated. (" + newDuration + ")");
     }
 
     private void distanceRenderer(double broadcastIntentDistance) {
-        String newDistance = MainHelper.formatDistance(broadcastIntentDistance);
+        if (distance != broadcastIntentDistance) {
+            distance = broadcastIntentDistance;
 
-        if (!newDistance.equals(distance)) {
+            String newDistance = MainHelper.formatDistance(distance);
             distanceTextView.setText(newDistance);
-            distance = newDistance;
-            Log.i(TAG, "Distance value updated. (" + distance + "km)");
+            Log.i(TAG, "Distance value updated. (" + newDistance + "km)");
         }
         else
             Log.i(TAG, "Distance did not need an update.");
     }
 
     private void paceRenderer(double broadcastIntentPace) {
-        String newPace = MainHelper.formatPace(broadcastIntentPace);
+        if (pace != broadcastIntentPace) {
+            pace = broadcastIntentPace;
+            paceList.add(pace);
 
-        if (!newPace.equals(pace)) {
+            String newPace = MainHelper.formatPace(pace);
             paceTextView.setText(newPace);
-            pace = newPace;
-            paceList.add(broadcastIntentPace);
-            Log.i(TAG, "Pace value updated. (" + pace + "km/min)");
+            Log.i(TAG, "Pace value updated. (" + newPace + "km/min)");
         }
         else
             Log.i(TAG, "Pace did not need an update.");
     }
 
     private void caloriesRenderer(double broadcastIntentCalories) {
-        String newCalories = MainHelper.formatCalories(broadcastIntentCalories);
+        if (calories != broadcastIntentCalories) {
+            calories = broadcastIntentCalories;
 
-        if (!newCalories.equals(calories)) {
+            String newCalories = MainHelper.formatCalories(calories);
             caloriesTextView.setText(newCalories);
-            calories = newCalories;
-            Log.i(TAG, "Calories value updated. (" + calories + "kcal)");
+            Log.i(TAG, "Calories value updated. (" + newCalories + "kcal)");
         }
         else
             Log.i(TAG, "Calories did not need an update.");
@@ -324,15 +333,17 @@ public class StopwatchActivity extends AppCompatActivity {
         if (!latestPositionList.isEmpty()) {
             finalPositionList.add(latestPositionList);
             latestPositionList = new ArrayList<>();
+            Log.i(TAG, "Location list saved after unpausing.");
+            return;
         }
 
-        Log.i(TAG, "Location list saved after unpausing.");
+        Log.i(TAG, "Location list is empty and does not need to be saved after unpausing.");
     }
 
     private double countAvgPace() {
         double paceCount = 0;
 
-        for (Double pace : paceList)
+        for (double pace : paceList)
             paceCount += pace;
 
         return paceCount / paceList.size();
