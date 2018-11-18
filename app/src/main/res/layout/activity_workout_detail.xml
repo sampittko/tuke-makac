@@ -22,7 +22,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textStyle="bold|italic"
-                android:text="@string/textview_workoutdetail_workouttitle"
+                android:text="@string/workoutdetail_workoutname"
                 android:textSize="35sp"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="11dp"/>
@@ -48,8 +48,7 @@
                     android:textStyle="bold"
                     android:textColor="#0CD6E7"
                     android:textSize="20sp"
-                    android:layout_below="@+id/textview_workoutdetail_labelsport"
-                    android:text="@string/textview_workoutdetail_sportactivity" />
+                    android:layout_below="@+id/textview_workoutdetail_labelsport" />
 
                 <TextView
                     android:id="@+id/textview_workoutdetail_activitydate"
@@ -57,8 +56,7 @@
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:textColor="#0CD6E7"
-                    android:layout_below="@+id/textview_workoutdetail_sportactivity"
-                    android:text="@string/textview_workoutdetail_activitydate" />
+                    android:layout_below="@+id/textview_workoutdetail_sportactivity" />
 
                 <TextView
                     android:id="@+id/textview_workoutdetail_labelsummary"
@@ -85,8 +83,7 @@
                     android:textStyle="bold"
                     android:textColor="#0CD6E7"
                     android:textSize="20sp"
-                    android:layout_below="@+id/textview_workoutdetail_labelduration"
-                    android:text="@string/textview_workoutdetail_valueduration" />
+                    android:layout_below="@+id/textview_workoutdetail_labelduration" />
 
                 <TextView
                     android:id="@+id/textview_workoutdetail_labelcalories"
@@ -103,8 +100,7 @@
                     android:textStyle="bold"
                     android:textColor="#0CD6E7"
                     android:textSize="20sp"
-                    android:layout_below="@+id/textview_workoutdetail_labelcalories"
-                    android:text="@string/textview_workoutdetail_valuecalories" />
+                    android:layout_below="@+id/textview_workoutdetail_labelcalories" />
 
                 <TextView
                     android:id="@+id/textview_workoutdetail_labeldistance"
@@ -121,8 +117,7 @@
                     android:textStyle="bold"
                     android:textSize="20sp"
                     android:textColor="#0CD6E7"
-                    android:layout_below="@+id/textview_workoutdetail_labeldistance"
-                    android:text="@string/textview_workoutdetail_valuedistance" />
+                    android:layout_below="@+id/textview_workoutdetail_labeldistance" />
 
                 <TextView
                     android:id="@+id/textview_workoutdetail_labelavgpace"
@@ -139,8 +134,7 @@
                     android:textStyle="bold"
                     android:textColor="#0CD6E7"
                     android:textSize="20sp"
-                    android:layout_below="@+id/textview_workoutdetail_labelavgpace"
-                    android:text="@string/textview_workoutdetail_valueavgpace" />
+                    android:layout_below="@+id/textview_workoutdetail_labelavgpace" />
             </RelativeLayout>
         </RelativeLayout>
 
@@ -153,7 +147,7 @@
                 android:id="@+id/button_workoutdetail_showmap"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
-                android:background="@drawable/ic_map_blue_24dp"
+                android:background="@drawable/ic_map_blue"
                 android:layout_centerHorizontal="true" />
 
             <TextView
