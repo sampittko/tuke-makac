@@ -157,6 +157,9 @@ public class TrackerService extends Service implements LocationListener {
 
                     Log.i(TAG, "Stopping service.");
                     stopSelf();
+                default:
+                    Log.i(TAG, "There is no specific task to process in service.");
+                    break;
             }
         }
     }
