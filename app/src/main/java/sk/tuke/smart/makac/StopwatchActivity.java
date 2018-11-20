@@ -55,7 +55,7 @@ public class StopwatchActivity extends AppCompatActivity {
 
     private long duration;
 
-    private double distance, pace, calories, caloriesDiff;
+    private double distance, pace, calories, totalCalories, latestBiggestNonZeroCalories;
 
     private final String TAG = "StopwatchActivity";
 
@@ -283,7 +283,10 @@ public class StopwatchActivity extends AppCompatActivity {
 
     private void caloriesRenderer(double broadcastIntentCalories) {
         if (calories != broadcastIntentCalories) {
-            calories = broadcastIntentCalories;
+            calories = broadcastIntentCalories + totalCalories;
+
+            if (broadcastIntentCalories != 0 && broadcastIntentCalories > latestBiggestNonZeroCalories)
+                latestBiggestNonZeroCalories = broadcastIntentCalories;
 
             String newCalories = MainHelper.formatCalories(calories);
             caloriesTextView.setText(newCalories);
@@ -326,10 +329,12 @@ public class StopwatchActivity extends AppCompatActivity {
             finalPositionList.add(latestPositionList);
             latestPositionList = new ArrayList<>();
             Log.i(TAG, "Location list saved after unpausing.");
-            return;
         }
+        else
+            Log.i(TAG, "Location list is empty and does not need to be saved after unpausing.");
 
-        Log.i(TAG, "Location list is empty and does not need to be saved after unpausing.");
+        totalCalories += latestBiggestNonZeroCalories;
+        latestBiggestNonZeroCalories = 0;
     }
 
     private double countAvgPace() {

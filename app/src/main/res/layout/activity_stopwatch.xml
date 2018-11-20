@@ -223,7 +223,7 @@
                             android:id="@+id/button_stopwatch_endworkout"
                             android:background="@drawable/ic_stop_circle_filled_red"
                             android:layout_width="60dp"
-                            android:text="@string/stopwatch_stop"
+                            android:text="@string/stopwatch_endworkout"
                             android:layout_height="60dp"
                             android:visibility="gone"/>
                     </LinearLayout>

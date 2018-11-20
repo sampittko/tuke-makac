@@ -22,6 +22,7 @@
         <string name="stopwatch_start"></string>
         <string name="stopwatch_stop"></string>
         <string name="stopwatch_continue"></string>
+        <string name="stopwatch_endworkout"></string>
         <!-- DIALOG BUTTONS -->
         <string name="yes">Yes</string>
         <string name="no">No</string>

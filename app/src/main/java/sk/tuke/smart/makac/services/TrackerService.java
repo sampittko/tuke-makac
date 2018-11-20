@@ -132,6 +132,7 @@ public class TrackerService extends Service implements LocationListener {
                     handler.postDelayed(runnable, 1000);
                     previousPosition = positionList.isEmpty() ? null : positionList.get(positionList.size() - 1);
                     positionList = new ArrayList<>();
+                    speedList = new ArrayList<>();
                     hasContinued = true;
                     state = IntentHelper.STATE_CONTINUE;
 
