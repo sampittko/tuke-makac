@@ -2,18 +2,22 @@ package sk.tuke.smart.makac;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
+import android.location.Location;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import butterknife.BindString;
 import butterknife.BindView;
@@ -30,6 +34,8 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     @BindView(R.id.textview_workoutdetail_valuecalories) TextView valueCaloriesTextView;
     @BindView(R.id.textview_workoutdetail_valuedistance) TextView valueDistanceTextView;
     @BindView(R.id.textview_workoutdetail_valueavgpace) TextView valueAvgPaceTextView;
+    @BindView(R.id.textview_workoutdetail_labelshowmap) TextView showMapTextView;
+    @BindView(R.id.button_workoutdetail_showmap) Button showMapButton;
 
     @BindString(R.string.workoutdetail_workoutname) String workoutTitle;
     @BindString(R.string.share_message) String shareMessage;
@@ -47,9 +53,15 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_workout_detail);
         ButterKnife.bind(this);
 
-        intent = getIntent();
-        extrasRenderer(intent.getBundleExtra(IntentHelper.DATA_BUNDLE));
-        createAlertDialog();
+        try {
+            intent = getIntent();
+            extrasRenderer(intent.getBundleExtra(IntentHelper.DATA_BUNDLE));
+            showMapButtonCheck((ArrayList<List<Location>>) intent.getBundleExtra(IntentHelper.DATA_BUNDLE).getSerializable(IntentHelper.DATA_POSITIONS));
+            createAlertDialog();
+        }
+        catch(NullPointerException e) {
+            Log.e(TAG, "Intent is missing values.");
+        }
     }
 
     private void extrasRenderer(Bundle bundle) {
@@ -103,6 +115,13 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     private void caloriesRenderer(double calories) {
         String caloriesString = MainHelper.formatCalories(calories) + " kcal";
         valueCaloriesTextView.setText(caloriesString);
+    }
+
+    private void showMapButtonCheck(ArrayList<List<Location>> finalPositionList) {
+        if (finalPositionList.size() == 1 && finalPositionList.get(0).size() < 2) {
+            showMapButton.setVisibility(View.GONE);
+            showMapTextView.setVisibility(View.GONE);
+        }
     }
 
     @Override

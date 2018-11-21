@@ -29,7 +29,7 @@
 
     <!-- WORKOUT DETAIL -->
         <!-- Map -->
-        <string name="button_workoutdetail_labelshowmap">Map</string>
+        <string name="textview_workoutdetail_labelshowmap">Map</string>
         <!-- MY WORKOUT -->
         <string name="workoutdetail_workoutname">My Workout</string>
             <!-- SPORT -->
