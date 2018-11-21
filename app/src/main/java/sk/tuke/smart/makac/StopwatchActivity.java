@@ -171,7 +171,7 @@ public class StopwatchActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         unregisterReceiver(broadcastReceiver);
-        if (!workoutStarted)
+        if (!workoutStarted || workoutPaused)
             stopService(new Intent(this, TrackerService.class));
 
         Log.i(TAG, "Receiver unregistered.");
