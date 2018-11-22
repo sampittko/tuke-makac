@@ -13,7 +13,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -118,7 +117,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     }
 
     private void showMapButtonCheck(ArrayList<List<Location>> finalPositionList) {
-        if (finalPositionList.size() == 1 && finalPositionList.get(0).size() < 2) {
+        if (finalPositionList == null || finalPositionList.size() == 1 && finalPositionList.get(0).size() < 2) {
             showMapButton.setVisibility(View.GONE);
             showMapTextView.setVisibility(View.GONE);
         }
