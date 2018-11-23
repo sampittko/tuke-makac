@@ -134,10 +134,10 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     private void createShareAlertDialog() {
         String shareMessage = this.shareMessage;
         shareMessage = shareMessage
-                .replace("WORKOUT_TYPE", getSportActivityString(intent.getBundleExtra(IntentHelper.DATA_BUNDLE).getInt(IntentHelper.DATA_SPORT, 0)).toLowerCase())
-                .replace("DISTANCE", MainHelper.formatDistance(intent.getBundleExtra(IntentHelper.DATA_BUNDLE).getDouble(IntentHelper.DATA_DISTANCE, 0)))
+                .replace("WORKOUT_TYPE", getSportActivityString(intent.getIntExtra(IntentHelper.DATA_SPORT, 0)).toLowerCase())
+                .replace("DISTANCE", MainHelper.formatDistance(intent.getDoubleExtra(IntentHelper.DATA_DISTANCE, 0)))
                 .replace("UNIT", "km")
-                .replace("DURATION", MainHelper.formatDuration(intent.getBundleExtra(IntentHelper.DATA_BUNDLE).getLong(IntentHelper.DATA_DURATION, 0)));
+                .replace("DURATION", MainHelper.formatDuration(intent.getLongExtra(IntentHelper.DATA_DURATION, 0)));
 
         EditText editText = new EditText(this);
         editText.setText(shareMessage);
