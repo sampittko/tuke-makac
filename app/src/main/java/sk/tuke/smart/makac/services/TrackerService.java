@@ -54,13 +54,8 @@ public class TrackerService extends Service implements LocationListener {
 
     private final IBinder mBinder = new LocalBinder();
 
-    /**
-     * Class used for the client Binder.  Because we know this service always
-     * runs in the same process as its clients, we don't need to deal with IPC.
-     */
     public class LocalBinder extends Binder {
         public TrackerService getService() {
-            // Return this instance of LocalService so clients can call public methods
             return TrackerService.this;
         }
     }
@@ -68,7 +63,7 @@ public class TrackerService extends Service implements LocationListener {
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            duration += 1;
+            duration += 1000;
             lastLocationUpdateBefore += 1;
             verifyPace();
 
@@ -80,7 +75,7 @@ public class TrackerService extends Service implements LocationListener {
 
         private Intent createBroadcastIntent() {
             return new Intent().setAction(IntentHelper.ACTION_TICK)
-                    .putExtra(IntentHelper.DATA_DURATION, duration)
+                    .putExtra(IntentHelper.DATA_DURATION, duration / 1000)
                     .putExtra(IntentHelper.DATA_DISTANCE, distance)
                     .putExtra(IntentHelper.DATA_STATE, state)
                     .putExtra(IntentHelper.DATA_POSITIONS, positionList)
@@ -258,7 +253,7 @@ public class TrackerService extends Service implements LocationListener {
     }
 
     private void countSpeed() {
-        speed = (float)distance / (float)duration;
+        speed = (float)distance / (float)(duration / 1000);
         speedList.add(speed);
         if (speedList.size() == 1)
             firstSpeedTime = new Date();
@@ -294,19 +289,17 @@ public class TrackerService extends Service implements LocationListener {
 
     @Override
     public void onStatusChanged(String s, int i, Bundle bundle) {
-
-        // TODO onStatusChanged()
-
+        //
     }
 
     @Override
     public void onProviderEnabled(String s) {
-
+        //
     }
 
     @Override
     public void onProviderDisabled(String s) {
-
+        //
     }
 
     public int getState() {
