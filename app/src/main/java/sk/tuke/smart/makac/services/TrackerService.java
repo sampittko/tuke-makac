@@ -75,7 +75,7 @@ public class TrackerService extends Service implements LocationListener {
 
         private Intent createBroadcastIntent() {
             return new Intent().setAction(IntentHelper.ACTION_TICK)
-                    .putExtra(IntentHelper.DATA_DURATION, duration / 1000)
+                    .putExtra(IntentHelper.DATA_DURATION, getSecondsDuration())
                     .putExtra(IntentHelper.DATA_DISTANCE, distance)
                     .putExtra(IntentHelper.DATA_STATE, state)
                     .putExtra(IntentHelper.DATA_POSITIONS, positionList)
@@ -253,7 +253,7 @@ public class TrackerService extends Service implements LocationListener {
     }
 
     private void countSpeed() {
-        speed = (float)distance / (float)(duration / 1000);
+        speed = (float)distance / (float)getSecondsDuration();
         speedList.add(speed);
         if (speedList.size() == 1)
             firstSpeedTime = new Date();
@@ -280,6 +280,10 @@ public class TrackerService extends Service implements LocationListener {
     private void countPace() {
         pace = 1000 / speed;
         Log.i(TAG, "Pace counted. (" + pace + "min/km)");
+    }
+
+    private long getSecondsDuration() {
+        return duration / 1000;
     }
 
     @Override
