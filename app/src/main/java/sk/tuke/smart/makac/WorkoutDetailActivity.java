@@ -39,6 +39,8 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     @BindString(R.string.workoutdetail_workoutname) String workoutTitle;
     @BindString(R.string.share_message) String shareMessage;
 
+    private ArrayList<List<Location>> finalPositionList;
+
     private Intent intent;
 
     private AlertDialog.Builder alertDialogBuilder;
@@ -54,23 +56,24 @@ public class WorkoutDetailActivity extends AppCompatActivity {
 
         try {
             intent = getIntent();
-            extrasRenderer(intent.getBundleExtra(IntentHelper.DATA_BUNDLE));
-            showMapButtonCheck((ArrayList<List<Location>>) intent.getBundleExtra(IntentHelper.DATA_BUNDLE).getSerializable(IntentHelper.DATA_POSITIONS));
-            createAlertDialog();
+            renderExtras();
+            finalPositionList = (ArrayList<List<Location>>) intent.getSerializableExtra(IntentHelper.DATA_POSITIONS);
+            mapButtonVisibilityCheck();
+            createShareAlertDialog();
         }
         catch(NullPointerException e) {
             Log.e(TAG, "Intent is missing values.");
         }
     }
 
-    private void extrasRenderer(Bundle bundle) {
+    private void renderExtras() {
         workoutTitleRenderer();
-        sportActivityRenderer(bundle.getInt(IntentHelper.DATA_SPORT, 0));
+        sportActivityRenderer(intent.getIntExtra(IntentHelper.DATA_SPORT, 0));
         activityDateRenderer();
-        durationRenderer(bundle.getLong(IntentHelper.DATA_DURATION, 0));
-        distanceRenderer(bundle.getDouble(IntentHelper.DATA_DISTANCE, 0));
-        avgPaceRenderer(bundle.getDouble(IntentHelper.DATA_PACE, 0));
-        caloriesRenderer(bundle.getDouble(IntentHelper.DATA_CALORIES, 0));
+        durationRenderer(intent.getLongExtra(IntentHelper.DATA_DURATION, 0));
+        distanceRenderer(intent.getDoubleExtra(IntentHelper.DATA_DISTANCE, 0));
+        avgPaceRenderer(intent.getDoubleExtra(IntentHelper.DATA_PACE, 0));
+        caloriesRenderer(intent.getDoubleExtra(IntentHelper.DATA_CALORIES, 0));
     }
 
     private void workoutTitleRenderer() {
@@ -116,7 +119,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         valueCaloriesTextView.setText(caloriesString);
     }
 
-    private void showMapButtonCheck(ArrayList<List<Location>> finalPositionList) {
+    private void mapButtonVisibilityCheck() {
         if (finalPositionList == null || finalPositionList.size() == 1 && finalPositionList.get(0).size() < 2) {
             showMapButton.setVisibility(View.GONE);
             showMapTextView.setVisibility(View.GONE);
@@ -128,7 +131,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    private void createAlertDialog() {
+    private void createShareAlertDialog() {
         String shareMessage = this.shareMessage;
         shareMessage = shareMessage
                 .replace("WORKOUT_TYPE", getSportActivityString(intent.getBundleExtra(IntentHelper.DATA_BUNDLE).getInt(IntentHelper.DATA_SPORT, 0)).toLowerCase())
@@ -162,9 +165,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     @OnClick(R.id.button_workoutdetail_showmap)
     public void showMapsActivity(View view) {
         Intent mapsIntent = new Intent(this, MapsActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(IntentHelper.DATA_POSITIONS, intent.getBundleExtra(IntentHelper.DATA_BUNDLE).getSerializable(IntentHelper.DATA_POSITIONS));
-        mapsIntent.putExtra(IntentHelper.DATA_BUNDLE, bundle);
+        mapsIntent.putExtra(IntentHelper.DATA_POSITIONS, finalPositionList);
         startActivity(mapsIntent);
     }
 

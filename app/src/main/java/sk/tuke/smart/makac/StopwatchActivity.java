@@ -146,14 +146,12 @@ public class StopwatchActivity extends AppCompatActivity {
                         startService(intent1);
 
                         Intent intent2 = new Intent(stopwatchActivity, WorkoutDetailActivity.class);
-                        Bundle bundle2 = new Bundle();
-                        bundle2.putInt(IntentHelper.DATA_SPORT, sportActivity);
-                        bundle2.putLong(IntentHelper.DATA_DURATION, duration);
-                        bundle2.putDouble(IntentHelper.DATA_DISTANCE, distance);
-                        bundle2.putDouble(IntentHelper.DATA_PACE, countAvgPace());
-                        bundle2.putDouble(IntentHelper.DATA_CALORIES, calories);
-                        bundle2.putSerializable(IntentHelper.DATA_POSITIONS, finalPositionList);
-                        intent2.putExtra(IntentHelper.DATA_BUNDLE, bundle2);
+                        intent2.putExtra(IntentHelper.DATA_SPORT, sportActivity);
+                        intent2.putExtra(IntentHelper.DATA_DURATION, duration);
+                        intent2.putExtra(IntentHelper.DATA_DISTANCE, distance);
+                        intent2.putExtra(IntentHelper.DATA_PACE, countAvgPace());
+                        intent2.putExtra(IntentHelper.DATA_CALORIES, calories);
+                        intent2.putExtra(IntentHelper.DATA_POSITIONS, finalPositionList);
                         startActivity(intent2);
                         dialogInterface.dismiss();
                         finish();

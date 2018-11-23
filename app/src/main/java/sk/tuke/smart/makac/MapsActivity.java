@@ -31,16 +31,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        Intent intent = getIntent();
-        parseIntent(intent);
+
+        finalPositionList = (ArrayList<List<Location>>) getIntent().getSerializableExtra(IntentHelper.DATA_POSITIONS);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_maps_workoutmap);
         mapFragment.getMapAsync(this);
-    }
-
-    private void parseIntent(Intent intent) {
-        Bundle bundle = intent.getBundleExtra(IntentHelper.DATA_BUNDLE);
-        finalPositionList = (ArrayList<List<Location>>) bundle.getSerializable(IntentHelper.DATA_POSITIONS);
     }
 
     @Override
