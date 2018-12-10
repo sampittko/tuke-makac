@@ -1,52 +1,146 @@
 <resources>
     <string name="app_name">Makač</string>
     <!-- STOPWATCH -->
-        <!-- DURATION -->
-        <string name="textview_stopwatch_labelduration">Duration</string>
-        <string name="textview_stopwatch_duration">00:00:00</string>
-        <!-- DISTANCE -->
-        <string name="textview_stopwatch_labeldistance">Distance</string>
-        <string name="textview_stopwatch_distance">0.0</string>
-        <string name="textview_stopwatch_distanceunit">km</string>
-        <!-- PACE -->
-        <string name="textview_stopwatch_labelpace">Pace</string>
-        <string name="textview_stopwatch_pace">00:00</string>
-        <string name="textview_stopwatch_unitpace">min/km</string>
-        <!-- CALORIES -->
-        <string name="textview_stopwatch_labelcalories">Calories</string>
-        <string name="textview_stopwatch_calories">0</string>
-        <string name="textview_stopwatch_unitcalories">kcal</string>
-        <!-- SELECT SPORT -->
-        <string name="textview_stopwatch_sportlabel">Sport</string>
-        <!-- STOPWATCH CONTROLS -->
-        <string name="stopwatch_start"></string>
-        <string name="stopwatch_stop"></string>
-        <string name="stopwatch_continue"></string>
-        <string name="stopwatch_endworkout"></string>
-        <!-- DIALOG BUTTONS -->
-        <string name="yes">Yes</string>
-        <string name="no">No</string>
+    <!-- DURATION -->
+    <string name="textview_stopwatch_labelduration">Duration</string>
+    <string name="textview_stopwatch_duration">00:00:00</string>
+    <!-- DISTANCE -->
+    <string name="textview_stopwatch_labeldistance">Distance</string>
+    <string name="textview_stopwatch_distance">0.0</string>
+    <string name="textview_stopwatch_distanceunit">km</string>
+    <!-- PACE -->
+    <string name="textview_stopwatch_labelpace">Pace</string>
+    <string name="textview_stopwatch_pace">00:00</string>
+    <string name="textview_stopwatch_unitpace">min/km</string>
+    <!-- CALORIES -->
+    <string name="textview_stopwatch_labelcalories">Calories</string>
+    <string name="textview_stopwatch_calories">0</string>
+    <string name="textview_stopwatch_unitcalories">kcal</string>
+    <!-- SELECT SPORT -->
+    <string name="textview_stopwatch_sportlabel">Sport</string>
+    <!-- STOPWATCH CONTROLS -->
+    <string name="stopwatch_start"></string>
+    <string name="stopwatch_stop"></string>
+    <string name="stopwatch_continue"></string>
+    <string name="stopwatch_endworkout"></string>
+    <!-- DIALOG BUTTONS -->
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
     <!-- WORKOUT DETAIL -->
-        <!-- Map -->
-        <string name="textview_workoutdetail_labelshowmap">Map</string>
-        <!-- MY WORKOUT -->
-        <string name="workoutdetail_workoutname">My Workout</string>
-            <!-- SPORT -->
-            <string name="textview_workoutdetail_labelsport">Sport</string>
-            <!-- SUMMARY -->
-            <string name="textview_workoutdetail_labelsummary">Summary</string>
-            <!-- DURATION -->
-            <string name="textview_workoutdetail_labelduration">Duration</string>
-            <!-- CALORIES -->
-            <string name="textview_workoutdetail_labelcalories">Calories</string>
-            <!-- DISTANCE -->
-            <string name="textview_workoutdetail_labeldistance">Distance</string>
-            <!-- AVG. PACE -->
-            <string name="textview_workoutdetail_labelavgpace">Average pace</string>
-        <!-- SOCIAL SHARE -->
-        <string name="textview_workoutdetail_labelsocialshare">Social share</string>
-        <string name="share">Share</string>
-        <string name="close">Close</string>
-        <string name="share_message">I was out for WORKOUT_TYPE. I tracked DISTANCE UNIT in DURATION.</string>
+    <!-- Map -->
+    <string name="textview_workoutdetail_labelshowmap">Map</string>
+    <!-- MY WORKOUT -->
+    <string name="workoutdetail_workoutname">My Workout</string>
+    <!-- SPORT -->
+    <string name="textview_workoutdetail_labelsport">Sport</string>
+    <!-- SUMMARY -->
+    <string name="textview_workoutdetail_labelsummary">Summary</string>
+    <!-- DURATION -->
+    <string name="textview_workoutdetail_labelduration">Duration</string>
+    <!-- CALORIES -->
+    <string name="textview_workoutdetail_labelcalories">Calories</string>
+    <!-- DISTANCE -->
+    <string name="textview_workoutdetail_labeldistance">Distance</string>
+    <!-- AVG. PACE -->
+    <string name="textview_workoutdetail_labelavgpace">Average pace</string>
+    <!-- SOCIAL SHARE -->
+    <string name="textview_workoutdetail_labelsocialshare">Social share</string>
+    <string name="share">Share</string>
+    <string name="close">Close</string>
+    <string name="share_message">I was out for WORKOUT_TYPE. I tracked DISTANCE UNIT in DURATION.</string>
+    <string name="title_activity_active_workout_map">Map</string>
+    <string name="title_activity_login">Sign in</string>
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_social_recommendations">Enable social recommendations</string>
+    <string name="pref_description_social_recommendations">Recommendations for people to contact
+        based on your message history
+    </string>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+    <string-array name="pref_example_list_titles">
+        <item>Always</item>
+        <item>When possible</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>Entry 1</item>
+        <item>Entry 2</item>
+        <item>Entry 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value" />
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="pref_header_notifications">Notifications</string>
+
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
 </resources>
