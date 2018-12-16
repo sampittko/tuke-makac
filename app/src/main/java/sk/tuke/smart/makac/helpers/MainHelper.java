@@ -65,4 +65,9 @@ public final class MainHelper {
     public static double minpkmToMinpmi(double n) {
         return n * MINpKM_TO_MINpMI;
     }
+
+    /* convert kmph to miph (multiply with corresponding constant) */
+    public static double kmphToMiph(double n) {
+        return n * MINpKM_TO_MINpMI * 60;
+    }
 }
