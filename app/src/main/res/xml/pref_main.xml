@@ -1,0 +1,21 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="GENERAL SETTINGS">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="gps_checking_switch"
+            android:summary="@string/pref_description_gps_checking"
+            android:title="@string/pref_title_gps_checking" />
+
+        <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
+             dismiss it. -->
+        <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/pref_list_titles_unit"
+            android:entryValues="@array/pref_list_values_unit"
+            android:key="list_unit"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="@string/pref_title_unit" />
+    </PreferenceCategory>
+</PreferenceScreen>

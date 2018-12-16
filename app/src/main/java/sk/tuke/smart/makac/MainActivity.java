@@ -1,5 +1,6 @@
 package sk.tuke.smart.makac;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -9,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import sk.tuke.smart.makac.settings.SettingsActivity;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -56,6 +59,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 
@@ -71,6 +75,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_workout) {
         } else if (id == R.id.nav_history) {
         } else if (id == R.id.nav_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
         } else if (id == R.id.nav_about) {
         }
 
