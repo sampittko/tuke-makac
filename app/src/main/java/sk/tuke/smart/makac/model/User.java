@@ -1,17 +1,30 @@
 package sk.tuke.smart.makac.model;
 
 public class User {
-    private int id;
+    private long id;
     /**
-     * foreign key to User model
+     * integer, numeric identifier of account type (G+, Facebook, etc.)
      */
-    private int user;
+    private int accType;
     /**
-     * weight - weight in kg
+     * 3rd party service account id (eg. G+ identifier)
      */
-    private float weight;
+    private String accId;
+    /**
+     * auth token for accessing 3rd party service data about user
+     */
+    private String authToken;
 
-    public int getId() {
+    public User() {
+
+    }
+
+    public User(int accType, String accId) {
+        this.accType = accType;
+        this.accId = accId;
+    }
+
+    public long getId() {
         return id;
     }
 
@@ -19,19 +32,27 @@ public class User {
         this.id = id;
     }
 
-    public int getUser() {
-        return user;
+    public int getAccType() {
+        return accType;
     }
 
-    public void setUser(int user) {
-        this.user = user;
+    public void setAccType(int accType) {
+        this.accType = accType;
     }
 
-    public float getWeight() {
-        return weight;
+    public String getAccId() {
+        return accId;
     }
 
-    public void setWeight(float weight) {
-        this.weight = weight;
+    public void setAccId(String accId) {
+        this.accId = accId;
+    }
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
     }
 }

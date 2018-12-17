@@ -3,11 +3,20 @@ package sk.tuke.smart.makac.model;
 import java.util.Date;
 
 public class Workout {
-    private int id;
+    // initial status of workout
+    public static final int statusUnknown = 0;
+    // ended workout
+    public static final int statusEnded = 1;
+    // paused workout
+    public static final int statusPaused = 2;
+    // deleted workout
+    public static final int statusDeleted= 3;
+
+    private long id;
     /**
      * Foreign key to User model
      */
-    private int user;
+    private long user;
     private String title;
     private Date created;
     /**
@@ -24,7 +33,16 @@ public class Workout {
     private int sportActivity;
     private Date lastUpdate;
 
-    public int getId() {
+    public Workout() {
+
+    }
+
+    public Workout(String title, int sportActivity) {
+        this.title = title;
+        this.sportActivity = sportActivity;
+    }
+
+    public long getId() {
         return id;
     }
 
@@ -32,7 +50,7 @@ public class Workout {
         this.id = id;
     }
 
-    public int getUser() {
+    public long getUser() {
         return user;
     }
 

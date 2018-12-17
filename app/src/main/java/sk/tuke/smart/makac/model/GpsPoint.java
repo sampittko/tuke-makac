@@ -1,29 +1,46 @@
 package sk.tuke.smart.makac.model;
 
+import android.location.Location;
+
 import java.util.Date;
 
 public class GpsPoint {
-    private int id;
+    private long id;
     /**
      * Foreign key to Workout model
      */
-    private int workout;
+    private Workout workout;
 
     /**
      * sessionNumber - number of workout session (new session is
      * created after pause/start click). Lower number is earlier session.
      */
-    private int sessionNumber;
+    private long sessionNumber;
     private double latitude;
     private double longitude;
     private long duration;
-    private double speed;
+    private float speed;
     private double pace;
     private double totalCalories;
     private Date created;
     private Date lastUpdate;
 
-    public int getId() {
+    public GpsPoint() {
+
+    }
+
+    public GpsPoint(Workout workout, long sessionNumber, Location location, long duration, float speed, double pace, double totalCalories) {
+        this.workout = workout;
+        this.sessionNumber = sessionNumber;
+        this.latitude = location.getLatitude();
+        this.longitude = location.getLongitude();
+        this.duration = duration;
+        this.speed = speed;
+        this.pace = pace;
+        this.totalCalories = totalCalories;
+    }
+
+    public long getId() {
         return id;
     }
 
@@ -31,7 +48,15 @@ public class GpsPoint {
         this.id = id;
     }
 
-    public int getSessionNumber() {
+    public Workout getWorkout() {
+        return workout;
+    }
+
+    public void setWorkout(Workout workout) {
+        this.workout = workout;
+    }
+
+    public long getSessionNumber() {
         return sessionNumber;
     }
 
@@ -63,11 +88,11 @@ public class GpsPoint {
         this.duration = duration;
     }
 
-    public double getSpeed() {
+    public float getSpeed() {
         return speed;
     }
 
-    public void setSpeed(double speed) {
+    public void setSpeed(float speed) {
         this.speed = speed;
     }
 
