@@ -1,14 +1,19 @@
 package sk.tuke.smart.makac.model;
 
+import com.j256.ormlite.field.DatabaseField;
+
 public class UserProfile {
+    @DatabaseField(generatedId = true, unique = true)
     private long id;
     /**
      * foreign key to User model
      */
+    @DatabaseField(foreign = true)
     private long user;
     /**
      * weight - weight in kg
      */
+    @DatabaseField
     private float weight;
 
     public UserProfile() {

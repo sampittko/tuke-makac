@@ -1,5 +1,7 @@
 package sk.tuke.smart.makac.model;
 
+import com.j256.ormlite.field.DatabaseField;
+
 import java.util.Date;
 
 public class Workout {
@@ -12,12 +14,16 @@ public class Workout {
     // deleted workout
     public static final int statusDeleted= 3;
 
+    @DatabaseField(generatedId = true, unique = true)
     private long id;
     /**
      * Foreign key to User model
      */
+    @DatabaseField(foreign = true)
     private long user;
+    @DatabaseField
     private String title;
+    @DatabaseField
     private Date created;
     /**
      * 0 - unknown (active workout)
@@ -25,12 +31,19 @@ public class Workout {
      * 2 - paused
      * 3 - deleted
      */
+    @DatabaseField
     private int status;
+    @DatabaseField
     private double distance;
+    @DatabaseField
     private long duration;
+    @DatabaseField
     private double totalCalories;
+    @DatabaseField
     private double paceAvg;
+    @DatabaseField
     private int sportActivity;
+    @DatabaseField
     private Date lastUpdate;
 
     public Workout() {

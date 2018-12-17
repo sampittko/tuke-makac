@@ -1,0 +1,129 @@
+#
+# generated on 2018/12/17 02:01:44
+#
+# --table-start--
+dataClass=sk.tuke.smart.makac.model.GpsPoint
+tableName=gpspoint
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+unique=true
+# --field-end--
+# --field-start--
+fieldName=workout
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=sessionNumber
+# --field-end--
+# --field-start--
+fieldName=latitude
+# --field-end--
+# --field-start--
+fieldName=longitude
+# --field-end--
+# --field-start--
+fieldName=duration
+# --field-end--
+# --field-start--
+fieldName=speed
+# --field-end--
+# --field-start--
+fieldName=pace
+# --field-end--
+# --field-start--
+fieldName=totalCalories
+# --field-end--
+# --field-start--
+fieldName=created
+# --field-end--
+# --field-start--
+fieldName=lastUpdate
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=sk.tuke.smart.makac.model.Workout
+tableName=workout
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+unique=true
+# --field-end--
+# --field-start--
+fieldName=user
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=title
+# --field-end--
+# --field-start--
+fieldName=created
+# --field-end--
+# --field-start--
+fieldName=status
+# --field-end--
+# --field-start--
+fieldName=distance
+# --field-end--
+# --field-start--
+fieldName=duration
+# --field-end--
+# --field-start--
+fieldName=totalCalories
+# --field-end--
+# --field-start--
+fieldName=paceAvg
+# --field-end--
+# --field-start--
+fieldName=sportActivity
+# --field-end--
+# --field-start--
+fieldName=lastUpdate
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=sk.tuke.smart.makac.model.User
+tableName=user
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+unique=true
+# --field-end--
+# --field-start--
+fieldName=accType
+# --field-end--
+# --field-start--
+fieldName=accId
+# --field-end--
+# --field-start--
+fieldName=authToken
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=sk.tuke.smart.makac.model.UserProfile
+tableName=userprofile
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+unique=true
+# --field-end--
+# --field-start--
+fieldName=user
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=weight
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################

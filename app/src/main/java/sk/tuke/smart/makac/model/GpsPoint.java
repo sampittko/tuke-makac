@@ -2,27 +2,40 @@ package sk.tuke.smart.makac.model;
 
 import android.location.Location;
 
+import com.j256.ormlite.field.DatabaseField;
+
 import java.util.Date;
 
 public class GpsPoint {
+    @DatabaseField(generatedId = true, unique = true)
     private long id;
     /**
      * Foreign key to Workout model
      */
+    @DatabaseField(foreign = true)
     private Workout workout;
 
     /**
      * sessionNumber - number of workout session (new session is
      * created after pause/start click). Lower number is earlier session.
      */
+    @DatabaseField
     private long sessionNumber;
+    @DatabaseField
     private double latitude;
+    @DatabaseField
     private double longitude;
+    @DatabaseField
     private long duration;
+    @DatabaseField
     private float speed;
+    @DatabaseField
     private double pace;
+    @DatabaseField
     private double totalCalories;
+    @DatabaseField
     private Date created;
+    @DatabaseField
     private Date lastUpdate;
 
     public GpsPoint() {
