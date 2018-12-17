@@ -179,8 +179,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_main);
-            bindPreferenceSummaryToValue(findPreference("gps_checking_switch"));
-            bindPreferenceSummaryToValue(findPreference("list_unit"));
+            // TODO
+            // bindPreferenceSummaryToValue(findPreference("gps_checking_switch"));
+            // bindPreferenceSummaryToValue(findPreference("list_unit"));
         }
 
         @Override

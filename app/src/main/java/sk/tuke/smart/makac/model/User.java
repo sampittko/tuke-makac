@@ -13,7 +13,7 @@ public class User {
     /**
      * 3rd party service account id (eg. G+ identifier)
      */
-    @DatabaseField
+    @DatabaseField(unique = true)
     private String accId;
     /**
      * auth token for accessing 3rd party service data about user
