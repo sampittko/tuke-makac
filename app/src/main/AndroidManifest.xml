@@ -47,7 +47,6 @@
         <activity android:name=".StopwatchActivity" />
         <activity android:name=".MapsActivity" />
         <activity android:name=".WorkoutDetailActivity" />
-
         <activity
             android:name=".ActiveWorkoutMapActivity"
             android:label="@string/title_activity_active_workout_map" />
@@ -56,7 +55,12 @@
             android:label="@string/title_activity_login" />
         <activity
             android:name=".settings.SettingsActivity"
-            android:label="@string/title_activity_settings" />
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="sk.tuke.smart.makac.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

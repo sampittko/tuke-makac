@@ -18,6 +18,7 @@ import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import android.view.MenuItem;
+import android.support.v4.app.NavUtils;
 
 import sk.tuke.smart.makac.R;
 
@@ -121,6 +122,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getFragmentManager()
+                .beginTransaction()
+                .replace(android.R.id.content, new MainPreferenceFragment())
+                .commit();
         setupActionBar();
     }
 
@@ -136,13 +141,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            finish();
+            if (!super.onMenuItemSelected(featureId, item)) {
+                NavUtils.navigateUpFromSameTask(this);
+            }
             return true;
         }
-        return super.onOptionsItemSelected(item);
+        return super.onMenuItemSelected(featureId, item);
     }
 
     /**
@@ -172,11 +179,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_main);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
             bindPreferenceSummaryToValue(findPreference("gps_checking_switch"));
             bindPreferenceSummaryToValue(findPreference("list_unit"));
         }
