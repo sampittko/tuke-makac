@@ -1,7 +1,9 @@
 package sk.tuke.smart.makac.model;
 
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
+@DatabaseTable
 public class UserProfile {
     @DatabaseField(generatedId = true, unique = true)
     private long id;
@@ -9,7 +11,7 @@ public class UserProfile {
      * foreign key to User model
      */
     @DatabaseField(foreign = true)
-    private long user;
+    private User user;
     /**
      * weight - weight in kg
      */
@@ -28,11 +30,11 @@ public class UserProfile {
         this.id = id;
     }
 
-    public long getUser() {
+    public User getUser() {
         return user;
     }
 
-    public void setUser(int user) {
+    public void setUser(User user) {
         this.user = user;
     }
 

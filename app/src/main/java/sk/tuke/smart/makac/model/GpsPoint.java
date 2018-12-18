@@ -3,9 +3,11 @@ package sk.tuke.smart.makac.model;
 import android.location.Location;
 
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
 import java.util.Date;
 
+@DatabaseTable
 public class GpsPoint {
     @DatabaseField(generatedId = true, unique = true)
     private long id;

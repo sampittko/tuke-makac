@@ -1,9 +1,11 @@
 package sk.tuke.smart.makac.model;
 
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
 import java.util.Date;
 
+@DatabaseTable
 public class Workout {
     // initial status of workout
     public static final int statusUnknown = 0;
@@ -20,7 +22,7 @@ public class Workout {
      * Foreign key to User model
      */
     @DatabaseField(foreign = true)
-    private long user;
+    private User user;
     @DatabaseField
     private String title;
     @DatabaseField
@@ -63,11 +65,11 @@ public class Workout {
         this.id = id;
     }
 
-    public long getUser() {
+    public User getUser() {
         return user;
     }
 
-    public void setUser(int user) {
+    public void setUser(User user) {
         this.user = user;
     }
 

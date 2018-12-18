@@ -16,6 +16,7 @@ public final class IntentHelper {
     public static final String DATA_LOCATION = "location";
     public static final String DATA_POSITIONS = "finalPositionList";
     public static final String DATA_STATE = "state";
+    public static final String DATA_WORKOUT = "workoutId";
 
     public static final int STATE_STOPPED = 1;
     public static final int STATE_RUNNING = 2;

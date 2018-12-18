@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -26,6 +25,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.j256.ormlite.dao.Dao;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,16 +43,11 @@ import sk.tuke.smart.makac.WorkoutDetailActivity;
 import sk.tuke.smart.makac.exceptions.SensorNotPresentException;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
+import sk.tuke.smart.makac.model.User;
+import sk.tuke.smart.makac.model.Workout;
+import sk.tuke.smart.makac.model.config.DatabaseHelper;
 import sk.tuke.smart.makac.services.TrackerService;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link StopwatchFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link StopwatchFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class StopwatchFragment extends Fragment {
     @BindView(R.id.button_stopwatch_start) public Button startWorkoutButton;
     @BindView(R.id.button_stopwatch_endworkout) public Button endWorkoutButton;
@@ -64,7 +62,7 @@ public class StopwatchFragment extends Fragment {
     @BindString(R.string.stopwatch_stop) public String stopString;
     @BindString(R.string.stopwatch_continue) public String continueString;
 
-    private boolean workoutStarted, workoutPaused;
+    private boolean workoutStarted, workoutPaused, persistedOnce;
 
     private AlertDialog.Builder alertDialogBuilder;
     private AlertDialog alertDialog;
@@ -87,6 +85,12 @@ public class StopwatchFragment extends Fragment {
 
     private FragmentActivity thisFragmentActivity;
 
+    private DatabaseHelper databaseHelper;
+
+    private List<Workout> workouts;
+
+    private Workout currentWorkout;
+
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent broadcastIntent) {
@@ -106,36 +110,13 @@ public class StopwatchFragment extends Fragment {
         }
     };
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-//    private static final String ARG_PARAM1 = "param1";
-//    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-//    private String mParam1;
-//    private String mParam2;
-
     private OnFragmentInteractionListener mListener;
 
     public StopwatchFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-//     * @param param1 Parameter 1.
-//     * @param param2 Parameter 2.
-     * @return A new instance of fragment StopwatchFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static StopwatchFragment newInstance() {
-//        StopwatchFragment fragment = new StopwatchFragment();
-//        Bundle args = new Bundle();
-//        args.putString(ARG_PARAM1, param1);
-//        args.putString(ARG_PARAM2, param2);
-//        fragment.setArguments(args);
         return new StopwatchFragment();
     }
 
@@ -147,6 +128,11 @@ public class StopwatchFragment extends Fragment {
 
         thisFragmentActivity = getActivity();
         thisFragmentActivity.setTitle(R.string.app_name);
+
+        databaseHelper = OpenHelperManager.getHelper(thisFragmentActivity, DatabaseHelper.class);
+
+//        createNewWorkout();
+//        createUser();
 
         try {
             checkGPS();
@@ -161,10 +147,38 @@ public class StopwatchFragment extends Fragment {
         intentFilter = new IntentFilter();
         intentFilter.addAction(IntentHelper.ACTION_TICK);
         intentFilter.addAction(IntentHelper.ACTION_GPS);
-//        if (getArguments() != null) {
-//            mParam1 = getArguments().getString(ARG_PARAM1);
-//            mParam2 = getArguments().getString(ARG_PARAM2);
-//        }
+    }
+
+    private void createUser() {
+        try {
+            Dao<User, Long> userDao = databaseHelper.userDao();
+            userDao.create(new User());
+            List<User> users = userDao.queryForAll();
+            Log.i("usersprofile", users.toString());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createNewWorkout() {
+        currentWorkout = new Workout();
+
+        try {
+            workouts = databaseHelper.workoutDao().queryForAll();
+        }
+        catch(SQLException e) {
+            Log.e(TAG, "SQL error.");
+        }
+
+        if (workouts.size() == 0) {
+            currentWorkout.setTitle("Workout 1");
+            Log.i(TAG, "Workout ID is 1.");
+        }
+        else {
+            currentWorkout.setTitle("Workout " + (workouts.size() + 1));
+            Log.i(TAG, "Workout ID is " + (workouts.size() + 1) + ".");
+        }
+        currentWorkout.setSportActivity(sportActivity);
     }
 
     @Override
@@ -227,6 +241,8 @@ public class StopwatchFragment extends Fragment {
                         intent2.putExtra(IntentHelper.DATA_PACE, countAvgPace());
                         intent2.putExtra(IntentHelper.DATA_CALORIES, calories);
                         intent2.putExtra(IntentHelper.DATA_POSITIONS, finalPositionList);
+                        // TODO workoutId Intent
+                        intent2.putExtra(IntentHelper.DATA_WORKOUT, 0);
                         startActivity(intent2);
                         dialogInterface.dismiss();
                         thisFragmentActivity.finish();
@@ -257,13 +273,6 @@ public class StopwatchFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_stopwatch, container, false);
         ButterKnife.bind(this, view);
         return view;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-//        if (mListener != null) {
-//            mListener.onFragmentInteraction(uri);
-//        }
     }
 
     @Override
@@ -422,8 +431,18 @@ public class StopwatchFragment extends Fragment {
             Log.i(TAG, "No new location received for " + lastLocationUpdateBeforeSeconds + " seconds.");
 
             if (lastLocationUpdateBeforeSeconds > 10) {
-                Log.e(TAG, "Cannot save workout data to database!");
-                lastLocationUpdateBeforeSeconds = 0;
+                try {
+                    if (persistedOnce) {
+                        databaseHelper.workoutDao().delete(currentWorkout);
+                    }
+                    databaseHelper.workoutDao().create(currentWorkout);
+                    persistedOnce = true;
+                    Log.i(TAG, "Workout data saved to database.");
+                    lastLocationUpdateBeforeSeconds = 0;
+                }
+                catch (SQLException e) {
+                    Log.e(TAG , "Cannot persist workout to database!");
+                }
             }
 
             return;
@@ -475,18 +494,5 @@ public class StopwatchFragment extends Fragment {
         Log.i(TAG, "Showing active workout map.");
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-//         TODO: Update argument type and name
-//        void onFragmentInteraction(Uri uri);
-    }
+    public interface OnFragmentInteractionListener {}
 }
