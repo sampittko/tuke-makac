@@ -31,6 +31,7 @@ import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import sk.tuke.smart.makac.ActiveWorkoutMapActivity;
 import sk.tuke.smart.makac.R;
 import sk.tuke.smart.makac.WorkoutDetailActivity;
 import sk.tuke.smart.makac.exceptions.SensorNotPresentException;
@@ -148,7 +149,7 @@ public class StopwatchFragment extends Fragment {
             activity.finish();
         }
 
-        createAlertDialog();
+        createStopWorkoutAlertDialog();
 
         intentFilter = new IntentFilter();
         intentFilter.addAction(IntentHelper.ACTION_TICK);
@@ -181,7 +182,7 @@ public class StopwatchFragment extends Fragment {
             Log.i(TAG, "Location permissions OK.");
     }
 
-    private void createAlertDialog() {
+    private void createStopWorkoutAlertDialog() {
         alertDialogBuilder = new AlertDialog.Builder(activity);
         alertDialogBuilder.setTitle("Stop workout")
                 .setMessage("Do you really want to stop recording?")
@@ -429,6 +430,13 @@ public class StopwatchFragment extends Fragment {
             paceCount += pace;
 
         return paceCount / paceList.size();
+    }
+
+    @OnClick(R.id.button_stopwatch_activeworkout)
+    public void showActiveWorkoutMap(View view) {
+        startActivity(new Intent(activity, ActiveWorkoutMapActivity.class));
+
+        Log.i(TAG, "Showing active workout map.");
     }
 
     /**

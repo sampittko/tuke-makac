@@ -24,6 +24,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initializeMainActivityLayout();
+    }
+
+    private void initializeMainActivityLayout() {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -36,7 +40,10 @@ public class MainActivity extends AppCompatActivity
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        displayStopwatchFragment();
+    }
 
+    private void displayStopwatchFragment() {
         MenuItem workoutMenuItem = navigationView.getMenu().findItem(R.id.nav_workout);
         onNavigationItemSelected(workoutMenuItem);
         workoutMenuItem.setChecked(true);
