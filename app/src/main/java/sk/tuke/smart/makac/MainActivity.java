@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             navigationView.getCheckedItem().setChecked(false);
+            navigationView.getMenu().findItem(R.id.nav_workout).setChecked(true);
             if (!getTitle().equals(R.string.app_name))
                 setTitle(R.string.app_name);
             super.onBackPressed();

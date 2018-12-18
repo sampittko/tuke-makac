@@ -17,6 +17,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -138,6 +141,8 @@ public class StopwatchFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(true);
+
         activity = getActivity();
         activity.setTitle(R.string.app_name);
 
@@ -158,6 +163,23 @@ public class StopwatchFragment extends Fragment {
 //            mParam1 = getArguments().getString(ARG_PARAM1);
 //            mParam2 = getArguments().getString(ARG_PARAM2);
 //        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.syncwithserver, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_syncwithserver) {
+            // TODO sync with server options available when logged in and Makacs Sync REST API
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void checkGPS() throws SensorNotPresentException {
