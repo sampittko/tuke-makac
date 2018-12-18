@@ -36,6 +36,10 @@ public class MainActivity extends AppCompatActivity
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        MenuItem workoutMenuItem = navigationView.getMenu().findItem(R.id.nav_workout);
+        onNavigationItemSelected(workoutMenuItem);
+        workoutMenuItem.setChecked(true);
     }
 
     @Override
@@ -83,10 +87,10 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_workout) {
-//            getSupportFragmentManager()
-//                    .beginTransaction()
-//                    .replace(R.id.main_replaceable, StopwatchFragment.newInstance())
-//                    .commit();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main_replaceable, StopwatchFragment.newInstance())
+                    .commit();
         } else if (id == R.id.nav_history) {
             getSupportFragmentManager()
                     .beginTransaction()
