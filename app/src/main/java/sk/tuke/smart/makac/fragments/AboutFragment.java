@@ -26,7 +26,7 @@ public class AboutFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().setTitle(R.string.nav_about);
+        getActivity().setTitle(R.string.menu_about);
         setHasOptionsMenu(true);
     }
 
