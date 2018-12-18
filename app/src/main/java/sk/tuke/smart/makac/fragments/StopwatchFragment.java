@@ -71,11 +71,13 @@ public class StopwatchFragment extends Fragment {
 
     private int sportActivity = IntentHelper.ACTIVITY_RUNNING;
 
+    private int lastLocationUpdateBeforeSeconds = 0;
+
     private long duration;
 
     private double distance, pace, calories, totalCalories, latestBiggestNonZeroCalories;
 
-    private final String TAG = "StopwatchActivity";
+    private final String TAG = "StopwatchFragment";
 
     private ArrayList<Double> paceList = new ArrayList<>();
     private ArrayList<Location> latestPositionList = new ArrayList<>();
@@ -83,7 +85,7 @@ public class StopwatchFragment extends Fragment {
 
     private IntentFilter intentFilter;
 
-    private FragmentActivity activity;
+    private FragmentActivity thisFragmentActivity;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -91,7 +93,7 @@ public class StopwatchFragment extends Fragment {
             try {
                 if (broadcastIntent.getAction().equals(IntentHelper.ACTION_TICK)) {
                     renderValues(broadcastIntent);
-                    verifyLatestPositionList(broadcastIntent.<Location>getParcelableArrayListExtra(IntentHelper.DATA_POSITIONS));
+                    verifyNewestLocation((Location)broadcastIntent.getParcelableExtra(IntentHelper.DATA_LOCATION));
                 }
                 else if (broadcastIntent.getAction().equals(IntentHelper.ACTION_GPS))
                     saveLatestPositionList();
@@ -143,15 +145,15 @@ public class StopwatchFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
-        activity = getActivity();
-        activity.setTitle(R.string.app_name);
+        thisFragmentActivity = getActivity();
+        thisFragmentActivity.setTitle(R.string.app_name);
 
         try {
             checkGPS();
         }
         catch(SensorNotPresentException e) {
             Log.e(TAG, "GPS sensor is missing so application cannot be started.");
-            activity.finish();
+            thisFragmentActivity.finish();
         }
 
         createStopWorkoutAlertDialog();
@@ -188,16 +190,16 @@ public class StopwatchFragment extends Fragment {
     }
 
     private void checkSensorPresence() throws SensorNotPresentException {
-        if (!activity.getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS)) {
-            Toast.makeText(activity, "Missing GPS sensor in device. Application closing.", Toast.LENGTH_LONG).show();
+        if (!thisFragmentActivity.getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS)) {
+            Toast.makeText(thisFragmentActivity, "Missing GPS sensor in device. Application closing.", Toast.LENGTH_LONG).show();
             throw new SensorNotPresentException();
         }
     }
 
     private void checkLocationPermissions() {
-        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED
-                || ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},0);
+        if (ActivityCompat.checkSelfPermission(thisFragmentActivity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED
+                || ActivityCompat.checkSelfPermission(thisFragmentActivity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(thisFragmentActivity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},0);
             Log.i(TAG, "Location permissions requested.");
         }
         else
@@ -205,7 +207,7 @@ public class StopwatchFragment extends Fragment {
     }
 
     private void createStopWorkoutAlertDialog() {
-        alertDialogBuilder = new AlertDialog.Builder(activity);
+        alertDialogBuilder = new AlertDialog.Builder(thisFragmentActivity);
         alertDialogBuilder.setTitle("Stop workout")
                 .setMessage("Do you really want to stop recording?")
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
@@ -214,11 +216,11 @@ public class StopwatchFragment extends Fragment {
                         saveLatestPositionList();
                         endWorkoutButton.setText(stopString);
 
-                        Intent intent1 = new Intent(activity, TrackerService.class);
+                        Intent intent1 = new Intent(thisFragmentActivity, TrackerService.class);
                         intent1.setAction(IntentHelper.ACTION_STOP);
-                        activity.startService(intent1);
+                        thisFragmentActivity.startService(intent1);
 
-                        Intent intent2 = new Intent(activity, WorkoutDetailActivity.class);
+                        Intent intent2 = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
                         intent2.putExtra(IntentHelper.DATA_SPORT, sportActivity);
                         intent2.putExtra(IntentHelper.DATA_DURATION, duration);
                         intent2.putExtra(IntentHelper.DATA_DISTANCE, distance);
@@ -227,7 +229,7 @@ public class StopwatchFragment extends Fragment {
                         intent2.putExtra(IntentHelper.DATA_POSITIONS, finalPositionList);
                         startActivity(intent2);
                         dialogInterface.dismiss();
-                        activity.finish();
+                        thisFragmentActivity.finish();
                     }
                 })
                 .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -241,9 +243,9 @@ public class StopwatchFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        activity.unregisterReceiver(broadcastReceiver);
+        thisFragmentActivity.unregisterReceiver(broadcastReceiver);
         if (!workoutStarted || workoutPaused)
-            activity.stopService(new Intent(activity, TrackerService.class));
+            thisFragmentActivity.stopService(new Intent(thisFragmentActivity, TrackerService.class));
 
         Log.i(TAG, "Receiver unregistered.");
     }
@@ -267,9 +269,9 @@ public class StopwatchFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        activity.registerReceiver(broadcastReceiver, intentFilter);
+        thisFragmentActivity.registerReceiver(broadcastReceiver, intentFilter);
         if (!workoutStarted)
-            activity.startService(new Intent(activity, TrackerService.class));
+            thisFragmentActivity.startService(new Intent(thisFragmentActivity, TrackerService.class));
 
         Log.i(TAG, "Receiver registered.");
     }
@@ -277,8 +279,8 @@ public class StopwatchFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Intent intent = new Intent(activity, TrackerService.class);
-        activity.stopService(intent);
+        Intent intent = new Intent(thisFragmentActivity, TrackerService.class);
+        thisFragmentActivity.stopService(intent);
     }
 
     @Override
@@ -312,9 +314,9 @@ public class StopwatchFragment extends Fragment {
 
     private void toggleRecording(boolean useStopString, boolean usePauseDrawable, String intentAction, boolean endWorkoutButtonVisible, boolean changeWorkoutStarted) {
         // START SERVICE WITH CORRESPONDING ACTION
-        Intent intent = new Intent(activity, TrackerService.class);
+        Intent intent = new Intent(thisFragmentActivity, TrackerService.class);
         intent.setAction(intentAction);
-        activity.startService(intent);
+        thisFragmentActivity.startService(intent);
 
         // CHANGE BUTTON STRING
         if (useStopString)
@@ -412,17 +414,29 @@ public class StopwatchFragment extends Fragment {
         Log.i(TAG, "Alert dialog is now visible.");
     }
 
-    private void verifyLatestPositionList(List<Location> newPositionList) {
-        if (newPositionList.size() == 0) {
-            Log.i(TAG, "There are no locations inside the list.");
+    private void verifyNewestLocation(Location newestLocation) {
+        if (newestLocation == null) {
+            Log.i(TAG, "There is no new location.");
+            lastLocationUpdateBeforeSeconds++;
+
+            Log.i(TAG, "No new location received for " + lastLocationUpdateBeforeSeconds + " seconds.");
+
+            if (lastLocationUpdateBeforeSeconds > 10) {
+                Log.e(TAG, "Cannot save workout data to database!");
+                lastLocationUpdateBeforeSeconds = 0;
+            }
+
             return;
         }
 
-        Location newPositionListNewestLocation = newPositionList.get(newPositionList.size() - 1);
+        lastLocationUpdateBeforeSeconds = 0;
+
+        Log.e(TAG, "Cannot save new location to database!");
+
         Location latestPositionListNewestLocation = latestPositionList.size() == 0 ? new Location("") : latestPositionList.get(latestPositionList.size() - 1);
 
-        if (newPositionListNewestLocation.getTime() != latestPositionListNewestLocation.getTime()) {
-            latestPositionList.add(newPositionListNewestLocation);
+        if (newestLocation.getTime() != latestPositionListNewestLocation.getTime()) {
+            latestPositionList.add(newestLocation);
             Log.i(TAG, "Position list updated.");
             return;
         }
@@ -456,7 +470,7 @@ public class StopwatchFragment extends Fragment {
 
     @OnClick(R.id.button_stopwatch_activeworkout)
     public void showActiveWorkoutMap(View view) {
-        startActivity(new Intent(activity, ActiveWorkoutMapActivity.class));
+        startActivity(new Intent(thisFragmentActivity, ActiveWorkoutMapActivity.class));
 
         Log.i(TAG, "Showing active workout map.");
     }

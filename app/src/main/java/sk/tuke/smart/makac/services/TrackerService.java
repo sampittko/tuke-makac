@@ -35,6 +35,7 @@ public class TrackerService extends Service implements LocationListener {
     private boolean hasContinued, locationUpdateReceived;
 
     private Location previousPosition;
+    private Location currentLocation;
 
     private Date firstSpeedTime, lastSpeedTime;
 
@@ -70,6 +71,8 @@ public class TrackerService extends Service implements LocationListener {
             sendBroadcast(createBroadcastIntent());
             Log.i(TAG, "Broadcast intent with action TICK sent.");
 
+            currentLocation = null;
+
             handler.postDelayed(this, 1000);
         }
 
@@ -78,7 +81,7 @@ public class TrackerService extends Service implements LocationListener {
                     .putExtra(IntentHelper.DATA_DURATION, getSecondsDuration())
                     .putExtra(IntentHelper.DATA_DISTANCE, distance)
                     .putExtra(IntentHelper.DATA_STATE, state)
-                    .putExtra(IntentHelper.DATA_POSITIONS, positionList)
+                    .putExtra(IntentHelper.DATA_LOCATION, currentLocation)
                     .putExtra(IntentHelper.DATA_SPORT, sportActivity)
                     .putExtra(IntentHelper.DATA_PACE, pace)
                     .putExtra(IntentHelper.DATA_CALORIES, calories);
@@ -188,6 +191,7 @@ public class TrackerService extends Service implements LocationListener {
         if (state != IntentHelper.STATE_PAUSED) {
             location.setTime(new Date().getTime());
             positionList.add(location);
+            currentLocation = location;
 
             try {
                 countDistance();
@@ -198,6 +202,7 @@ public class TrackerService extends Service implements LocationListener {
             catch (InsufficientDistanceException ide) {
                 Log.w(TAG, "Location not updated because distance between last 2 locations was less than 2 meters.");
                 positionList.remove(positionList.size() - 1);
+                currentLocation = null;
                 locationUpdateReceived = false;
                 Log.w(TAG, "Last location removed.");
             }

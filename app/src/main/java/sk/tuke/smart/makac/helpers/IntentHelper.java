@@ -13,6 +13,7 @@ public final class IntentHelper {
     public static final String DATA_DISTANCE = "distance";
     public static final String DATA_PACE = "pace";
     public static final String DATA_CALORIES = "calories";
+    public static final String DATA_LOCATION = "location";
     public static final String DATA_POSITIONS = "finalPositionList";
     public static final String DATA_STATE = "state";
 
