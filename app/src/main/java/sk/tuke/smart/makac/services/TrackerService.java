@@ -61,7 +61,7 @@ public class TrackerService extends Service implements LocationListener {
         }
     }
 
-    private Runnable runnable = new Runnable() {
+    private Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
             duration += 1000;
@@ -120,14 +120,14 @@ public class TrackerService extends Service implements LocationListener {
         if (intent.getAction() != null) {
             switch (intent.getAction()) {
                 case IntentHelper.ACTION_START:
-                    handler.postDelayed(runnable, 1000);
+                    handler.postDelayed(timerRunnable, 1000);
                     state = IntentHelper.STATE_RUNNING;
 
                     Log.i(TAG, "Service started.");
                     break;
 
                 case IntentHelper.ACTION_CONTINUE:
-                    handler.postDelayed(runnable, 1000);
+                    handler.postDelayed(timerRunnable, 1000);
                     previousPosition = positionList.isEmpty() ? null : positionList.get(positionList.size() - 1);
                     positionList = new ArrayList<>();
                     speedList = new ArrayList<>();
@@ -143,14 +143,14 @@ public class TrackerService extends Service implements LocationListener {
                     break;
 
                 case IntentHelper.ACTION_PAUSE:
-                    handler.removeCallbacks(runnable);
+                    handler.removeCallbacks(timerRunnable);
                     state = IntentHelper.STATE_PAUSED;
 
                     Log.i(TAG, "Service paused.");
                     break;
 
                 case IntentHelper.ACTION_STOP:
-                    handler.removeCallbacks(runnable);
+                    handler.removeCallbacks(timerRunnable);
                     state = IntentHelper.STATE_STOPPED;
 
                     Log.i(TAG, "Stopping service.");

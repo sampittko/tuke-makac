@@ -147,6 +147,8 @@ public class StopwatchFragment extends Fragment {
         intentFilter = new IntentFilter();
         intentFilter.addAction(IntentHelper.ACTION_TICK);
         intentFilter.addAction(IntentHelper.ACTION_GPS);
+
+        thisFragmentActivity.registerReceiver(broadcastReceiver, intentFilter);
     }
 
     private void createUser() {
@@ -259,11 +261,11 @@ public class StopwatchFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        thisFragmentActivity.unregisterReceiver(broadcastReceiver);
-        if (!workoutStarted || workoutPaused)
-            thisFragmentActivity.stopService(new Intent(thisFragmentActivity, TrackerService.class));
+//        thisFragmentActivity.unregisterReceiver(broadcastReceiver);
+//        if (!workoutStarted || workoutPaused)
+//            thisFragmentActivity.stopService(new Intent(thisFragmentActivity, TrackerService.class));
 
-        Log.i(TAG, "Receiver unregistered.");
+//        Log.i(TAG, "Receiver unregistered.");
     }
 
     @Override
@@ -278,7 +280,6 @@ public class StopwatchFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        thisFragmentActivity.registerReceiver(broadcastReceiver, intentFilter);
         if (!workoutStarted)
             thisFragmentActivity.startService(new Intent(thisFragmentActivity, TrackerService.class));
 
@@ -288,8 +289,11 @@ public class StopwatchFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        thisFragmentActivity.unregisterReceiver(broadcastReceiver);
+        Log.i(TAG, "Receiver unregistered.");
         Intent intent = new Intent(thisFragmentActivity, TrackerService.class);
         thisFragmentActivity.stopService(intent);
+        Log.i(TAG, "Service stopped.");
     }
 
     @Override
@@ -489,8 +493,9 @@ public class StopwatchFragment extends Fragment {
 
     @OnClick(R.id.button_stopwatch_activeworkout)
     public void showActiveWorkoutMap(View view) {
-        startActivity(new Intent(thisFragmentActivity, ActiveWorkoutMapActivity.class));
-
+        Intent intent = new Intent(thisFragmentActivity, ActiveWorkoutMapActivity.class);
+        intent.putExtra(IntentHelper.DATA_POSITIONS, finalPositionList);
+        startActivity(intent);
         Log.i(TAG, "Showing active workout map.");
     }
 

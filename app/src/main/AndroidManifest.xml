@@ -44,7 +44,6 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".StopwatchActivity" />
         <activity android:name=".MapsActivity" />
         <activity android:name=".WorkoutDetailActivity" />
         <activity
@@ -62,5 +61,4 @@
                 android:value="sk.tuke.smart.makac.MainActivity" />
         </activity>
     </application>
-
 </manifest>
