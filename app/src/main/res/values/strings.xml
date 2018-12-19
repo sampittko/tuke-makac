@@ -82,6 +82,8 @@
     </string>
     <string name="title_activity_settings">Settings</string>
 
+    <string name="button_activeworkoutmap_back">Back to Workout</string>
+
     <!-- Strings related to Settings -->
     <string name="cancel">Cancel</string>
 
