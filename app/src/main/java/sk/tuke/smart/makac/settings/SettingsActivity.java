@@ -22,8 +22,6 @@ import android.support.v4.app.NavUtils;
 
 import sk.tuke.smart.makac.R;
 
-import java.util.List;
-
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
  * handset devices, settings are presented as a single list. On tablets,

@@ -1,6 +1,5 @@
 package sk.tuke.smart.makac;
 
-import android.content.Intent;
 import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;

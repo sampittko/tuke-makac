@@ -3,7 +3,6 @@ package sk.tuke.smart.makac;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -18,7 +17,11 @@ import sk.tuke.smart.makac.fragments.StopwatchFragment;
 import sk.tuke.smart.makac.settings.SettingsActivity;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AboutFragment.OnFragmentInteractionListener, HistoryFragment.OnListFragmentInteractionListener, StopwatchFragment.OnFragmentInteractionListener {
+        implements
+        NavigationView.OnNavigationItemSelectedListener,
+        AboutFragment.OnFragmentInteractionListener,
+        HistoryFragment.OnListFragmentInteractionListener,
+        StopwatchFragment.OnFragmentInteractionListener {
     private NavigationView navigationView;
 
     @Override
@@ -40,6 +43,7 @@ public class MainActivity extends AppCompatActivity
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
         displayStopwatchFragment();
     }
 
@@ -71,52 +75,51 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onAttachFragment(Fragment fragment) {
-//        if (fragment instanceof AboutFragment) {
-//            // nothing
-//        }
+        performCorrespondingActionForMenuItem(item.getItemId());
+        return true;
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_workout) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main_replaceable, StopwatchFragment.newInstance())
-                    .commit();
-        } else if (id == R.id.nav_history) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main_replaceable, HistoryFragment.newInstance())
-                    .addToBackStack(null)
-                    .commit();
-        } else if (id == R.id.nav_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-        } else if (id == R.id.nav_about) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main_replaceable, AboutFragment.newInstance())
-                    .addToBackStack(null)
-                    .commit();
-        }
+        performCorrespondingActionForMenuItem(item.getItemId());
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+
         return true;
+    }
+
+    private void performCorrespondingActionForMenuItem(int itemId) {
+        switch(itemId) {
+            case R.id.nav_workout:
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.main_replaceable, StopwatchFragment.newInstance())
+                        .commit();
+                break;
+            case R.id.nav_history:
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.main_replaceable, HistoryFragment.newInstance())
+                        .addToBackStack(null)
+                        .commit();
+                break;
+            case R.id.nav_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
+            case R.id.nav_about:
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.main_replaceable, AboutFragment.newInstance())
+                        .addToBackStack(null)
+                        .commit();
+                break;
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
+            default:
+                throw new UnsupportedOperationException();
+        }
     }
 }

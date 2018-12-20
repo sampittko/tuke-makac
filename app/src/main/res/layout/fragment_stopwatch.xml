@@ -28,7 +28,6 @@
                 android:layout_centerHorizontal="true"
                 android:text="@string/textview_stopwatch_labelduration"
                 android:textSize="25sp" />
-
             <TextView
                 android:id="@+id/textview_stopwatch_duration"
                 android:layout_width="wrap_content"
@@ -39,7 +38,6 @@
                 android:textStyle="bold"
                 android:text="@string/textview_stopwatch_duration"
                 android:textSize="45sp" />
-
             <!-- DISTANCE -->
             <TextView
                 android:id="@+id/textview_stopwatch_labeldistance"
@@ -51,7 +49,6 @@
                 android:layout_marginTop="5dp"
                 android:text="@string/textview_stopwatch_labeldistance"
                 android:textSize="25sp" />
-
             <RelativeLayout
                 android:id="@+id/distancepack"
                 android:layout_width="wrap_content"
@@ -71,7 +68,6 @@
                         android:layout_marginEnd="10dp"
                         android:text="@string/textview_stopwatch_distance"
                         android:textSize="45sp" />
-
                     <TextView
                         android:id="@+id/textview_stopwatch_distanceunit"
                         android:layout_width="match_parent"
@@ -105,7 +101,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerHorizontal="true" />
-
                         <TextView
                             android:id="@+id/textview_stopwatch_pace"
                             android:layout_below="@+id/textview_stopwatch_labelpace"
@@ -116,7 +111,6 @@
                             android:text="@string/textview_stopwatch_pace"
                             android:textSize="40sp"
                             android:layout_centerHorizontal="true"/>
-
                         <TextView
                             android:id="@+id/textview_stopwatch_unitpace"
                             android:layout_below="@+id/textview_stopwatch_pace"
@@ -141,7 +135,6 @@
                             android:layout_centerHorizontal="true"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
-
                         <TextView
                             android:id="@+id/textview_stopwatch_calories"
                             android:layout_below="@+id/textview_stopwatch_labelcalories"
@@ -153,7 +146,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="5dp"/>
-
                         <TextView
                             android:id="@+id/textview_stopwatch_unitcalories"
                             android:layout_below="@+id/textview_stopwatch_calories"
@@ -185,7 +177,6 @@
                         android:textStyle="bold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
-
                     <!-- RUNNING -->
                     <Button
                         android:layout_below="@+id/textview_stopwatch_sportlabel"

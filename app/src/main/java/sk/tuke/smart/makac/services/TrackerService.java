@@ -25,7 +25,13 @@ import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.SportActivities;
 
 public class TrackerService extends Service implements LocationListener {
+    private final IBinder mBinder = new LocalBinder();
+    private final String TAG = "TrackerService";
     private final float WEIGHT = 80;
+    private final int MIN_TIME_BTW_UPDATES = 3000;
+    private final int MIN_DISTANCE = 10;
+    private final int PACE_UPDATE_LIMIT = MIN_TIME_BTW_UPDATES / 1000 * 2;
+
     private int state = IntentHelper.STATE_STOPPED;
     private int sportActivity = IntentHelper.ACTIVITY_RUNNING;
     private double calories, distance, pace;
@@ -37,7 +43,7 @@ public class TrackerService extends Service implements LocationListener {
     private Location previousPosition;
     private Location currentLocation;
 
-    private Date firstSpeedTime, lastSpeedTime;
+    private Date firstSpeedTime;
 
     private ArrayList<Float> speedList = new ArrayList<>();
     private ArrayList<Location> positionList = new ArrayList<>();
@@ -46,14 +52,7 @@ public class TrackerService extends Service implements LocationListener {
 
     private Handler handler = new Handler();
 
-    private final String TAG = "TrackerService";
-
-    private final int MIN_TIME_BTW_UPDATES = 3000;
-    private final int MIN_DISTANCE = 10;
-    private final int PACE_UPDATE_LIMIT = MIN_TIME_BTW_UPDATES / 1000 * 2;
     private int lastLocationUpdateBefore = 0;
-
-    private final IBinder mBinder = new LocalBinder();
 
     public class LocalBinder extends Binder {
         public TrackerService getService() {
@@ -266,7 +265,7 @@ public class TrackerService extends Service implements LocationListener {
     }
 
     private double getTimeFillingSpeedListInHours() {
-        lastSpeedTime = new Date();
+        Date lastSpeedTime = new Date();
         return ((lastSpeedTime.getTime() - firstSpeedTime.getTime()) / 3.6) / 1000000;
     }
 
