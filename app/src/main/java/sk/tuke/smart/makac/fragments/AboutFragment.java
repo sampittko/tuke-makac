@@ -3,6 +3,7 @@ package sk.tuke.smart.makac.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import sk.tuke.smart.makac.R;
 
 public class AboutFragment extends Fragment {
+    private static final String TAG = "AboutFragment";
     private OnFragmentInteractionListener mListener;
 
     public AboutFragment() {
@@ -37,14 +39,16 @@ public class AboutFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_syncwithserver) {
-            // TODO sync with server options available when logged in and Makacs Sync REST API
-            return true;
+        switch(item.getItemId()) {
+            case R.id.action_syncwithserver:
+                // TODO sync with server
+                Log.e(TAG, "Sync not implemetned.");
+                break;
+            default:
+                throw new UnsupportedOperationException();
         }
 
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
     @Override
@@ -53,6 +57,7 @@ public class AboutFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_about, container, false);
     }
 
+    // TODO onAttach
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -64,6 +69,7 @@ public class AboutFragment extends Fragment {
         }
     }
 
+    // TODO onDetach
     @Override
     public void onDetach() {
         super.onDetach();

@@ -149,6 +149,7 @@ public class StopwatchFragment extends Fragment {
         intentFilter.addAction(IntentHelper.ACTION_GPS);
 
         thisFragmentActivity.registerReceiver(broadcastReceiver, intentFilter);
+
     }
 
     private void createUser() {
@@ -190,14 +191,16 @@ public class StopwatchFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_syncwithserver) {
-            // TODO sync with server options available when logged in and Makacs Sync REST API
-            return true;
+        switch(item.getItemId()) {
+            case R.id.action_syncwithserver:
+                // TODO sync with server
+                Log.e(TAG, "Sync not implemetned.");
+                break;
+            default:
+                throw new UnsupportedOperationException();
         }
 
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
     private void checkGPS() throws SensorNotPresentException {
@@ -231,23 +234,29 @@ public class StopwatchFragment extends Fragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         saveLatestPositionList();
                         endWorkoutButton.setText(stopString);
+                        stopTrackerService();
+                        startWorkoutDetailActivity();
+                        dialogInterface.dismiss();
+                        thisFragmentActivity.finish();
+                    }
 
+                    private void stopTrackerService() {
                         Intent intent1 = new Intent(thisFragmentActivity, TrackerService.class);
                         intent1.setAction(IntentHelper.ACTION_STOP);
                         thisFragmentActivity.startService(intent1);
+                    }
 
-                        Intent intent2 = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
-                        intent2.putExtra(IntentHelper.DATA_SPORT, sportActivity);
-                        intent2.putExtra(IntentHelper.DATA_DURATION, duration);
-                        intent2.putExtra(IntentHelper.DATA_DISTANCE, distance);
-                        intent2.putExtra(IntentHelper.DATA_PACE, countAvgPace());
-                        intent2.putExtra(IntentHelper.DATA_CALORIES, calories);
-                        intent2.putExtra(IntentHelper.DATA_POSITIONS, finalPositionList);
+                    private void startWorkoutDetailActivity() {
+                        Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
+                        intent.putExtra(IntentHelper.DATA_SPORT, sportActivity);
+                        intent.putExtra(IntentHelper.DATA_DURATION, duration);
+                        intent.putExtra(IntentHelper.DATA_DISTANCE, distance);
+                        intent.putExtra(IntentHelper.DATA_PACE, countAvgPace());
+                        intent.putExtra(IntentHelper.DATA_CALORIES, calories);
+                        intent.putExtra(IntentHelper.DATA_POSITIONS, finalPositionList);
                         // TODO workoutId Intent
-                        intent2.putExtra(IntentHelper.DATA_WORKOUT, 0);
-                        startActivity(intent2);
-                        dialogInterface.dismiss();
-                        thisFragmentActivity.finish();
+                        intent.putExtra(IntentHelper.DATA_WORKOUT, 0);
+                        startActivity(intent);
                     }
                 })
                 .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -261,11 +270,12 @@ public class StopwatchFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-//        thisFragmentActivity.unregisterReceiver(broadcastReceiver);
-//        if (!workoutStarted || workoutPaused)
-//            thisFragmentActivity.stopService(new Intent(thisFragmentActivity, TrackerService.class));
+        if (!workoutStarted || workoutPaused) {
+            thisFragmentActivity.unregisterReceiver(broadcastReceiver);
+            thisFragmentActivity.stopService(new Intent(thisFragmentActivity, TrackerService.class));
+        }
 
-//        Log.i(TAG, "Receiver unregistered.");
+        Log.i(TAG, "Receiver unregistered.");
     }
 
     @Override
@@ -280,6 +290,9 @@ public class StopwatchFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
+        thisFragmentActivity.registerReceiver(broadcastReceiver, intentFilter);
+
         if (!workoutStarted)
             thisFragmentActivity.startService(new Intent(thisFragmentActivity, TrackerService.class));
 
@@ -289,13 +302,12 @@ public class StopwatchFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        thisFragmentActivity.unregisterReceiver(broadcastReceiver);
-        Log.i(TAG, "Receiver unregistered.");
         Intent intent = new Intent(thisFragmentActivity, TrackerService.class);
         thisFragmentActivity.stopService(intent);
         Log.i(TAG, "Service stopped.");
     }
 
+    // TODO onAttach
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -307,6 +319,7 @@ public class StopwatchFragment extends Fragment {
         }
     }
 
+    // TODO onDetach
     @Override
     public void onDetach() {
         super.onDetach();
