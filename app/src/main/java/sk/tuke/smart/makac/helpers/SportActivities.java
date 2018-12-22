@@ -2,6 +2,7 @@ package sk.tuke.smart.makac.helpers;
 
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -105,5 +106,12 @@ public final class SportActivities {
         for (float speed : speedList)
             speedsSum += speed;
         return speedsSum / speedList.size();
+    }
+
+    public static double getAveragePace(ArrayList<Double> paceList) {
+        double paceCount = 0;
+        for (double pace : paceList)
+            paceCount += pace;
+        return paceCount / paceList.size();
     }
 }

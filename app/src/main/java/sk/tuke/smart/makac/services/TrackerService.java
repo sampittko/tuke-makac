@@ -69,7 +69,7 @@ public class TrackerService extends Service implements LocationListener {
 
     private long sessionNumber;
 
-    private int lastLocationUpdateBeforeSeconds = 0;
+    private int lastLocationUpdateBeforeSeconds, workoutDataSavedAtSeconds;
 
     public class LocalBinder extends Binder {
         public TrackerService getService() {
@@ -82,9 +82,8 @@ public class TrackerService extends Service implements LocationListener {
         public void run() {
             duration += 1000;
             lastLocationUpdateBeforeSeconds += 1;
-            verifyPace();
-            // TODO
-            // verifyWorkoutData();
+
+            performCheck();
 
             sendBroadcast(createBroadcastIntent());
             Log.i(TAG, "Broadcast intent with action TICK sent.");
@@ -112,7 +111,7 @@ public class TrackerService extends Service implements LocationListener {
 
         checkLocationPermissions();
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        databaseConnectionSetup();
+        databaseSetup();
         createNewWorkout();
 
         Log.i(TAG, "Service created.");
@@ -126,10 +125,12 @@ public class TrackerService extends Service implements LocationListener {
         }
     }
 
-    private void databaseConnectionSetup() {
+    private void databaseSetup() {
         databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
         try {
             gpsPointDao = databaseHelper.gpsPointDao();
+            gpsPointDao.delete(gpsPointDao.queryForAll());
+
             workoutDao = databaseHelper.workoutDao();
         }
         catch (SQLException e) {
@@ -148,15 +149,24 @@ public class TrackerService extends Service implements LocationListener {
         }
 
         if (workouts != null) {
-            if (workouts.size() == 0) {
-                pendingWorkout = new Workout("Workout 1", sportActivity);
-                Log.i(TAG, "Workout with ID 1 created.");
-            }
-            else {
-                int workoutId = workouts.size() + 1;
-                String workoutTitle = "Workout " + workoutId;
-                pendingWorkout = new Workout(workoutTitle, sportActivity);
+            int workoutId;
+            String workoutTitle;
+
+            if (workouts.size() == 0)
+                workoutId = 1;
+            else
+                workoutId = workouts.size() + 1;
+
+            workoutTitle = "Workout " + workoutId;
+            pendingWorkout = new Workout(workoutTitle, sportActivity);
+            pendingWorkout.setCreated(new Date());
+
+            try {
+                workoutDao.create(pendingWorkout);
                 Log.i(TAG, "Workout with ID " + workoutId + " created.");
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -299,25 +309,81 @@ public class TrackerService extends Service implements LocationListener {
         }
     }
 
-//    private void verifyWorkoutData() {
-//        return;
-//        Log.i(TAG, "No new location received for " + lastLocationUpdateBeforeSeconds + " seconds.");
-//
-//        if (lastLocationUpdateBeforeSeconds > 10) {
-//            try {
-//                if (persistedOnce) {
-//                    databaseHelper.workoutDao().delete(pendingWorkout);
-//                }
-//                databaseHelper.workoutDao().create(pendingWorkout);
-//                persistedOnce = true;
-//                Log.i(TAG, "Workout data saved to database.");
-//                lastLocationUpdateBeforeSeconds = 0;
-//            }
-//            catch (SQLException e) {
-//                Log.e(TAG , "Cannot persist workout to database!");
-//            }
-//        }
-//    }
+    private void performCheck() {
+        verifyVariables();
+        verifyPace();
+        verifyWorkoutData();
+    }
+
+    private void verifyVariables() {
+        if (locationUpdateReceived) {
+            locationUpdateReceived = false;
+            lastLocationUpdateBeforeSeconds = 0;
+            Log.i(TAG, "Location received. Variables reset.");
+        }
+    }
+
+    private void verifyPace() {
+        if (!locationUpdateReceived && lastLocationUpdateBeforeSeconds > PACE_UPDATE_LIMIT) {
+            pace = 0.0;
+            Log.i(TAG, "Pace set to 0.0km/h due to overcome time limit.");
+        }
+    }
+
+    private void verifyWorkoutData() {
+        if (lastLocationUpdateBeforeSeconds > 10 && lastLocationUpdateBeforeSeconds - workoutDataSavedAtSeconds == 10) {
+            Log.i(TAG, "No new location received for " + lastLocationUpdateBeforeSeconds + " seconds.");
+            saveWorkoutData();
+            workoutDataSavedAtSeconds = lastLocationUpdateBeforeSeconds;
+        }
+        else
+            Log.i(TAG, "Saving workout data is not required.");
+    }
+
+    private void saveWorkoutData() {
+        try {
+            pendingWorkout.setTotalCalories(totalCalories);
+            pendingWorkout.setDistance(distance);
+            pendingWorkout.setDuration(duration);
+            pendingWorkout.setLastUpdate(new Date());
+            pendingWorkout.setPaceAvg(getAveragePace());
+            pendingWorkout.setStatus(getWorkoutStatus());
+            databaseHelper.workoutDao().update(pendingWorkout);
+            Log.i(TAG, "Workout data saved to database.");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private double getAveragePace() {
+        ArrayList<Double> paceList = new ArrayList<>();
+        try {
+            List<GpsPoint> gpsPoints = gpsPointDao.queryForAll();
+            for (GpsPoint gpsPoint : gpsPoints)
+                paceList.add(gpsPoint.getPace());
+            return SportActivities.getAveragePace(paceList);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    private int getWorkoutStatus() {
+        switch (state) {
+            case IntentHelper.STATE_CONTINUE:
+                return Workout.statusUnknown;
+            case IntentHelper.STATE_PAUSED:
+                return Workout.statusPaused;
+            case IntentHelper.STATE_RUNNING:
+                return Workout.statusUnknown;
+            case IntentHelper.STATE_STOPPED:
+                return Workout.statusEnded;
+            default:
+                return Workout.statusUnknown;
+        }
+    }
 
     private void countDistance() throws InsufficientDistanceException, NotEnoughLocationsException {
         if (positionList.size() > 1) {
@@ -372,18 +438,6 @@ public class TrackerService extends Service implements LocationListener {
     private double getTimeFillingSpeedListInHours() {
         Date lastSpeedTime = new Date();
         return ((lastSpeedTime.getTime() - firstSpeedTime.getTime()) / 3.6) / 1000000;
-    }
-
-    private void verifyPace() {
-        if (!locationUpdateReceived && lastLocationUpdateBeforeSeconds > PACE_UPDATE_LIMIT) {
-            pace = 0.0;
-            Log.i(TAG, "Pace set to 0.0km/h due to overcome time limit.");
-        }
-        else if (locationUpdateReceived) {
-            locationUpdateReceived = false;
-            lastLocationUpdateBeforeSeconds = 0;
-            Log.i(TAG, "Location received. Variables reset.");
-        }
     }
 
     private void countPace() {

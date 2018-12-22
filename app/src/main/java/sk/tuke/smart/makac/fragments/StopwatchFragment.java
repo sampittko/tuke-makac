@@ -43,7 +43,7 @@ import sk.tuke.smart.makac.WorkoutDetailActivity;
 import sk.tuke.smart.makac.exceptions.SensorNotPresentException;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
-import sk.tuke.smart.makac.model.User;
+import sk.tuke.smart.makac.helpers.SportActivities;
 import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 import sk.tuke.smart.makac.services.TrackerService;
@@ -62,10 +62,9 @@ public class StopwatchFragment extends Fragment {
     @BindString(R.string.stopwatch_stop) public String stopString;
     @BindString(R.string.stopwatch_continue) public String continueString;
 
-    private boolean workoutStarted, workoutPaused, persistedOnce;
+    private boolean workoutStarted, workoutPaused;
 
     private AlertDialog.Builder alertDialogBuilder;
-    private AlertDialog alertDialog;
 
     private int sportActivity = IntentHelper.ACTIVITY_RUNNING;
 
@@ -82,12 +81,6 @@ public class StopwatchFragment extends Fragment {
     private IntentFilter intentFilter;
 
     private FragmentActivity thisFragmentActivity;
-
-    private DatabaseHelper databaseHelper;
-
-    private List<Workout> workouts;
-
-    private Workout currentWorkout;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -110,9 +103,7 @@ public class StopwatchFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public StopwatchFragment() {
-        // Required empty public constructor
-    }
+    public StopwatchFragment() {}
 
     public static StopwatchFragment newInstance() {
         return new StopwatchFragment();
@@ -126,11 +117,6 @@ public class StopwatchFragment extends Fragment {
 
         thisFragmentActivity = getActivity();
         thisFragmentActivity.setTitle(R.string.app_name);
-
-        databaseHelper = OpenHelperManager.getHelper(thisFragmentActivity, DatabaseHelper.class);
-
-//        createNewWorkout();
-//        createUser();
 
         try {
             checkGPS();
@@ -147,39 +133,6 @@ public class StopwatchFragment extends Fragment {
         intentFilter.addAction(IntentHelper.ACTION_GPS);
 
         thisFragmentActivity.registerReceiver(broadcastReceiver, intentFilter);
-
-    }
-
-    private void createUser() {
-        try {
-            Dao<User, Long> userDao = databaseHelper.userDao();
-            userDao.create(new User());
-            List<User> users = userDao.queryForAll();
-            Log.i("usersprofile", users.toString());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void createNewWorkout() {
-        currentWorkout = new Workout();
-
-        try {
-            workouts = databaseHelper.workoutDao().queryForAll();
-        }
-        catch(SQLException e) {
-            Log.e(TAG, "SQL error.");
-        }
-
-        if (workouts.size() == 0) {
-            currentWorkout.setTitle("Workout 1");
-            Log.i(TAG, "Workout ID is 1.");
-        }
-        else {
-            currentWorkout.setTitle("Workout " + (workouts.size() + 1));
-            Log.i(TAG, "Workout ID is " + (workouts.size() + 1) + ".");
-        }
-        currentWorkout.setSportActivity(sportActivity);
     }
 
     @Override
@@ -249,12 +202,23 @@ public class StopwatchFragment extends Fragment {
                         intent.putExtra(IntentHelper.DATA_SPORT, sportActivity);
                         intent.putExtra(IntentHelper.DATA_DURATION, duration);
                         intent.putExtra(IntentHelper.DATA_DISTANCE, distance);
-                        intent.putExtra(IntentHelper.DATA_PACE, countAvgPace());
+                        intent.putExtra(IntentHelper.DATA_PACE, SportActivities.getAveragePace(paceList));
                         intent.putExtra(IntentHelper.DATA_CALORIES, calories);
                         intent.putExtra(IntentHelper.DATA_POSITIONS, finalPositionList);
-                        // TODO workoutId Intent
-                        intent.putExtra(IntentHelper.DATA_WORKOUT, 0);
+                        intent.putExtra(IntentHelper.DATA_WORKOUT, getWorkoutId());
                         startActivity(intent);
+                    }
+
+                    private long getWorkoutId() {
+                        DatabaseHelper databaseHelper = OpenHelperManager.getHelper(thisFragmentActivity, DatabaseHelper.class);
+                        try {
+                            Dao<Workout, Long> workoutDao = databaseHelper.workoutDao();
+                            return workoutDao.countOf();
+                        }
+                        catch (SQLException e) {
+                            e.printStackTrace();
+                            return 0;
+                        }
                     }
                 })
                 .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -432,7 +396,7 @@ public class StopwatchFragment extends Fragment {
 
     @OnClick(R.id.button_stopwatch_endworkout)
     public void stopRecordingHandler(View view) {
-        alertDialog = alertDialogBuilder.create();
+        AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
 
         Log.i(TAG, "Alert dialog is now visible.");
@@ -468,15 +432,6 @@ public class StopwatchFragment extends Fragment {
 
         totalCalories += latestBiggestNonZeroCalories;
         latestBiggestNonZeroCalories = 0;
-    }
-
-    private double countAvgPace() {
-        double paceCount = 0;
-
-        for (double pace : paceList)
-            paceCount += pace;
-
-        return paceCount / paceList.size();
     }
 
     @OnClick(R.id.button_stopwatch_activeworkout)
