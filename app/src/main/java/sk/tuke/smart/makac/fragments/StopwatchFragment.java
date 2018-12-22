@@ -82,6 +82,10 @@ public class StopwatchFragment extends Fragment {
 
     private FragmentActivity thisFragmentActivity;
 
+    private DatabaseHelper databaseHelper;
+
+    private Dao<Workout, Long> workoutDao;
+
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent broadcastIntent) {
@@ -93,10 +97,10 @@ public class StopwatchFragment extends Fragment {
                 else if (broadcastIntent.getAction().equals(IntentHelper.ACTION_GPS))
                     saveLatestPositionList();
                 else
-                    Log.e(TAG, "Broadcast intent does not contain accepted action.");
+                    Log.e(TAG, "Broadcast intent does not contain accepted action");
             }
             catch(NullPointerException e) {
-                Log.e(TAG, "Broadcast intent does not have any action inside.");
+                Log.e(TAG, "Broadcast intent does not have any action inside");
             }
         }
     };
@@ -112,46 +116,20 @@ public class StopwatchFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setHasOptionsMenu(true);
-
         thisFragmentActivity = getActivity();
         thisFragmentActivity.setTitle(R.string.app_name);
-
         try {
             checkGPS();
         }
         catch(SensorNotPresentException e) {
-            Log.e(TAG, "GPS sensor is missing so application cannot be started.");
+            Log.e(TAG, "GPS sensor is missing so application cannot be started");
             thisFragmentActivity.finish();
         }
-
         createStopWorkoutAlertDialog();
-
-        intentFilter = new IntentFilter();
-        intentFilter.addAction(IntentHelper.ACTION_TICK);
-        intentFilter.addAction(IntentHelper.ACTION_GPS);
-
-        thisFragmentActivity.registerReceiver(broadcastReceiver, intentFilter);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.syncwithserver, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.action_syncwithserver:
-                // TODO sync with server
-                Log.e(TAG, "Sync not implemetned.");
-                break;
-            default:
-                throw new UnsupportedOperationException();
-        }
-
-        return true;
+        registerBroadcastReceiver();
+        databaseSetup();
+        performRecoveryCheck();
     }
 
     private void checkGPS() throws SensorNotPresentException {
@@ -210,9 +188,7 @@ public class StopwatchFragment extends Fragment {
                     }
 
                     private long getWorkoutId() {
-                        DatabaseHelper databaseHelper = OpenHelperManager.getHelper(thisFragmentActivity, DatabaseHelper.class);
                         try {
-                            Dao<Workout, Long> workoutDao = databaseHelper.workoutDao();
                             return workoutDao.countOf();
                         }
                         catch (SQLException e) {
@@ -229,6 +205,55 @@ public class StopwatchFragment extends Fragment {
                 });
     }
 
+    private void registerBroadcastReceiver() {
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(IntentHelper.ACTION_TICK);
+        intentFilter.addAction(IntentHelper.ACTION_GPS);
+        thisFragmentActivity.registerReceiver(broadcastReceiver, intentFilter);
+        Log.i(TAG, "Broadcast receiver registered");
+    }
+
+    private void databaseSetup() {
+        databaseHelper = OpenHelperManager.getHelper(thisFragmentActivity, DatabaseHelper.class);
+        try {
+            workoutDao = databaseHelper.workoutDao();
+            Log.i(TAG, "Local database is ready");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void performRecoveryCheck() {
+        try {
+            Workout lastWorkout = workoutDao.queryForId(workoutDao.countOf());
+            if (lastWorkout.getStatus() != Workout.statusEnded || lastWorkout.getStatus() != Workout.statusDeleted)
+                Log.e(TAG, "Workout recovery not implemented yet");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.syncwithserver, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.action_syncwithserver:
+                // TODO sync with server
+                Log.e(TAG, "Sync not implemetned.");
+                break;
+            default:
+                throw new UnsupportedOperationException();
+        }
+
+        return true;
+    }
+
     @Override
     public void onPause() {
         super.onPause();
@@ -243,7 +268,6 @@ public class StopwatchFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_stopwatch, container, false);
         ButterKnife.bind(this, view);
         return view;

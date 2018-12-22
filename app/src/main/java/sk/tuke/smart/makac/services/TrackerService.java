@@ -197,7 +197,7 @@ public class TrackerService extends Service implements LocationListener {
 
     private void performStartAction() {
         handler.postDelayed(timerRunnable, 1000);
-        state = IntentHelper.STATE_RUNNING;
+        updateState(IntentHelper.STATE_RUNNING);
         sessionNumber = 1;
         Log.i(TAG, "Service started");
     }
@@ -208,7 +208,7 @@ public class TrackerService extends Service implements LocationListener {
         positionList = new ArrayList<>();
         speedList = new ArrayList<>();
         hasContinued = true;
-        state = IntentHelper.STATE_CONTINUE;
+        updateState(IntentHelper.STATE_CONTINUE);
         sessionNumber++;
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(IntentHelper.ACTION_GPS);
@@ -219,16 +219,27 @@ public class TrackerService extends Service implements LocationListener {
 
     private void performPauseAction() {
         handler.removeCallbacks(timerRunnable);
-        state = IntentHelper.STATE_PAUSED;
+        updateState(IntentHelper.STATE_PAUSED);
         previousCalories += calories;
         Log.i(TAG, "Service paused");
     }
 
     private void performStopAction() {
         handler.removeCallbacks(timerRunnable);
-        state = IntentHelper.STATE_STOPPED;
+        updateState(IntentHelper.STATE_STOPPED);
         Log.i(TAG, "Stopping service");
         stopSelf();
+    }
+
+    private void updateState(int newState) {
+        state = newState;
+        pendingWorkout.setStatus(getWorkoutStatus());
+        try {
+            workoutDao.update(pendingWorkout);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void enableLocationUpdates() {
