@@ -11,6 +11,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.facebook.stetho.Stetho;
+
 import sk.tuke.smart.makac.fragments.AboutFragment;
 import sk.tuke.smart.makac.fragments.HistoryFragment;
 import sk.tuke.smart.makac.fragments.StopwatchFragment;
@@ -27,6 +29,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // live DB
+        Stetho.initializeWithDefaults(this);
+
         initializeMainActivityLayout();
     }
 

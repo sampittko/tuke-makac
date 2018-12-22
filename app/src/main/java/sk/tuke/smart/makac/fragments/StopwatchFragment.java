@@ -69,8 +69,6 @@ public class StopwatchFragment extends Fragment {
 
     private int sportActivity = IntentHelper.ACTIVITY_RUNNING;
 
-    private int lastLocationUpdateBeforeSeconds = 0;
-
     private long duration;
 
     private double distance, pace, calories, totalCalories, latestBiggestNonZeroCalories;
@@ -443,31 +441,8 @@ public class StopwatchFragment extends Fragment {
     private void verifyNewestLocation(Location newestLocation) {
         if (newestLocation == null) {
             Log.i(TAG, "There is no new location.");
-            lastLocationUpdateBeforeSeconds++;
-
-            Log.i(TAG, "No new location received for " + lastLocationUpdateBeforeSeconds + " seconds.");
-
-            if (lastLocationUpdateBeforeSeconds > 10) {
-                try {
-                    if (persistedOnce) {
-                        databaseHelper.workoutDao().delete(currentWorkout);
-                    }
-                    databaseHelper.workoutDao().create(currentWorkout);
-                    persistedOnce = true;
-                    Log.i(TAG, "Workout data saved to database.");
-                    lastLocationUpdateBeforeSeconds = 0;
-                }
-                catch (SQLException e) {
-                    Log.e(TAG , "Cannot persist workout to database!");
-                }
-            }
-
             return;
         }
-
-        lastLocationUpdateBeforeSeconds = 0;
-
-        Log.e(TAG, "Cannot save new location to database!");
 
         Location latestPositionListNewestLocation = latestPositionList.size() == 0 ? new Location("") : latestPositionList.get(latestPositionList.size() - 1);
 

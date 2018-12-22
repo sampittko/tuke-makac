@@ -16,13 +16,21 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.j256.ormlite.dao.Dao;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import sk.tuke.smart.makac.exceptions.InsufficientDistanceException;
 import sk.tuke.smart.makac.exceptions.NotEnoughLocationsException;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.SportActivities;
+import sk.tuke.smart.makac.model.GpsPoint;
+import sk.tuke.smart.makac.model.Workout;
+import sk.tuke.smart.makac.model.config.DatabaseHelper;
 
 public class TrackerService extends Service implements LocationListener {
     private final IBinder mBinder = new LocalBinder();
@@ -34,7 +42,7 @@ public class TrackerService extends Service implements LocationListener {
 
     private int state = IntentHelper.STATE_STOPPED;
     private int sportActivity = IntentHelper.ACTIVITY_RUNNING;
-    private double calories, distance, pace;
+    private double calories, previousCalories, totalCalories, distance, pace;
     private long duration;
     private float speed;
 
@@ -48,11 +56,20 @@ public class TrackerService extends Service implements LocationListener {
     private ArrayList<Float> speedList = new ArrayList<>();
     private ArrayList<Location> positionList = new ArrayList<>();
 
+    private Dao<GpsPoint, Long> gpsPointDao;
+    private Dao<Workout, Long> workoutDao;
+
     private LocationManager locationManager;
 
     private Handler handler = new Handler();
 
-    private int lastLocationUpdateBefore = 0;
+    private DatabaseHelper databaseHelper;
+
+    private Workout pendingWorkout;
+
+    private long sessionNumber;
+
+    private int lastLocationUpdateBeforeSeconds = 0;
 
     public class LocalBinder extends Binder {
         public TrackerService getService() {
@@ -64,8 +81,10 @@ public class TrackerService extends Service implements LocationListener {
         @Override
         public void run() {
             duration += 1000;
-            lastLocationUpdateBefore += 1;
+            lastLocationUpdateBeforeSeconds += 1;
             verifyPace();
+            // TODO
+            // verifyWorkoutData();
 
             sendBroadcast(createBroadcastIntent());
             Log.i(TAG, "Broadcast intent with action TICK sent.");
@@ -93,6 +112,8 @@ public class TrackerService extends Service implements LocationListener {
 
         checkLocationPermissions();
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        databaseConnectionSetup();
+        createNewWorkout();
 
         Log.i(TAG, "Service created.");
     }
@@ -102,6 +123,41 @@ public class TrackerService extends Service implements LocationListener {
             ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
             Log.w(TAG, "Creating service with missing permissions.");
             Toast.makeText(this, "Permissions for GPS are missing.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void databaseConnectionSetup() {
+        databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
+        try {
+            gpsPointDao = databaseHelper.gpsPointDao();
+            workoutDao = databaseHelper.workoutDao();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createNewWorkout() {
+        List<Workout> workouts = null;
+
+        try {
+            workouts = databaseHelper.workoutDao().queryForAll();
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+        if (workouts != null) {
+            if (workouts.size() == 0) {
+                pendingWorkout = new Workout("Workout 1", sportActivity);
+                Log.i(TAG, "Workout with ID 1 created.");
+            }
+            else {
+                int workoutId = workouts.size() + 1;
+                String workoutTitle = "Workout " + workoutId;
+                pendingWorkout = new Workout(workoutTitle, sportActivity);
+                Log.i(TAG, "Workout with ID " + workoutId + " created.");
+            }
         }
     }
 
@@ -119,46 +175,58 @@ public class TrackerService extends Service implements LocationListener {
         if (intent.getAction() != null) {
             switch (intent.getAction()) {
                 case IntentHelper.ACTION_START:
-                    handler.postDelayed(timerRunnable, 1000);
-                    state = IntentHelper.STATE_RUNNING;
-
-                    Log.i(TAG, "Service started.");
+                    performStartAction();
                     break;
-
                 case IntentHelper.ACTION_CONTINUE:
-                    handler.postDelayed(timerRunnable, 1000);
-                    previousPosition = positionList.isEmpty() ? null : positionList.get(positionList.size() - 1);
-                    positionList = new ArrayList<>();
-                    speedList = new ArrayList<>();
-                    hasContinued = true;
-                    state = IntentHelper.STATE_CONTINUE;
-
-                    Intent broadcastIntent = new Intent();
-                    broadcastIntent.setAction(IntentHelper.ACTION_GPS);
-                    sendBroadcast(broadcastIntent);
-                    Log.i(TAG, "Broadcast intent with action GPS sent.");
-
-                    Log.i(TAG, "Service is active again.");
+                    performContinueAction();
                     break;
-
                 case IntentHelper.ACTION_PAUSE:
-                    handler.removeCallbacks(timerRunnable);
-                    state = IntentHelper.STATE_PAUSED;
-
-                    Log.i(TAG, "Service paused.");
+                    performPauseAction();
                     break;
-
                 case IntentHelper.ACTION_STOP:
-                    handler.removeCallbacks(timerRunnable);
-                    state = IntentHelper.STATE_STOPPED;
-
-                    Log.i(TAG, "Stopping service.");
-                    stopSelf();
+                    performStopAction();
+                    break;
                 default:
                     Log.i(TAG, "There is no specific task to process in service.");
                     break;
             }
         }
+    }
+
+    private void performStartAction() {
+        handler.postDelayed(timerRunnable, 1000);
+        state = IntentHelper.STATE_RUNNING;
+        sessionNumber = 1;
+        Log.i(TAG, "Service started.");
+    }
+
+    private void performContinueAction() {
+        handler.postDelayed(timerRunnable, 1000);
+        previousPosition = positionList.isEmpty() ? null : positionList.get(positionList.size() - 1);
+        positionList = new ArrayList<>();
+        speedList = new ArrayList<>();
+        hasContinued = true;
+        state = IntentHelper.STATE_CONTINUE;
+        sessionNumber++;
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction(IntentHelper.ACTION_GPS);
+        sendBroadcast(broadcastIntent);
+        Log.i(TAG, "Broadcast intent with action GPS sent.");
+        Log.i(TAG, "Service is active again.");
+    }
+
+    private void performPauseAction() {
+        handler.removeCallbacks(timerRunnable);
+        state = IntentHelper.STATE_PAUSED;
+        previousCalories += calories;
+        Log.i(TAG, "Service paused.");
+    }
+
+    private void performStopAction() {
+        handler.removeCallbacks(timerRunnable);
+        state = IntentHelper.STATE_STOPPED;
+        Log.i(TAG, "Stopping service.");
+        stopSelf();
     }
 
     private void enableLocationUpdates() {
@@ -197,6 +265,8 @@ public class TrackerService extends Service implements LocationListener {
                 countSpeed();
                 countPace();
                 calories = SportActivities.countCalories(sportActivity, WEIGHT, speedList, getTimeFillingSpeedListInHours());
+                countTotalCalories();
+                persistGpsPoint();
             }
             catch (InsufficientDistanceException ide) {
                 Log.w(TAG, "Location not updated because distance between last 2 locations was less than 2 meters.");
@@ -213,6 +283,41 @@ public class TrackerService extends Service implements LocationListener {
         else
             Log.i(TAG, "Location ignored because of the current state.");
     }
+
+    private void countTotalCalories() {
+        totalCalories = previousCalories + calories;
+        Log.i(TAG, "Total calories calculated. (" + totalCalories + ")");
+    }
+
+    private void persistGpsPoint() {
+        GpsPoint currentGpsPoint = new GpsPoint(pendingWorkout, sessionNumber, currentLocation, duration, speed, pace, totalCalories);
+        try {
+            gpsPointDao.create(currentGpsPoint);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+//    private void verifyWorkoutData() {
+//        return;
+//        Log.i(TAG, "No new location received for " + lastLocationUpdateBeforeSeconds + " seconds.");
+//
+//        if (lastLocationUpdateBeforeSeconds > 10) {
+//            try {
+//                if (persistedOnce) {
+//                    databaseHelper.workoutDao().delete(pendingWorkout);
+//                }
+//                databaseHelper.workoutDao().create(pendingWorkout);
+//                persistedOnce = true;
+//                Log.i(TAG, "Workout data saved to database.");
+//                lastLocationUpdateBeforeSeconds = 0;
+//            }
+//            catch (SQLException e) {
+//                Log.e(TAG , "Cannot persist workout to database!");
+//            }
+//        }
+//    }
 
     private void countDistance() throws InsufficientDistanceException, NotEnoughLocationsException {
         if (positionList.size() > 1) {
@@ -270,13 +375,13 @@ public class TrackerService extends Service implements LocationListener {
     }
 
     private void verifyPace() {
-        if (!locationUpdateReceived && lastLocationUpdateBefore > PACE_UPDATE_LIMIT) {
+        if (!locationUpdateReceived && lastLocationUpdateBeforeSeconds > PACE_UPDATE_LIMIT) {
             pace = 0.0;
             Log.i(TAG, "Pace set to 0.0km/h due to overcome time limit.");
         }
         else if (locationUpdateReceived) {
             locationUpdateReceived = false;
-            lastLocationUpdateBefore = 0;
+            lastLocationUpdateBeforeSeconds = 0;
             Log.i(TAG, "Location received. Variables reset.");
         }
     }
