@@ -15,6 +15,8 @@ public class Workout {
     public static final int statusPaused = 2;
     // deleted workout
     public static final int statusDeleted= 3;
+    // workout id offset
+    public static final long ID_OFFSET = 47;
 
     @DatabaseField(generatedId = true, unique = true)
     private long id;

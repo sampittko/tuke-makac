@@ -21,9 +21,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
     private static final String DATABASE_NAME = "tracker";
     private static final int DATABASE_VERSION = 1;
 
-    /**
-     * The data access object used to interact with the Sqlite database to do C.R.U.D operations.
-     */
     private Dao<Workout, Long> workoutsDao;
     private Dao<GpsPoint, Long> gpsPointsDao;
     private Dao<User, Long> userDao;
@@ -31,20 +28,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION,
-                /**
-                 * R.raw.ormlite_config is a reference to the ormlite_config.txt file in the
-                 * /res/raw/ directory of this project
-                 * */
                 R.raw.ormlite_config);
     }
 
     @Override
     public void onCreate(SQLiteDatabase database, ConnectionSource connectionSource) {
         try {
-
-            /**
-             * creates the Todo database table
-             */
             TableUtils.createTable(connectionSource, Workout.class);
             TableUtils.createTable(connectionSource, GpsPoint.class);
             TableUtils.createTable(connectionSource, User.class);
@@ -59,9 +48,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
     public void onUpgrade(SQLiteDatabase database, ConnectionSource connectionSource,
                           int oldVersion, int newVersion) {
         try {
-            /**
-             * Recreates the database when onUpgrade is called by the framework
-             */
             TableUtils.dropTable(connectionSource, Workout.class, true);
             TableUtils.dropTable(connectionSource, GpsPoint.class, true);
             TableUtils.dropTable(connectionSource, User.class, true);

@@ -189,7 +189,7 @@ public class TrackerService extends Service implements LocationListener {
         }
 
         if (workouts != null) {
-            long workoutId = StopwatchFragment.BULHARSKO;
+            long workoutId = Workout.ID_OFFSET;
             String workoutTitle;
 
             if (workouts.size() == 0)
@@ -245,7 +245,7 @@ public class TrackerService extends Service implements LocationListener {
 
     private void performWorkoutRecovery() {
         try {
-            pendingWorkout = workoutDao.queryForId(StopwatchFragment.BULHARSKO + workoutDao.countOf());
+            pendingWorkout = workoutDao.queryForId(Workout.ID_OFFSET + workoutDao.countOf());
             previousCalories = pendingWorkout.getTotalCalories();
             distance = pendingWorkout.getDistance();
             duration = pendingWorkout.getDuration();

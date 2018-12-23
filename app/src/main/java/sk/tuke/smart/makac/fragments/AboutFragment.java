@@ -18,7 +18,6 @@ public class AboutFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
     public AboutFragment() {
-        // Required empty public constructor
     }
 
     public static AboutFragment newInstance() {

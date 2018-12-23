@@ -44,6 +44,7 @@ import sk.tuke.smart.makac.exceptions.SensorNotPresentException;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
 import sk.tuke.smart.makac.helpers.SportActivities;
+import sk.tuke.smart.makac.model.GpsPoint;
 import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 import sk.tuke.smart.makac.services.TrackerService;
@@ -62,8 +63,6 @@ public class StopwatchFragment extends Fragment {
     @BindString(R.string.stopwatch_stop) public String stopString;
     @BindString(R.string.stopwatch_continue) public String continueString;
 
-    // TODO remove BULHARSKO
-    public static final long BULHARSKO = 47;
     private final String TAG = "StopwatchFragment";
 
     private boolean workoutStarted, workoutPaused;
@@ -85,6 +84,7 @@ public class StopwatchFragment extends Fragment {
     private FragmentActivity thisFragmentActivity;
 
     private Dao<Workout, Long> workoutDao;
+    private Dao<GpsPoint, Long> gpsPointDao;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -199,7 +199,7 @@ public class StopwatchFragment extends Fragment {
 
                     private long getWorkoutId() {
                         try {
-                            return workoutDao.countOf();
+                            return Workout.ID_OFFSET + workoutDao.countOf();
                         }
                         catch (SQLException e) {
                             e.printStackTrace();
@@ -227,6 +227,7 @@ public class StopwatchFragment extends Fragment {
         try {
             DatabaseHelper databaseHelper = OpenHelperManager.getHelper(thisFragmentActivity, DatabaseHelper.class);
             workoutDao = databaseHelper.workoutDao();
+            gpsPointDao = databaseHelper.gpsPointDao();
             Log.i(TAG, "Local database is ready");
         }
         catch (SQLException e) {
@@ -277,7 +278,7 @@ public class StopwatchFragment extends Fragment {
         try {
             long workoutsCount = workoutDao.countOf();
             if (workoutsCount != 0) {
-                Workout lastWorkout = workoutDao.queryForId(workoutsCount + BULHARSKO);
+                Workout lastWorkout = workoutDao.queryForId(workoutsCount + Workout.ID_OFFSET);
                 int lastWorkoutStatus = lastWorkout.getStatus();
                 if (lastWorkoutStatus == Workout.statusPaused || lastWorkoutStatus == Workout.statusUnknown)
                     performWorkoutRecovery(lastWorkout);
@@ -295,7 +296,33 @@ public class StopwatchFragment extends Fragment {
         workoutPaused = false;
         toggleRecordingHandler(getView());
         renderValues(MainHelper.msToS(lastWorkout.getDuration()), lastWorkout.getDistance(), lastWorkout.getPaceAvg(), lastWorkout.getTotalCalories());
+        retrievePositions();
         Log.i(TAG, "StopwatchFragment recovered");
+    }
+
+    private void retrievePositions() {
+        try {
+            List<GpsPoint> gpsPoints = gpsPointDao.queryForAll();
+            long index = 1;
+            long currentSessionNumber;
+            Location currentLocation;
+            for (GpsPoint currentGpsPoint : gpsPoints) {
+                currentLocation = new Location("");
+                currentSessionNumber = currentGpsPoint.getSessionNumber();
+                if (index != currentSessionNumber) {
+                    index = currentSessionNumber;
+                    finalPositionList.add(latestPositionList);
+                    latestPositionList = new ArrayList<>();
+                }
+                currentLocation.setLongitude(currentGpsPoint.getLongitude());
+                currentLocation.setLatitude(currentGpsPoint.getLatitude());
+                latestPositionList.add(currentLocation);
+            }
+            Log.i(TAG, "Positions retrieved from local database");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
