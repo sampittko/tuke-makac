@@ -28,6 +28,7 @@ import sk.tuke.smart.makac.exceptions.InsufficientDistanceException;
 import sk.tuke.smart.makac.exceptions.NotEnoughLocationsException;
 import sk.tuke.smart.makac.fragments.StopwatchFragment;
 import sk.tuke.smart.makac.helpers.IntentHelper;
+import sk.tuke.smart.makac.helpers.MainHelper;
 import sk.tuke.smart.makac.helpers.SportActivities;
 import sk.tuke.smart.makac.model.GpsPoint;
 import sk.tuke.smart.makac.model.Workout;
@@ -90,7 +91,7 @@ public class TrackerService extends Service implements LocationListener {
 
         private Intent createNewIntent() {
             return new Intent().setAction(IntentHelper.ACTION_TICK)
-                    .putExtra(IntentHelper.DATA_DURATION, getSecondsDuration())
+                    .putExtra(IntentHelper.DATA_DURATION, MainHelper.msToS(duration))
                     .putExtra(IntentHelper.DATA_DISTANCE, distance)
                     .putExtra(IntentHelper.DATA_STATE, state)
                     .putExtra(IntentHelper.DATA_LOCATION, currentLocation)
@@ -234,37 +235,71 @@ public class TrackerService extends Service implements LocationListener {
     private void performPauseAction() {
         if (sessionNumber == 0)
             performWorkoutRecovery();
+        else
+            saveWorkoutData();
         handler.removeCallbacks(timerRunnable);
         updateState(IntentHelper.STATE_PAUSED);
         previousCalories += calories;
         Log.i(TAG, "Service paused");
     }
 
-    // TODO add previousCalories, distance, duration, previousLocation
     private void performWorkoutRecovery() {
         try {
             pendingWorkout = workoutDao.queryForId(StopwatchFragment.BULHARSKO + workoutDao.countOf());
+            previousCalories = pendingWorkout.getTotalCalories();
+            distance = pendingWorkout.getDistance();
+            duration = pendingWorkout.getDuration();
+            GpsPoint previousGpsPoint = getPreviousGpsPoint();
+            if (previousGpsPoint != null) {
+                retrievePreviousLocation(previousGpsPoint);
+                sessionNumber = previousGpsPoint.getSessionNumber();
+            }
+            Log.i(TAG, "Workout recovery successful");
         }
         catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    private GpsPoint getPreviousGpsPoint() throws SQLException {
+        List<GpsPoint> gpsPoints = gpsPointDao.queryForAll();
+        if (gpsPoints.size() > 0)
+            return gpsPoints.get(gpsPoints.size() - 1);
+        else
+            return null;
+    }
+
+    private void retrievePreviousLocation(GpsPoint previousGpsPoint) throws SQLException {
+        List<GpsPoint> gpsPoints = gpsPointDao.queryForAll();
+        if (gpsPoints.size() > 0) {
+            Location retrievedLocation = new Location("");
+            retrievedLocation.setLatitude(previousGpsPoint.getLatitude());
+            retrievedLocation.setLongitude(previousGpsPoint.getLongitude());
+            previousLocation = retrievedLocation;
+            Log.i(TAG, "Location was retrieved successfully from last gps point");
+        }
+        else
+            Log.i(TAG, "There is no previous gps point to retrieve last location from");
+    }
+
     private void performStopAction() {
         handler.removeCallbacks(timerRunnable);
         updateState(IntentHelper.STATE_STOPPED);
+        saveWorkoutData();
         Log.i(TAG, "Stopping service");
         stopSelf();
     }
 
     private void updateState(int newState) {
         state = newState;
-        pendingWorkout.setStatus(getWorkoutStatus());
-        try {
-            workoutDao.update(pendingWorkout);
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
+        if (state != IntentHelper.STATE_STOPPED) {
+            try {
+                pendingWorkout.setStatus(getWorkoutStatus());
+                workoutDao.update(pendingWorkout);
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -385,8 +420,12 @@ public class TrackerService extends Service implements LocationListener {
         ArrayList<Double> paceList = new ArrayList<>();
         try {
             List<GpsPoint> gpsPoints = gpsPointDao.queryForAll();
-            for (GpsPoint gpsPoint : gpsPoints)
-                paceList.add(gpsPoint.getPace());
+            double currentPace;
+            for (GpsPoint gpsPoint : gpsPoints) {
+                currentPace = gpsPoint.getPace();
+                if (currentPace != 0.0)
+                    paceList.add(currentPace);
+            }
             return SportActivities.getAveragePace(paceList);
         }
         catch (SQLException e) {
@@ -452,7 +491,7 @@ public class TrackerService extends Service implements LocationListener {
     }
 
     private void countSpeed() {
-        speed = (float)distance / (float)getSecondsDuration();
+        speed = (float)distance / (float) MainHelper.msToS(duration);
         speedList.add(speed);
         if (speedList.size() == 1)
             firstSpeedTime = new Date();
@@ -467,10 +506,6 @@ public class TrackerService extends Service implements LocationListener {
     private void countPace() {
         pace = 1000 / speed;
         Log.i(TAG, "New pace: " + pace + "min/km");
-    }
-
-    private long getSecondsDuration() {
-        return duration / 1000;
     }
 
     @Override

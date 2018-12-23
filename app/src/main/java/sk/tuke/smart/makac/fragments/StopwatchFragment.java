@@ -294,7 +294,7 @@ public class StopwatchFragment extends Fragment {
         workoutStarted = true;
         workoutPaused = false;
         toggleRecordingHandler(getView());
-        renderValues(lastWorkout.getDuration(), lastWorkout.getDistance(), lastWorkout.getPaceAvg(), lastWorkout.getTotalCalories());
+        renderValues(MainHelper.msToS(lastWorkout.getDuration()), lastWorkout.getDistance(), lastWorkout.getPaceAvg(), lastWorkout.getTotalCalories());
         Log.i(TAG, "StopwatchFragment recovered");
     }
 
@@ -304,7 +304,7 @@ public class StopwatchFragment extends Fragment {
         thisFragmentActivity.registerReceiver(broadcastReceiver, intentFilter);
         if (!workoutStarted)
             thisFragmentActivity.startService(new Intent(thisFragmentActivity, TrackerService.class));
-        Log.i(TAG, "Receiver registered.");
+        Log.i(TAG, "Receiver registered");
     }
 
     @Override
@@ -312,7 +312,7 @@ public class StopwatchFragment extends Fragment {
         super.onDestroy();
         Intent intent = new Intent(thisFragmentActivity, TrackerService.class);
         thisFragmentActivity.stopService(intent);
-        Log.i(TAG, "Service stopped.");
+        Log.i(TAG, "Service stopped");
     }
 
     // TODO onAttach
@@ -378,7 +378,6 @@ public class StopwatchFragment extends Fragment {
     }
 
     private void renderValues(Intent broadcastIntent) {
-        Log.i(TAG, "Render of counters requested.");
         durationRenderer(broadcastIntent.getLongExtra(
                 IntentHelper.DATA_DURATION, 0));
         distanceRenderer(broadcastIntent.getDoubleExtra(
@@ -387,16 +386,13 @@ public class StopwatchFragment extends Fragment {
                 IntentHelper.DATA_PACE, 0));
         caloriesRenderer(broadcastIntent.getDoubleExtra(
                 IntentHelper.DATA_CALORIES, 0));
-        Log.i(TAG, "UI updated.");
     }
 
     private void renderValues(long duration, double distance, double pace, double totalCalories) {
-        Log.i(TAG, "Render of counters requested.");
         durationRenderer(duration);
         distanceRenderer(distance);
         paceRenderer(pace);
         caloriesRenderer(totalCalories);
-        Log.i(TAG, "UI updated.");
     }
 
     private void durationRenderer(long broadcastIntentDuration) {
@@ -404,7 +400,7 @@ public class StopwatchFragment extends Fragment {
 
         String newDuration = String.valueOf(MainHelper.formatDuration(duration));
         durationTextView.setText(newDuration);
-        Log.i(TAG, "Duration value updated. (" + newDuration + ")");
+        Log.i(TAG, "New duration: " + newDuration);
     }
 
     private void distanceRenderer(double broadcastIntentDistance) {
@@ -413,10 +409,8 @@ public class StopwatchFragment extends Fragment {
 
             String newDistance = MainHelper.formatDistance(distance);
             distanceTextView.setText(newDistance);
-            Log.i(TAG, "Distance value updated. (" + newDistance + "km)");
+            Log.i(TAG, "New distance: " + newDistance);
         }
-        else
-            Log.i(TAG, "Distance did not need an update.");
     }
 
     private void paceRenderer(double broadcastIntentPace) {
@@ -426,14 +420,12 @@ public class StopwatchFragment extends Fragment {
 
             String newPace = MainHelper.formatPace(pace);
             paceTextView.setText(newPace);
-            Log.i(TAG, "Pace value updated. (" + newPace + "km/min)");
+            Log.i(TAG, "New pace: " + newPace);
         }
-        else
-            Log.i(TAG, "Pace did not need an update.");
     }
 
     private void caloriesRenderer(double broadcastIntentCalories) {
-        if (calories != broadcastIntentCalories) {
+        if (calories - totalCalories != broadcastIntentCalories) {
             calories = broadcastIntentCalories + totalCalories;
 
             if (broadcastIntentCalories != 0 && broadcastIntentCalories > latestBiggestNonZeroCalories)
@@ -441,10 +433,8 @@ public class StopwatchFragment extends Fragment {
 
             String newCalories = MainHelper.formatCalories(calories);
             caloriesTextView.setText(newCalories);
-            Log.i(TAG, "Calories value updated. (" + newCalories + "kcal)");
+            Log.i(TAG, "New calories: " + newCalories);
         }
-        else
-            Log.i(TAG, "Calories did not need an update.");
     }
 
     @OnClick(R.id.button_stopwatch_endworkout)

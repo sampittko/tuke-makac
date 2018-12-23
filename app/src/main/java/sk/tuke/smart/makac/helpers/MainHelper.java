@@ -10,7 +10,7 @@ public final class MainHelper {
      * @param time - in seconds
      */
     public static String formatDuration(long time) {
-        long seconds = time %60;
+        long seconds = time % 60;
         time -= seconds;
 
         long minutesCount = time / 60;
@@ -69,5 +69,9 @@ public final class MainHelper {
     /* convert kmph to miph (multiply with corresponding constant) */
     public static double kmphToMiph(double n) {
         return n * MINpKM_TO_MINpMI * 60;
+    }
+
+    public static long msToS(long n) {
+        return n / 1000;
     }
 }
