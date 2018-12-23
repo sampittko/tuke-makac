@@ -62,6 +62,8 @@ public class StopwatchFragment extends Fragment {
     @BindString(R.string.stopwatch_stop) public String stopString;
     @BindString(R.string.stopwatch_continue) public String continueString;
 
+    private final String TAG = "StopwatchFragment";
+
     private boolean workoutStarted, workoutPaused;
 
     private AlertDialog.Builder alertDialogBuilder;
@@ -72,8 +74,6 @@ public class StopwatchFragment extends Fragment {
 
     private double distance, pace, calories, totalCalories, latestBiggestNonZeroCalories;
 
-    private final String TAG = "StopwatchFragment";
-
     private ArrayList<Double> paceList = new ArrayList<>();
     private ArrayList<Location> latestPositionList = new ArrayList<>();
     private ArrayList<List<Location>> finalPositionList = new ArrayList<>();
@@ -81,8 +81,6 @@ public class StopwatchFragment extends Fragment {
     private IntentFilter intentFilter;
 
     private FragmentActivity thisFragmentActivity;
-
-    private DatabaseHelper databaseHelper;
 
     private Dao<Workout, Long> workoutDao;
 
@@ -129,7 +127,6 @@ public class StopwatchFragment extends Fragment {
         createStopWorkoutAlertDialog();
         registerBroadcastReceiver();
         databaseSetup();
-        performRecoveryCheck();
     }
 
     private void checkGPS() throws SensorNotPresentException {
@@ -214,21 +211,10 @@ public class StopwatchFragment extends Fragment {
     }
 
     private void databaseSetup() {
-        databaseHelper = OpenHelperManager.getHelper(thisFragmentActivity, DatabaseHelper.class);
         try {
+            DatabaseHelper databaseHelper = OpenHelperManager.getHelper(thisFragmentActivity, DatabaseHelper.class);
             workoutDao = databaseHelper.workoutDao();
             Log.i(TAG, "Local database is ready");
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void performRecoveryCheck() {
-        try {
-            Workout lastWorkout = workoutDao.queryForId(workoutDao.countOf());
-            if (lastWorkout.getStatus() != Workout.statusEnded || lastWorkout.getStatus() != Workout.statusDeleted)
-                Log.e(TAG, "Workout recovery not implemented yet");
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -270,18 +256,40 @@ public class StopwatchFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_stopwatch, container, false);
         ButterKnife.bind(this, view);
+        performWorkoutRecoveryCheck();
         return view;
+    }
+
+    private void performWorkoutRecoveryCheck() {
+        try {
+            long workoutsCount = workoutDao.countOf();
+            if (workoutsCount != 0) {
+                Workout lastWorkout = workoutDao.queryForId(workoutsCount);
+                int lastWorkoutStatus = lastWorkout.getStatus();
+                if (lastWorkoutStatus == Workout.statusPaused || lastWorkoutStatus == Workout.statusUnknown)
+                    performWorkoutRecovery(lastWorkout);
+            }
+            else
+                Log.i(TAG, "Skipping recovery check because of empty local workout database table");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void performWorkoutRecovery(Workout lastWorkout) {
+        Log.e(TAG, "Performing temporary recovery");
+        workoutStarted = true;
+        workoutPaused = false;
+        toggleRecordingHandler(getView());
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
         thisFragmentActivity.registerReceiver(broadcastReceiver, intentFilter);
-
         if (!workoutStarted)
             thisFragmentActivity.startService(new Intent(thisFragmentActivity, TrackerService.class));
-
         Log.i(TAG, "Receiver registered.");
     }
 

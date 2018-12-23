@@ -63,8 +63,6 @@ public class TrackerService extends Service implements LocationListener {
 
     private Handler handler = new Handler();
 
-    private DatabaseHelper databaseHelper;
-
     private Workout pendingWorkout;
 
     private long sessionNumber;
@@ -107,7 +105,6 @@ public class TrackerService extends Service implements LocationListener {
         checkLocationPermissions();
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         databaseSetup();
-        createNewWorkout();
         Log.i(TAG, "Service created");
     }
 
@@ -120,8 +117,8 @@ public class TrackerService extends Service implements LocationListener {
     }
 
     private void databaseSetup() {
-        databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
         try {
+            DatabaseHelper databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
             gpsPointDao = databaseHelper.gpsPointDao();
             gpsPointDao.delete(gpsPointDao.queryForAll());
             workoutDao = databaseHelper.workoutDao();
@@ -129,39 +126,6 @@ public class TrackerService extends Service implements LocationListener {
         }
         catch (SQLException e) {
             e.printStackTrace();
-        }
-    }
-
-    private void createNewWorkout() {
-        List<Workout> workouts = null;
-
-        try {
-            workouts = databaseHelper.workoutDao().queryForAll();
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-
-        if (workouts != null) {
-            int workoutId;
-            String workoutTitle;
-
-            if (workouts.size() == 0)
-                workoutId = 1;
-            else
-                workoutId = workouts.size() + 1;
-
-            workoutTitle = "Workout " + workoutId;
-            pendingWorkout = new Workout(workoutTitle, sportActivity);
-            pendingWorkout.setCreated(new Date());
-
-            try {
-                workoutDao.create(pendingWorkout);
-                Log.i(TAG, "Workout with ID " + workoutId + " created");
-            }
-            catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -196,10 +160,44 @@ public class TrackerService extends Service implements LocationListener {
     }
 
     private void performStartAction() {
+        createNewWorkout();
         handler.postDelayed(timerRunnable, 1000);
         updateState(IntentHelper.STATE_RUNNING);
         sessionNumber = 1;
         Log.i(TAG, "Service started");
+    }
+
+    private void createNewWorkout() {
+        List<Workout> workouts = null;
+
+        try {
+            workouts = workoutDao.queryForAll();
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+        if (workouts != null) {
+            int workoutId;
+            String workoutTitle;
+
+            if (workouts.size() == 0)
+                workoutId = 1;
+            else
+                workoutId = workouts.size() + 1;
+
+            workoutTitle = "Workout " + workoutId;
+            pendingWorkout = new Workout(workoutTitle, sportActivity);
+            pendingWorkout.setCreated(new Date());
+
+            try {
+                workoutDao.create(pendingWorkout);
+                Log.i(TAG, "Workout with ID " + workoutId + " created");
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void performContinueAction() {
@@ -218,10 +216,16 @@ public class TrackerService extends Service implements LocationListener {
     }
 
     private void performPauseAction() {
+        if (sessionNumber == 0)
+            performWorkoutRecovery();
         handler.removeCallbacks(timerRunnable);
         updateState(IntentHelper.STATE_PAUSED);
         previousCalories += calories;
         Log.i(TAG, "Service paused");
+    }
+
+    private void performWorkoutRecovery() {
+        Log.e(TAG, "Recovery not implemented yet");
     }
 
     private void performStopAction() {
@@ -347,7 +351,7 @@ public class TrackerService extends Service implements LocationListener {
             pendingWorkout.setLastUpdate(new Date());
             pendingWorkout.setPaceAvg(getAveragePace());
             pendingWorkout.setStatus(getWorkoutStatus());
-            databaseHelper.workoutDao().update(pendingWorkout);
+            workoutDao.update(pendingWorkout);
             Log.i(TAG, "Workout data saved to database");
         }
         catch (SQLException e) {
