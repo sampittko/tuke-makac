@@ -30,9 +30,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
         finalPositionList = (ArrayList<List<Location>>) getIntent().getSerializableExtra(IntentHelper.DATA_POSITIONS);
-
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_maps_map);
         mapFragment.getMapAsync(this);
@@ -41,19 +39,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        renderRoute();
+        setCamera();
+    }
 
+    private void renderRoute() {
         for (List<Location> locationList : finalPositionList) {
             PolylineOptions polylineOptions = new PolylineOptions().clickable(true);
             for (Location location : locationList)
                 polylineOptions.add(new LatLng(location.getLatitude(), location.getLongitude()));
             mMap.addPolyline(polylineOptions);
         }
+        Log.i(TAG, "Route was rendered");
+    }
 
+    private void setCamera() {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        LatLng startPoint = new LatLng(finalPositionList.get(0).get(0).getLatitude(), finalPositionList.get(0).get(0).getLongitude());
 
-        List<Location> lastLocationList = finalPositionList.get(finalPositionList.size() - 1);
-        LatLng endPoint = new LatLng(lastLocationList.get(lastLocationList.size() - 1).getLatitude(), lastLocationList.get(lastLocationList.size() - 1).getLongitude());
+        LatLng startPoint = getStartPoint();
+        LatLng endPoint = getEndPoint();
 
         builder.include(startPoint);
         builder.include(endPoint);
@@ -61,8 +65,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLngBounds bounds = builder.build();
 
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 100);
-        googleMap.animateCamera(cu);
+        mMap.animateCamera(cu);
 
-        Log.i(TAG, "Map rendered.");
+        Log.i(TAG, "Camera setup successful");
+    }
+
+    private LatLng getStartPoint() {
+        return new LatLng(finalPositionList.get(0).get(0).getLatitude(), finalPositionList.get(0).get(0).getLongitude());
+    }
+
+    private LatLng getEndPoint() {
+        List<Location> lastLocationList = finalPositionList.get(finalPositionList.size() - 1);
+        return new LatLng(lastLocationList.get(lastLocationList.size() - 1).getLatitude(), lastLocationList.get(lastLocationList.size() - 1).getLongitude());
     }
 }

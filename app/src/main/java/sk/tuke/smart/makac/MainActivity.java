@@ -29,14 +29,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         // live DB
         Stetho.initializeWithDefaults(this);
-
-        initializeMainActivityLayout();
+        initializeLayout();
     }
 
-    private void initializeMainActivityLayout() {
+    private void initializeLayout() {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

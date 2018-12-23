@@ -26,7 +26,6 @@ import java.util.List;
 
 import sk.tuke.smart.makac.exceptions.InsufficientDistanceException;
 import sk.tuke.smart.makac.exceptions.NotEnoughLocationsException;
-import sk.tuke.smart.makac.fragments.StopwatchFragment;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
 import sk.tuke.smart.makac.helpers.SportActivities;
@@ -35,6 +34,7 @@ import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 
 public class TrackerService extends Service implements LocationListener {
+    private final double SESSION_DIFF_LIMIT = 100;
     private final IBinder mBinder = new LocalBinder();
     private final String TAG = "TrackerService";
     private final float WEIGHT = 80;
@@ -142,7 +142,8 @@ public class TrackerService extends Service implements LocationListener {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Service is running");
-        handleIntent(intent);
+        if (intent != null)
+            handleIntent(intent);
         enableLocationUpdates();
         return super.onStartCommand(intent, flags, startId);
     }
@@ -470,7 +471,7 @@ public class TrackerService extends Service implements LocationListener {
 
     private double getAdditionalDistanceAfterContinue() {
         double newDistance = calculateNewDistance(positionList.get(positionList.size() - 1), previousLocation);
-        if (newDistance <= 100)
+        if (newDistance <= SESSION_DIFF_LIMIT)
             return newDistance;
         return 0;
     }

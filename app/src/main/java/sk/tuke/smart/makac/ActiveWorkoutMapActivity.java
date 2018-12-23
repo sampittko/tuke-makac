@@ -46,8 +46,6 @@ public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapR
             try {
                 lastRenderBeforeSeconds++;
                 if (broadcastIntent.getAction().equals(IntentHelper.ACTION_TICK)) {
-                    if (currentMarker == null)
-                        setupMarkerAndCamera();
                     Location newestLocation = broadcastIntent.getParcelableExtra(IntentHelper.DATA_LOCATION);
                     updateMapLocation(newestLocation);
                     if (lastRenderBeforeSeconds == 15)
@@ -80,23 +78,16 @@ public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapR
     private void updateMapLocation(Location newestLocation) {
         if (newestLocation != null) {
             Log.i(TAG, "Location changed.");
-
             handleFinalPositionList(newestLocation);
-
             if (currentMarker != null) {
                 currentMarker.remove();
                 Log.i(TAG, "Marker removed");
             }
-
             LatLng latLng = new LatLng(newestLocation.getLatitude(), newestLocation.getLongitude());
             currentMarker = mMap.addMarker(new MarkerOptions().position(latLng));
-
             Log.i(TAG, "New marker placed");
-
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL));
-
             Log.i(TAG, "Camera moved.");
-
             Log.i(TAG, "Location updated.");
         }
         else {
@@ -126,7 +117,6 @@ public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapR
                 polylineOptions.add(new LatLng(location.getLatitude(), location.getLongitude()));
             mMap.addPolyline(polylineOptions);
         }
-
         lastRenderBeforeSeconds = 0;
         Log.i(TAG, "Map rendered.");
     }
@@ -136,16 +126,8 @@ public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapR
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_active_workout_map);
         ButterKnife.bind(this);
-
         finalPositionList = (ArrayList<List<Location>>) getIntent().getSerializableExtra(IntentHelper.DATA_POSITIONS);
-
         setupBroadcastReceiver();
-
-        if (finalPositionList.size() != 0) {
-            performRouteRender();
-            Log.i(TAG, "Route initially rendered.");
-        }
-
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_activeworkoutmap_map);
         mapFragment.getMapAsync(this);
@@ -175,12 +157,12 @@ public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapR
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         if (initialLatLng == null) {
             getInitialLatLng();
             if (initialLatLng == null)
                 return;
         }
+        setupMarkerAndCamera();
         mMap.animateCamera(CameraUpdateFactory.newLatLng(initialLatLng));
     }
 
