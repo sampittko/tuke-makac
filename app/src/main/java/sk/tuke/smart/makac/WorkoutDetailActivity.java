@@ -6,8 +6,9 @@ import android.location.Location;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,6 +26,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
+import sk.tuke.smart.makac.settings.SettingsActivity;
 
 public class WorkoutDetailActivity extends AppCompatActivity {
     @BindView(R.id.textview_workoutdetail_workouttitle) TextView workoutTitleTextView;
@@ -54,10 +56,10 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workout_detail);
 
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-
         ButterKnife.bind(this);
+
+        setTitle(R.string.workout_review);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         try {
             intent = getIntent();
@@ -68,6 +70,33 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         }
         catch(NullPointerException e) {
             Log.e(TAG, "Intent is missing values.");
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        performCorrespondingActionForMenuItem(item.getItemId());
+        return true;
+    }
+
+    private void performCorrespondingActionForMenuItem(int itemId) {
+        switch(itemId) {
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
+            // TODO on back pressed, do not start whole app, only StopwatchFragment
+            case 16908332:
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+                break;
+            default:
+                throw new UnsupportedOperationException();
         }
     }
 

@@ -44,7 +44,11 @@
         </service>
 
         <activity android:name=".MapsActivity" />
-        <activity android:name=".WorkoutDetailActivity" />
+        <activity android:name=".WorkoutDetailActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="sk.tuke.smart.makac.MainActivity" />
+        </activity>
         <activity
             android:name=".ActiveWorkoutMapActivity"
             android:label="@string/title_activity_active_workout_map" />
