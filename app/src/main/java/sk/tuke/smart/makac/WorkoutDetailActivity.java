@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -75,7 +76,9 @@ public class WorkoutDetailActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.main, menu);
+        menuInflater.inflate(R.menu.delete, menu);
         return true;
     }
 
@@ -89,6 +92,9 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         switch(itemId) {
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
+                break;
+            // TODO delete workout
+            case R.id.action_delete:
                 break;
             // TODO on back pressed, do not start whole app, only StopwatchFragment
             case 16908332:

@@ -77,6 +77,7 @@
 
     <!-- TOOLBAR MENU -->
     <string name="all_actionsettings">Settings</string>
+    <string name="all_actiondelete">Delete</string>
     <string name="historysettings_actionsync">Sync with server</string>
 
     <!-- HISTORY FRAGMENT -->
