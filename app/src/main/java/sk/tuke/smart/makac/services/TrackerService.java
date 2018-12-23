@@ -26,6 +26,7 @@ import java.util.List;
 
 import sk.tuke.smart.makac.exceptions.InsufficientDistanceException;
 import sk.tuke.smart.makac.exceptions.NotEnoughLocationsException;
+import sk.tuke.smart.makac.fragments.StopwatchFragment;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.SportActivities;
 import sk.tuke.smart.makac.model.GpsPoint;
@@ -40,28 +41,28 @@ public class TrackerService extends Service implements LocationListener {
     private final int MIN_DISTANCE = 10;
     private final int PACE_UPDATE_LIMIT = MIN_TIME_BTW_UPDATES / 1000 * 2;
 
-    private int state = IntentHelper.STATE_STOPPED;
-    private int sportActivity = IntentHelper.ACTIVITY_RUNNING;
+    private int state;
+    private int sportActivity;
     private double calories, previousCalories, totalCalories, distance, pace;
     private long duration;
     private float speed;
 
     private boolean hasContinued;
 
-    private Location previousPosition;
+    private Location previousLocation;
     private Location currentLocation;
 
     private Date firstSpeedTime;
 
-    private ArrayList<Float> speedList = new ArrayList<>();
-    private ArrayList<Location> positionList = new ArrayList<>();
+    private ArrayList<Float> speedList;
+    private ArrayList<Location> positionList;
 
     private Dao<GpsPoint, Long> gpsPointDao;
     private Dao<Workout, Long> workoutDao;
 
     private LocationManager locationManager;
 
-    private Handler handler = new Handler();
+    private Handler handler;
 
     private Workout pendingWorkout;
 
@@ -102,10 +103,19 @@ public class TrackerService extends Service implements LocationListener {
     @Override
     public void onCreate() {
         super.onCreate();
+        initializeVariables();
         checkLocationPermissions();
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         databaseSetup();
         Log.i(TAG, "Service created");
+    }
+
+    private void initializeVariables() {
+        speedList = new ArrayList<>();
+        positionList = new ArrayList<>();
+        handler = new Handler();
+        sportActivity = IntentHelper.ACTIVITY_RUNNING;
+        state = IntentHelper.STATE_STOPPED;
     }
 
     private void checkLocationPermissions() {
@@ -120,7 +130,6 @@ public class TrackerService extends Service implements LocationListener {
         try {
             DatabaseHelper databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
             gpsPointDao = databaseHelper.gpsPointDao();
-            gpsPointDao.delete(gpsPointDao.queryForAll());
             workoutDao = databaseHelper.workoutDao();
             Log.i(TAG, "Local database is ready");
         }
@@ -171,6 +180,7 @@ public class TrackerService extends Service implements LocationListener {
         List<Workout> workouts = null;
 
         try {
+            removePreviousGpsPoints();
             workouts = workoutDao.queryForAll();
         }
         catch(SQLException e) {
@@ -178,13 +188,13 @@ public class TrackerService extends Service implements LocationListener {
         }
 
         if (workouts != null) {
-            int workoutId;
+            long workoutId = StopwatchFragment.BULHARSKO;
             String workoutTitle;
 
             if (workouts.size() == 0)
-                workoutId = 1;
+                workoutId += 1;
             else
-                workoutId = workouts.size() + 1;
+                workoutId += workouts.size() + 1;
 
             workoutTitle = "Workout " + workoutId;
             pendingWorkout = new Workout(workoutTitle, sportActivity);
@@ -200,9 +210,15 @@ public class TrackerService extends Service implements LocationListener {
         }
     }
 
+    private void removePreviousGpsPoints() throws SQLException {
+        long gpsPointsCount = gpsPointDao.countOf();
+        gpsPointDao.delete(gpsPointDao.queryForAll());
+        Log.i(TAG, gpsPointsCount + " gps points from previous workout removed from database");
+    }
+
     private void performContinueAction() {
         handler.postDelayed(timerRunnable, 1000);
-        previousPosition = positionList.isEmpty() ? null : positionList.get(positionList.size() - 1);
+        previousLocation = positionList.isEmpty() ? null : positionList.get(positionList.size() - 1);
         positionList = new ArrayList<>();
         speedList = new ArrayList<>();
         hasContinued = true;
@@ -224,8 +240,14 @@ public class TrackerService extends Service implements LocationListener {
         Log.i(TAG, "Service paused");
     }
 
+    // TODO add previousCalories, distance, duration, previousLocation
     private void performWorkoutRecovery() {
-        Log.e(TAG, "Recovery not implemented yet");
+        try {
+            pendingWorkout = workoutDao.queryForId(StopwatchFragment.BULHARSKO + workoutDao.countOf());
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void performStopAction() {
@@ -394,7 +416,7 @@ public class TrackerService extends Service implements LocationListener {
             validateNewDistance(newDistance);
         }
         else if (hasContinued) {
-            if (previousPosition != null) {
+            if (previousLocation != null) {
                 double additionalDistance = getAdditionalDistanceAfterContinue();
                 distance += additionalDistance;
                 Log.i(TAG, additionalDistance + " meter(s) added after resuming pending workout");
@@ -408,7 +430,7 @@ public class TrackerService extends Service implements LocationListener {
     }
 
     private double getAdditionalDistanceAfterContinue() {
-        double newDistance = calculateNewDistance(positionList.get(positionList.size() - 1), previousPosition);
+        double newDistance = calculateNewDistance(positionList.get(positionList.size() - 1), previousLocation);
         if (newDistance <= 100)
             return newDistance;
         return 0;

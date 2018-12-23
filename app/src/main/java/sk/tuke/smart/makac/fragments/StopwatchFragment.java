@@ -62,21 +62,23 @@ public class StopwatchFragment extends Fragment {
     @BindString(R.string.stopwatch_stop) public String stopString;
     @BindString(R.string.stopwatch_continue) public String continueString;
 
+    // TODO remove BULHARSKO
+    public static final long BULHARSKO = 47;
     private final String TAG = "StopwatchFragment";
 
     private boolean workoutStarted, workoutPaused;
 
     private AlertDialog.Builder alertDialogBuilder;
 
-    private int sportActivity = IntentHelper.ACTIVITY_RUNNING;
+    private int sportActivity;
 
     private long duration;
 
     private double distance, pace, calories, totalCalories, latestBiggestNonZeroCalories;
 
-    private ArrayList<Double> paceList = new ArrayList<>();
-    private ArrayList<Location> latestPositionList = new ArrayList<>();
-    private ArrayList<List<Location>> finalPositionList = new ArrayList<>();
+    private ArrayList<Double> paceList;
+    private ArrayList<Location> latestPositionList;
+    private ArrayList<List<Location>> finalPositionList;
 
     private IntentFilter intentFilter;
 
@@ -89,11 +91,14 @@ public class StopwatchFragment extends Fragment {
         public void onReceive(Context context, Intent broadcastIntent) {
             try {
                 if (broadcastIntent.getAction().equals(IntentHelper.ACTION_TICK)) {
+                    Log.i(TAG, IntentHelper.ACTION_TICK);
                     renderValues(broadcastIntent);
                     verifyNewestLocation((Location)broadcastIntent.getParcelableExtra(IntentHelper.DATA_LOCATION));
                 }
-                else if (broadcastIntent.getAction().equals(IntentHelper.ACTION_GPS))
+                else if (broadcastIntent.getAction().equals(IntentHelper.ACTION_GPS)) {
+                    Log.i(TAG, IntentHelper.ACTION_GPS);
                     saveLatestPositionList();
+                }
                 else
                     Log.e(TAG, "Broadcast intent does not contain accepted action");
             }
@@ -114,9 +119,8 @@ public class StopwatchFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initializeVariables();
         setHasOptionsMenu(true);
-        thisFragmentActivity = getActivity();
-        thisFragmentActivity.setTitle(R.string.app_name);
         try {
             checkGPS();
         }
@@ -127,6 +131,15 @@ public class StopwatchFragment extends Fragment {
         createStopWorkoutAlertDialog();
         registerBroadcastReceiver();
         databaseSetup();
+    }
+
+    private void initializeVariables() {
+        paceList = new ArrayList<>();
+        latestPositionList = new ArrayList<>();
+        finalPositionList = new ArrayList<>();
+        thisFragmentActivity = getActivity();
+        thisFragmentActivity.setTitle(R.string.app_name);
+        sportActivity = IntentHelper.ACTIVITY_RUNNING;
     }
 
     private void checkGPS() throws SensorNotPresentException {
@@ -264,7 +277,7 @@ public class StopwatchFragment extends Fragment {
         try {
             long workoutsCount = workoutDao.countOf();
             if (workoutsCount != 0) {
-                Workout lastWorkout = workoutDao.queryForId(workoutsCount);
+                Workout lastWorkout = workoutDao.queryForId(workoutsCount + BULHARSKO);
                 int lastWorkoutStatus = lastWorkout.getStatus();
                 if (lastWorkoutStatus == Workout.statusPaused || lastWorkoutStatus == Workout.statusUnknown)
                     performWorkoutRecovery(lastWorkout);
@@ -278,10 +291,11 @@ public class StopwatchFragment extends Fragment {
     }
 
     private void performWorkoutRecovery(Workout lastWorkout) {
-        Log.e(TAG, "Performing temporary recovery");
         workoutStarted = true;
         workoutPaused = false;
         toggleRecordingHandler(getView());
+        renderValues(lastWorkout.getDuration(), lastWorkout.getDistance(), lastWorkout.getPaceAvg(), lastWorkout.getTotalCalories());
+        Log.i(TAG, "StopwatchFragment recovered");
     }
 
     @Override
@@ -364,8 +378,7 @@ public class StopwatchFragment extends Fragment {
     }
 
     private void renderValues(Intent broadcastIntent) {
-        Log.i(TAG, "Broadcast intent received with action TICK.");
-
+        Log.i(TAG, "Render of counters requested.");
         durationRenderer(broadcastIntent.getLongExtra(
                 IntentHelper.DATA_DURATION, 0));
         distanceRenderer(broadcastIntent.getDoubleExtra(
@@ -374,7 +387,15 @@ public class StopwatchFragment extends Fragment {
                 IntentHelper.DATA_PACE, 0));
         caloriesRenderer(broadcastIntent.getDoubleExtra(
                 IntentHelper.DATA_CALORIES, 0));
+        Log.i(TAG, "UI updated.");
+    }
 
+    private void renderValues(long duration, double distance, double pace, double totalCalories) {
+        Log.i(TAG, "Render of counters requested.");
+        durationRenderer(duration);
+        distanceRenderer(distance);
+        paceRenderer(pace);
+        caloriesRenderer(totalCalories);
         Log.i(TAG, "UI updated.");
     }
 
@@ -452,8 +473,6 @@ public class StopwatchFragment extends Fragment {
     }
 
     private void saveLatestPositionList() {
-        Log.i(TAG, "Broadcast intent received with action GPS.");
-
         if (!latestPositionList.isEmpty()) {
             finalPositionList.add(latestPositionList);
             latestPositionList = new ArrayList<>();
