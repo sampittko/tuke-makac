@@ -1,6 +1,7 @@
 package sk.tuke.smart.makac.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -14,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
@@ -27,6 +27,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import sk.tuke.smart.makac.HistoryListAdapter;
 import sk.tuke.smart.makac.R;
+import sk.tuke.smart.makac.WorkoutDetailActivity;
+import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 
@@ -76,10 +78,9 @@ public class HistoryFragment extends Fragment {
         workoutsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(thisFragmentActivity, "Item " + (i + 1) + " clicked.", Toast.LENGTH_SHORT).show();
-                // TODO start WorkoutDetailActivity
-                // Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
-                // startActivity(intent);
+                 Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
+                 intent.putExtra(IntentHelper.DATA_WORKOUT, (long)(i+1));
+                 startActivity(intent);
             }
         });
         Log.i(TAG, "Workouts displayed successfully");

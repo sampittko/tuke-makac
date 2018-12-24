@@ -70,7 +70,6 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         initializeLayout();
         databaseSetup();
-        currentWorkoutId = getIntent().getLongExtra(IntentHelper.DATA_WORKOUT, -1);
         retrieveWorkoutValues();
         renderValues();
         mapButtonVisibilityCheck();
@@ -98,6 +97,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
 
     private void retrieveWorkoutValues() {
         try {
+            currentWorkoutId = getIntent().getLongExtra(IntentHelper.DATA_WORKOUT, -1);
             Workout currentWorkout = workoutDao.queryForId(currentWorkoutId);
             sportActivity = currentWorkout.getSportActivity();
             duration = currentWorkout.getDuration();
