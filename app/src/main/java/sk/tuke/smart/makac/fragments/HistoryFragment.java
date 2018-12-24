@@ -11,8 +11,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
@@ -71,6 +73,15 @@ public class HistoryFragment extends Fragment {
         List<Workout> workouts = workoutDao.queryForAll();
         HistoryListAdapter historyListAdapter = new HistoryListAdapter(thisFragmentActivity, R.layout.adapter_history, getStringifiedWorkouts(workouts), workouts);
         workoutsListView.setAdapter(historyListAdapter);
+        workoutsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(thisFragmentActivity, "Item " + (i + 1) + " clicked.", Toast.LENGTH_SHORT).show();
+                // TODO start WorkoutDetailActivity
+                // Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
+                // startActivity(intent);
+            }
+        });
         Log.i(TAG, "Workouts displayed successfully");
     }
 
