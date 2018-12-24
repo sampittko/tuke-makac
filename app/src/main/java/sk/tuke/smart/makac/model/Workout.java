@@ -1,9 +1,13 @@
 package sk.tuke.smart.makac.model;
 
+import android.support.annotation.NonNull;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.util.Date;
+
+import sk.tuke.smart.makac.helpers.MainHelper;
 
 @DatabaseTable
 public class Workout {
@@ -145,5 +149,15 @@ public class Workout {
 
     public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return MainHelper.formatDuration(MainHelper.msToS(duration)) + " "
+                + MainHelper.intToSportActivity(sportActivity) + " | "
+                + MainHelper.formatDistance(distance) + " km | "
+                + MainHelper.formatCalories(totalCalories) + " kcal | "
+                + MainHelper.formatPace(paceAvg) + " min/km";
     }
 }

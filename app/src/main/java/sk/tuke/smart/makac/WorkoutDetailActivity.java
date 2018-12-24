@@ -122,16 +122,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     }
 
     private void sportActivityRenderer(int sportActivity) {
-        sportActivityTextView.setText(getSportActivityString(sportActivity));
-    }
-
-    private String getSportActivityString(int sportActivity) {
-        switch (sportActivity) {
-            case 0: return "Running";
-            case 1: return "Walking";
-            case 2: return "Cycling";
-            default: return "Unknown sport";
-        }
+        sportActivityTextView.setText(MainHelper.intToSportActivity(sportActivity));
     }
 
     private void activityDateRenderer() {
@@ -174,7 +165,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     private void createShareAlertDialog() {
         String shareMessage = this.shareMessage;
         shareMessage = shareMessage
-                .replace("WORKOUT_TYPE", getSportActivityString(intent.getIntExtra(IntentHelper.DATA_SPORT, 0)).toLowerCase())
+                .replace("WORKOUT_TYPE", MainHelper.intToSportActivity(intent.getIntExtra(IntentHelper.DATA_SPORT, 0)).toLowerCase())
                 .replace("DISTANCE", MainHelper.formatDistance(intent.getDoubleExtra(IntentHelper.DATA_DISTANCE, 0)))
                 .replace("UNIT", "km")
                 .replace("DURATION", MainHelper.formatDuration(intent.getLongExtra(IntentHelper.DATA_DURATION, 0)));

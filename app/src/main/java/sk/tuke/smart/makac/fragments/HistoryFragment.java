@@ -18,6 +18,8 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -66,9 +68,17 @@ public class HistoryFragment extends Fragment {
     }
 
     private void displayHistoryItems() throws SQLException {
-        HistoryListAdapter historyListAdapter = new HistoryListAdapter(thisFragmentActivity, R.layout.adapter_history, workoutDao.queryForAll());
+        HistoryListAdapter historyListAdapter = new HistoryListAdapter(thisFragmentActivity, R.layout.adapter_history, getStringifiedWorkouts());
         workoutsListView.setAdapter(historyListAdapter);
         Log.i(TAG, "Workouts displayed successfully");
+    }
+
+    private List<String> getStringifiedWorkouts() throws SQLException {
+        List<String> stringifiedWorkouts = new ArrayList<>();
+        List<Workout> workouts = workoutDao.queryForAll();
+        for (Workout workout : workouts)
+            stringifiedWorkouts.add(workout.toString());
+        return stringifiedWorkouts;
     }
 
     @Override
