@@ -10,6 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.facebook.stetho.Stetho;
 
@@ -26,9 +29,12 @@ public class MainActivity extends AppCompatActivity
         StopwatchFragment.OnFragmentInteractionListener {
     private NavigationView navigationView;
 
+    private MainActivity thisActivity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        thisActivity = this;
         // live DB
         Stetho.initializeWithDefaults(this);
         initializeLayout();
@@ -36,6 +42,7 @@ public class MainActivity extends AppCompatActivity
 
     private void initializeLayout() {
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -47,8 +54,26 @@ public class MainActivity extends AppCompatActivity
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        setOnClicksForNavigationView();
 
         displayStopwatchFragment();
+    }
+
+    private void setOnClicksForNavigationView() {
+        View.OnClickListener openLoginOnClick = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(thisActivity, LoginActivity.class));
+            }
+        };
+
+        View headerview = navigationView.getHeaderView(0);
+
+        ImageView userImageImageView = headerview.findViewById(R.id.menu_loggedInUserImage);
+        userImageImageView.setOnClickListener(openLoginOnClick);
+
+        TextView userNameTextView = headerview.findViewById(R.id.menu_loggedInUserFullName);
+        userNameTextView.setOnClickListener(openLoginOnClick);
     }
 
     private void displayStopwatchFragment() {
