@@ -96,7 +96,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
             // TODO delete workout
             case R.id.action_delete:
                 break;
-            // TODO on back pressed, do not start whole app, only StopwatchFragment
+            // TODO on back pressed, perform back action
             case 16908332:
                 startActivity(new Intent(this, MainActivity.class));
                 finish();

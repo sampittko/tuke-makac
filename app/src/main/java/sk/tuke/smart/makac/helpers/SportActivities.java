@@ -15,6 +15,10 @@ public final class SportActivities {
     private static final double WALKING_MET_AVG = 1.14;
     private static final double CYCLING_MET_AVG = 0.744444444;
 
+    public static final int RUNNING = 0;
+    public static final int WALKING = 1;
+    public static final int CYCLING = 2;
+
     private static final String TAG = "SportActivities";
 
     public SportActivities() {
@@ -53,22 +57,22 @@ public final class SportActivities {
         try {
             int convertedSpeed = (int)Math.ceil(MainHelper.mpsToMiph(speed));
             switch (activityType) {
-                case IntentHelper.ACTIVITY_RUNNING:
+                case RUNNING:
                     return runningMets.get(convertedSpeed);
-                case IntentHelper.ACTIVITY_WALKING:
+                case WALKING:
                     return walkingMets.get(convertedSpeed);
-                case IntentHelper.ACTIVITY_CYCLING:
+                case CYCLING:
                     return cyclingMets.get(convertedSpeed);
             }
         }
         catch (NullPointerException e) {
             double convertedSpeed = MainHelper.mpsToMiph(speed);
             switch (activityType) {
-                case IntentHelper.ACTIVITY_RUNNING:
+                case RUNNING:
                     return convertedSpeed * RUNNING_MET_AVG;
-                case IntentHelper.ACTIVITY_WALKING:
+                case WALKING:
                     return convertedSpeed * WALKING_MET_AVG;
-                case IntentHelper.ACTIVITY_CYCLING:
+                case CYCLING:
                     return convertedSpeed * CYCLING_MET_AVG;
             }
         }

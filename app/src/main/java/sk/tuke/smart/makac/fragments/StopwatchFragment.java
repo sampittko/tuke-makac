@@ -139,7 +139,7 @@ public class StopwatchFragment extends Fragment {
         finalPositionList = new ArrayList<>();
         thisFragmentActivity = getActivity();
         thisFragmentActivity.setTitle(R.string.app_name);
-        sportActivity = IntentHelper.ACTIVITY_RUNNING;
+        sportActivity = SportActivities.RUNNING;
     }
 
     private void checkGPS() throws SensorNotPresentException {

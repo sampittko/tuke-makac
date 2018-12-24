@@ -115,7 +115,7 @@ public class TrackerService extends Service implements LocationListener {
         speedList = new ArrayList<>();
         positionList = new ArrayList<>();
         handler = new Handler();
-        sportActivity = IntentHelper.ACTIVITY_RUNNING;
+        sportActivity = SportActivities.RUNNING;
         state = IntentHelper.STATE_STOPPED;
     }
 
