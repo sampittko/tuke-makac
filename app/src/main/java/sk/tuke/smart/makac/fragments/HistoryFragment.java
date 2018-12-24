@@ -68,14 +68,14 @@ public class HistoryFragment extends Fragment {
     }
 
     private void displayHistoryItems() throws SQLException {
-        HistoryListAdapter historyListAdapter = new HistoryListAdapter(thisFragmentActivity, R.layout.adapter_history, getStringifiedWorkouts());
+        List<Workout> workouts = workoutDao.queryForAll();
+        HistoryListAdapter historyListAdapter = new HistoryListAdapter(thisFragmentActivity, R.layout.adapter_history, getStringifiedWorkouts(workouts), workouts);
         workoutsListView.setAdapter(historyListAdapter);
         Log.i(TAG, "Workouts displayed successfully");
     }
 
-    private List<String> getStringifiedWorkouts() throws SQLException {
+    private List<String> getStringifiedWorkouts(List<Workout> workouts) {
         List<String> stringifiedWorkouts = new ArrayList<>();
-        List<Workout> workouts = workoutDao.queryForAll();
         for (Workout workout : workouts)
             stringifiedWorkouts.add(workout.toString());
         return stringifiedWorkouts;

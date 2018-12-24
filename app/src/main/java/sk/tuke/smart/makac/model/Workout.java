@@ -157,7 +157,7 @@ public class Workout {
         return MainHelper.formatDuration(MainHelper.msToS(duration)) + " "
                 + MainHelper.intToSportActivity(sportActivity) + " | "
                 + MainHelper.formatDistance(distance) + " km | "
-                + MainHelper.formatCalories(totalCalories) + " kcal | "
+                + MainHelper.formatCalories(totalCalories) + " kcal | Φ "
                 + MainHelper.formatPace(paceAvg) + " min/km";
     }
 }
