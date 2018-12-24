@@ -338,6 +338,7 @@ public class StopwatchFragment extends Fragment {
         super.onDestroy();
         Intent intent = new Intent(thisFragmentActivity, TrackerService.class);
         thisFragmentActivity.stopService(intent);
+        OpenHelperManager.releaseHelper();
         Log.i(TAG, "Service stopped");
     }
 

@@ -157,5 +157,11 @@ public class HistoryFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        OpenHelperManager.releaseHelper();
+    }
+
     public interface OnFragmentInteractionListener {}
 }

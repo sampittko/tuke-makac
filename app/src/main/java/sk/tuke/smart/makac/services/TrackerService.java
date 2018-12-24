@@ -323,6 +323,7 @@ public class TrackerService extends Service implements LocationListener {
         super.onDestroy();
         locationManager.removeUpdates(this);
         Log.i(TAG, "Location updates were stopped");
+        OpenHelperManager.releaseHelper();
         Log.i(TAG, "Service was destroyed");
     }
 
