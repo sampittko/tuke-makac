@@ -1,7 +1,13 @@
 package sk.tuke.smart.makac.helpers;
 
+import android.location.Location;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+
+import sk.tuke.smart.makac.model.GpsPoint;
 
 public final class MainHelper {
     private static final float MpS_TO_MIpH = 2.23694f;
@@ -82,5 +88,28 @@ public final class MainHelper {
 
     public static String sToDate(long n) {
         return new SimpleDateFormat("HH:mm - dd.MM. yyyy", Locale.ENGLISH).format(n);
+    }
+
+    public static ArrayList<List<Location>> getFinalPositionList(List<GpsPoint> gpsPoints) {
+        long index = 1;
+        long currentSessionNumber;
+        ArrayList<List<Location>> finalPositionList = new ArrayList<>();
+        ArrayList<Location> latestPositionList = new ArrayList<>();
+        Location currentLocation;
+
+        for (GpsPoint currentGpsPoint : gpsPoints) {
+            currentLocation = new Location("");
+            currentSessionNumber = currentGpsPoint.getSessionNumber();
+            if (index != currentSessionNumber) {
+                index = currentSessionNumber;
+                latestPositionList = new ArrayList<>();
+                finalPositionList.add(latestPositionList);
+            }
+            currentLocation.setLongitude(currentGpsPoint.getLongitude());
+            currentLocation.setLatitude(currentGpsPoint.getLatitude());
+            latestPositionList.add(currentLocation);
+        }
+        finalPositionList.add(latestPositionList);
+        return finalPositionList;
     }
 }

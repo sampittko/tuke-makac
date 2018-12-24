@@ -31,6 +31,7 @@ import butterknife.OnClick;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
 import sk.tuke.smart.makac.helpers.SportActivities;
+import sk.tuke.smart.makac.model.GpsPoint;
 import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 import sk.tuke.smart.makac.settings.SettingsActivity;
@@ -53,6 +54,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     private long currentWorkoutId;
 
     private Dao<Workout, Long> workoutDao;
+    private Dao<GpsPoint, Long> gpsPointDao;
 
     private final String TAG = "WorkoutDetailActivity";
 
@@ -86,6 +88,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         try {
             DatabaseHelper databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
             workoutDao = databaseHelper.workoutDao();
+            gpsPointDao = databaseHelper.gpsPointDao();
             Log.i(TAG, "Local database is ready");
         }
         catch (SQLException e) {
@@ -101,8 +104,8 @@ public class WorkoutDetailActivity extends AppCompatActivity {
             totalCalories = currentWorkout.getTotalCalories();
             avgPace = currentWorkout.getPaceAvg();
             distance = currentWorkout.getDistance();
-            // TODO
-            finalPositionList = null;
+            List<GpsPoint> gpsPoints = gpsPointDao.queryForEq("workout_id", currentWorkoutId);
+            finalPositionList = MainHelper.getFinalPositionList(gpsPoints);
             workoutDate = currentWorkout.getCreated();
             workoutTitle = currentWorkout.getTitle();
             Log.i(TAG, "Values from local database retrieved successfully");
@@ -177,7 +180,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     @OnClick(R.id.button_workoutdetail_showmap)
     public void showMapsActivity(View view) {
         Intent mapsIntent = new Intent(this, MapsActivity.class);
-        mapsIntent.putExtra(IntentHelper.DATA_POSITIONS, finalPositionList);
+        mapsIntent.putExtra(IntentHelper.DATA_WORKOUT, currentWorkoutId);
         startActivity(mapsIntent);
     }
 

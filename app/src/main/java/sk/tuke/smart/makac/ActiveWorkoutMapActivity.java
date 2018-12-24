@@ -18,13 +18,19 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.j256.ormlite.dao.Dao;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import sk.tuke.smart.makac.helpers.IntentHelper;
+import sk.tuke.smart.makac.helpers.MainHelper;
+import sk.tuke.smart.makac.model.GpsPoint;
+import sk.tuke.smart.makac.model.config.DatabaseHelper;
 
 public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapReadyCallback {
     private static final String TAG = "ActiveWorkoutMapA";
@@ -39,6 +45,8 @@ public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapR
     private Marker currentMarker;
 
     private LatLng initialLatLng;
+
+    private Dao<GpsPoint, Long> gpsPointDao;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -126,11 +134,34 @@ public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapR
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_active_workout_map);
         ButterKnife.bind(this);
-        finalPositionList = (ArrayList<List<Location>>) getIntent().getSerializableExtra(IntentHelper.DATA_POSITIONS);
+        databaseSetup();
+        retrieveVariables();
         setupBroadcastReceiver();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_activeworkoutmap_map);
         mapFragment.getMapAsync(this);
+    }
+
+    private void databaseSetup() {
+        try {
+            DatabaseHelper databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
+            gpsPointDao = databaseHelper.gpsPointDao();
+            Log.i(TAG, "Local database is ready");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void retrieveVariables() {
+        try {
+            long currentWorkoutId = getIntent().getLongExtra(IntentHelper.DATA_WORKOUT, -1);
+            List<GpsPoint> gpsPoints = gpsPointDao.queryForEq("workout_id", currentWorkoutId);
+            finalPositionList = MainHelper.getFinalPositionList(gpsPoints);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setupBroadcastReceiver() {
@@ -150,6 +181,7 @@ public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapR
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        OpenHelperManager.releaseHelper();
         unregisterReceiver(broadcastReceiver);
         Log.i(TAG, "Receiver unregistered.");
     }

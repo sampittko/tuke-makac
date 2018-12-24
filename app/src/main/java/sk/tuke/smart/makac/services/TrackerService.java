@@ -182,7 +182,6 @@ public class TrackerService extends Service implements LocationListener {
         List<Workout> workouts = null;
 
         try {
-            removePreviousGpsPoints();
             workouts = workoutDao.queryForAll();
         }
         catch(SQLException e) {
@@ -210,12 +209,6 @@ public class TrackerService extends Service implements LocationListener {
                 e.printStackTrace();
             }
         }
-    }
-
-    private void removePreviousGpsPoints() throws SQLException {
-        long gpsPointsCount = gpsPointDao.countOf();
-        gpsPointDao.delete(gpsPointDao.queryForAll());
-        Log.i(TAG, gpsPointsCount + " gps points from previous workout removed from database");
     }
 
     private void performContinueAction() {
@@ -263,7 +256,7 @@ public class TrackerService extends Service implements LocationListener {
     }
 
     private GpsPoint getPreviousGpsPoint() throws SQLException {
-        List<GpsPoint> gpsPoints = gpsPointDao.queryForAll();
+        List<GpsPoint> gpsPoints = gpsPointDao.queryForEq("workout_id", pendingWorkout.getId());
         if (gpsPoints.size() > 0)
             return gpsPoints.get(gpsPoints.size() - 1);
         else
@@ -271,7 +264,7 @@ public class TrackerService extends Service implements LocationListener {
     }
 
     private void retrievePreviousLocation(GpsPoint previousGpsPoint) throws SQLException {
-        List<GpsPoint> gpsPoints = gpsPointDao.queryForAll();
+        List<GpsPoint> gpsPoints = gpsPointDao.queryForEq("workout_id", pendingWorkout.getId());
         if (gpsPoints.size() > 0) {
             Location retrievedLocation = new Location("");
             retrievedLocation.setLatitude(previousGpsPoint.getLatitude());
@@ -421,7 +414,7 @@ public class TrackerService extends Service implements LocationListener {
     private double getAveragePace() {
         ArrayList<Double> paceList = new ArrayList<>();
         try {
-            List<GpsPoint> gpsPoints = gpsPointDao.queryForAll();
+            List<GpsPoint> gpsPoints = gpsPointDao.queryForEq("workout_id", pendingWorkout.getId());
             double currentPace;
             for (GpsPoint gpsPoint : gpsPoints) {
                 currentPace = gpsPoint.getPace();

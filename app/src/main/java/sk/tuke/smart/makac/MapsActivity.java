@@ -13,14 +13,22 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.j256.ormlite.dao.Dao;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import sk.tuke.smart.makac.helpers.IntentHelper;
+import sk.tuke.smart.makac.helpers.MainHelper;
+import sk.tuke.smart.makac.model.GpsPoint;
+import sk.tuke.smart.makac.model.config.DatabaseHelper;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
+
+    private Dao<GpsPoint, Long> gpsPointDao;
 
     private ArrayList<List<Location>> finalPositionList;
 
@@ -30,10 +38,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        finalPositionList = (ArrayList<List<Location>>) getIntent().getSerializableExtra(IntentHelper.DATA_POSITIONS);
+        databaseSetup();
+        retrieveVariables();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_maps_map);
         mapFragment.getMapAsync(this);
+    }
+
+    private void databaseSetup() {
+        try {
+            DatabaseHelper databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
+            gpsPointDao = databaseHelper.gpsPointDao();
+            Log.i(TAG, "Local database is ready");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void retrieveVariables() {
+        try {
+            long currentWorkoutId = getIntent().getLongExtra(IntentHelper.DATA_WORKOUT, -1);
+            List<GpsPoint> gpsPoints = gpsPointDao.queryForEq("workout_id", currentWorkoutId);
+            finalPositionList = MainHelper.getFinalPositionList(gpsPoints);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        OpenHelperManager.releaseHelper();
     }
 
     @Override

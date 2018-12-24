@@ -43,7 +43,6 @@ import sk.tuke.smart.makac.WorkoutDetailActivity;
 import sk.tuke.smart.makac.exceptions.SensorNotPresentException;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
-import sk.tuke.smart.makac.helpers.SportActivities;
 import sk.tuke.smart.makac.model.GpsPoint;
 import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
@@ -69,15 +68,12 @@ public class StopwatchFragment extends Fragment {
 
     private AlertDialog.Builder alertDialogBuilder;
 
-    private int sportActivity;
-
     private long duration;
 
     private double distance, pace, calories, totalCalories, latestBiggestNonZeroCalories;
 
     private ArrayList<Double> paceList;
-    private ArrayList<Location> latestPositionList;
-    private ArrayList<List<Location>> finalPositionList;
+    private List<Location> latestPositionList;
 
     private IntentFilter intentFilter;
 
@@ -136,10 +132,8 @@ public class StopwatchFragment extends Fragment {
     private void initializeVariables() {
         paceList = new ArrayList<>();
         latestPositionList = new ArrayList<>();
-        finalPositionList = new ArrayList<>();
         thisFragmentActivity = getActivity();
         thisFragmentActivity.setTitle(R.string.app_name);
-        sportActivity = SportActivities.RUNNING;
     }
 
     private void checkGPS() throws SensorNotPresentException {
@@ -194,10 +188,6 @@ public class StopwatchFragment extends Fragment {
                         catch (SQLException e) {
                             e.printStackTrace();
                         }
-                    }
-
-                    private long getCurrentWorkoutId() throws SQLException {
-                        return Workout.ID_OFFSET + workoutDao.countOf();
                     }
                 })
                 .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -295,23 +285,14 @@ public class StopwatchFragment extends Fragment {
 
     private void retrievePositions() {
         try {
-            List<GpsPoint> gpsPoints = gpsPointDao.queryForAll();
-            long index = 1;
-            long currentSessionNumber;
-            Location currentLocation;
-            for (GpsPoint currentGpsPoint : gpsPoints) {
-                currentLocation = new Location("");
-                currentSessionNumber = currentGpsPoint.getSessionNumber();
-                if (index != currentSessionNumber) {
-                    index = currentSessionNumber;
-                    finalPositionList.add(latestPositionList);
-                    latestPositionList = new ArrayList<>();
-                }
-                currentLocation.setLongitude(currentGpsPoint.getLongitude());
-                currentLocation.setLatitude(currentGpsPoint.getLatitude());
-                latestPositionList.add(currentLocation);
+            List<GpsPoint> gpsPoints = gpsPointDao.queryForEq("workout_id", getCurrentWorkoutId());
+            ArrayList<List<Location>> finalPositionList = MainHelper.getFinalPositionList(gpsPoints);
+            if (finalPositionList.size() == 0)
+                Log.i(TAG, "There are no positions to retrieve");
+            else {
+                latestPositionList = finalPositionList.get(finalPositionList.size() - 1);
+                Log.i(TAG, "Positions retrieved from local database");
             }
-            Log.i(TAG, "Positions retrieved from local database");
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -354,7 +335,6 @@ public class StopwatchFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
-
     @OnClick(R.id.button_stopwatch_start)
     public void toggleRecordingHandler(View view) {
         if (workoutStarted) {
@@ -485,7 +465,6 @@ public class StopwatchFragment extends Fragment {
 
     private void saveLatestPositionList() {
         if (!latestPositionList.isEmpty()) {
-            finalPositionList.add(latestPositionList);
             latestPositionList = new ArrayList<>();
             Log.i(TAG, "Location list saved after unpausing.");
         }
@@ -498,10 +477,19 @@ public class StopwatchFragment extends Fragment {
 
     @OnClick(R.id.button_stopwatch_activeworkout)
     public void showActiveWorkoutMap(View view) {
-        Intent intent = new Intent(thisFragmentActivity, ActiveWorkoutMapActivity.class);
-        intent.putExtra(IntentHelper.DATA_POSITIONS, finalPositionList);
-        startActivity(intent);
-        Log.i(TAG, "Showing active workout map.");
+        try {
+            Intent intent = new Intent(thisFragmentActivity, ActiveWorkoutMapActivity.class);
+            intent.putExtra(IntentHelper.DATA_WORKOUT, getCurrentWorkoutId());
+            startActivity(intent);
+            Log.i(TAG, "Showing active workout map");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private long getCurrentWorkoutId() throws SQLException {
+        return Workout.ID_OFFSET + workoutDao.countOf();
     }
 
     public interface OnFragmentInteractionListener {}
