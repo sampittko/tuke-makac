@@ -33,13 +33,13 @@ public class AboutFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.syncwithserver, menu);
+        inflater.inflate(R.menu.sync_with_server, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
-            case R.id.action_syncwithserver:
+            case R.id.action_sync_with_server:
                 // TODO sync with server
                 Log.e(TAG, "Sync not implemetned.");
                 break;

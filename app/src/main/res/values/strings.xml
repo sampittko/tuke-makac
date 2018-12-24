@@ -78,10 +78,11 @@
     <!-- TOOLBAR MENU -->
     <string name="all_actionsettings">Settings</string>
     <string name="all_actiondelete">Delete</string>
-    <string name="historysettings_actionsync">Sync with server</string>
 
     <!-- HISTORY FRAGMENT -->
     <string name="history_general_image">Item Image</string>
+    <string name="historysettings_actionsync">Sync with server</string>
+    <string name="historysettings_actionclearhistory">Clear history</string>
 
     <!-- ABOUT FRAGMENT -->
     <string name="textview_about_baseinfo">All rights reserved</string>
@@ -98,4 +99,8 @@
     <string name="close">Close</string>
     <string name="share">Share</string>
     <string name="share_message">I was out for WORKOUT_TYPE. I tracked DISTANCE UNIT in DURATION.</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="history_nohistorydata">No data</string>
 </resources>

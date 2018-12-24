@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity
         implements
         NavigationView.OnNavigationItemSelectedListener,
         AboutFragment.OnFragmentInteractionListener,
-        HistoryFragment.OnListFragmentInteractionListener,
+        HistoryFragment.OnFragmentInteractionListener,
         StopwatchFragment.OnFragmentInteractionListener {
     private NavigationView navigationView;
 

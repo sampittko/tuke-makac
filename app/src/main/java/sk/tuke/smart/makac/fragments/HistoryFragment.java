@@ -3,83 +3,130 @@ package sk.tuke.smart.makac.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.TextView;
 
+import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.j256.ormlite.dao.Dao;
+
+import java.sql.SQLException;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import sk.tuke.smart.makac.HistoryListAdapter;
 import sk.tuke.smart.makac.R;
+import sk.tuke.smart.makac.model.Workout;
+import sk.tuke.smart.makac.model.config.DatabaseHelper;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
- */
 public class HistoryFragment extends Fragment {
+    @BindView(R.id.textview_history_noHistoryData) public TextView noHistoryDataTextView;
+    @BindView(R.id.listview_history_workouts) public ListView workoutsListView;
 
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
-//    private int mColumnCount = 1;
-    private OnListFragmentInteractionListener mListener;
+    private static final String TAG = "HistoryFragment";
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
+    private OnFragmentInteractionListener mListener;
+
+    private Dao<Workout, Long> workoutDao;
+
+    private FragmentActivity thisFragmentActivity;
+
     public HistoryFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
     public static HistoryFragment newInstance() {
-//        HistoryFragment fragment = new HistoryFragment();
-//        Bundle args = new Bundle();
-//        args.putInt(ARG_COLUMN_COUNT, columnCount);
-//        fragment.setArguments(args);
         return new HistoryFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().setTitle(R.string.menu_history);
-//        if (getArguments() != null) {
-//            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-//        }
+        thisFragmentActivity = getActivity();
+        thisFragmentActivity.setTitle(R.string.menu_history);
+        setHasOptionsMenu(true);
+        databaseSetup();
+    }
+
+    private void databaseSetup() {
+        try {
+            DatabaseHelper databaseHelper = OpenHelperManager.getHelper(thisFragmentActivity, DatabaseHelper.class);
+            workoutDao = databaseHelper.workoutDao();
+            Log.i(TAG, "Local database is ready");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void displayHistoryItems() throws SQLException {
+        HistoryListAdapter historyListAdapter = new HistoryListAdapter(thisFragmentActivity, R.layout.adapter_history, workoutDao.queryForAll());
+        workoutsListView.setAdapter(historyListAdapter);
+        Log.i(TAG, "Workouts displayed successfully");
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.clear_history, menu);
+        inflater.inflate(R.menu.sync_with_server, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        performCorrespondingActionForMenuItem(item.getItemId());
+        return true;
+    }
+
+    private void performCorrespondingActionForMenuItem(int itemId) {
+        switch(itemId) {
+            case R.id.action_clear_history:
+                // TODO clear history
+                break;
+            case R.id.action_sync_with_server:
+                // TODO sync with server
+                break;
+            default:
+                throw new UnsupportedOperationException();
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.adapter_history, container, false);
-
-        // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-//            if (mColumnCount <= 1) {
-//                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-//            } else {
-//                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-//            }
-//            recyclerView.setAdapter(new HistoryListAdapter(DummyContent.ITEMS, mListener));
-        }
+        View view = inflater.inflate(R.layout.fragment_history, container, false);
+        ButterKnife.bind(this, view);
+        displayContent();
         return view;
     }
 
+    private void displayContent() {
+        try {
+            if (workoutDao.countOf() != 0)
+                displayHistoryItems();
+            else {
+                noHistoryDataTextView.setVisibility(View.VISIBLE);
+                Log.i(TAG, "There is no data to display");
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
+                    + " must implement OnFragmentInteractionListener");
         }
     }
 
@@ -89,18 +136,5 @@ public class HistoryFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-//        void onListFragmentInteraction(DummyItem item);
-    }
+    public interface OnFragmentInteractionListener {}
 }
