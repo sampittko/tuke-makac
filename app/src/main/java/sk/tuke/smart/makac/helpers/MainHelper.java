@@ -74,13 +74,4 @@ public final class MainHelper {
     public static long msToS(long n) {
         return n / 1000;
     }
-
-    public static String intToSportActivity(int n) {
-        switch (n) {
-            case 0: return "Running";
-            case 1: return "Walking";
-            case 2: return "Cycling";
-            default: return "Unknown sport";
-        }
-    }
 }

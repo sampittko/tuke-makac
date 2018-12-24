@@ -27,6 +27,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
+import sk.tuke.smart.makac.helpers.SportActivities;
 import sk.tuke.smart.makac.settings.SettingsActivity;
 
 public class WorkoutDetailActivity extends AppCompatActivity {
@@ -118,11 +119,10 @@ public class WorkoutDetailActivity extends AppCompatActivity {
 
     private void workoutTitleRenderer() {
         workoutTitleTextView.setText(workoutTitle);
-        Log.i(TAG, "");
     }
 
     private void sportActivityRenderer(int sportActivity) {
-        sportActivityTextView.setText(MainHelper.intToSportActivity(sportActivity));
+        sportActivityTextView.setText(SportActivities.getSportActivityStringFromInt(sportActivity));
     }
 
     private void activityDateRenderer() {
@@ -165,7 +165,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     private void createShareAlertDialog() {
         String shareMessage = this.shareMessage;
         shareMessage = shareMessage
-                .replace("WORKOUT_TYPE", MainHelper.intToSportActivity(intent.getIntExtra(IntentHelper.DATA_SPORT, 0)).toLowerCase())
+                .replace("WORKOUT_TYPE", SportActivities.getSportActivityStringFromInt(intent.getIntExtra(IntentHelper.DATA_SPORT, 0)).toLowerCase())
                 .replace("DISTANCE", MainHelper.formatDistance(intent.getDoubleExtra(IntentHelper.DATA_DISTANCE, 0)))
                 .replace("UNIT", "km")
                 .replace("DURATION", MainHelper.formatDuration(intent.getLongExtra(IntentHelper.DATA_DURATION, 0)));

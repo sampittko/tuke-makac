@@ -118,4 +118,13 @@ public final class SportActivities {
             paceCount += pace;
         return paceCount / paceList.size();
     }
+
+    public static String getSportActivityStringFromInt(int n) {
+        switch (n) {
+            case 0: return "Running";
+            case 1: return "Walking";
+            case 2: return "Cycling";
+            default: return "Unknown sport";
+        }
+    }
 }

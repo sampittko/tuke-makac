@@ -8,6 +8,7 @@ import com.j256.ormlite.table.DatabaseTable;
 import java.util.Date;
 
 import sk.tuke.smart.makac.helpers.MainHelper;
+import sk.tuke.smart.makac.helpers.SportActivities;
 
 @DatabaseTable
 public class Workout {
@@ -155,7 +156,7 @@ public class Workout {
     @Override
     public String toString() {
         return MainHelper.formatDuration(MainHelper.msToS(duration)) + " "
-                + MainHelper.intToSportActivity(sportActivity) + " | "
+                + SportActivities.getSportActivityStringFromInt(sportActivity) + " | "
                 + MainHelper.formatDistance(distance) + " km | "
                 + MainHelper.formatCalories(totalCalories) + " kcal | Φ "
                 + MainHelper.formatPace(paceAvg) + " min/km";
