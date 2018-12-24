@@ -49,7 +49,6 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     @BindString(R.string.share_message) String shareMessage;
 
     private AlertDialog.Builder alertDialogBuilder;
-    private AlertDialog alertDialog;
 
     private long currentWorkoutId;
 
@@ -69,16 +68,11 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         initializeLayout();
         databaseSetup();
-        try {
-            currentWorkoutId = getIntent().getLongExtra(IntentHelper.DATA_WORKOUT, -1);
-        }
-        catch(NullPointerException e) {
-            Log.e(TAG, "Intent is missing workout ID.");
-        }
+        currentWorkoutId = getIntent().getLongExtra(IntentHelper.DATA_WORKOUT, -1);
         retrieveWorkoutValues();
+        renderValues();
         mapButtonVisibilityCheck();
         createShareAlertDialog();
-        renderValues();
     }
 
     private void initializeLayout() {
@@ -118,10 +112,79 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         }
     }
 
+    private void renderValues() {
+        workoutTitleTextView.setText(workoutTitle);
+        sportActivityTextView.setText(SportActivities.getSportActivityStringFromInt(sportActivity));
+        activityDateTextView.setText(MainHelper.sToDate(workoutDate.getTime()));
+        valueDurationTextView.setText(MainHelper.formatDuration(MainHelper.msToS(duration)));
+        String distanceString = MainHelper.formatDistance(distance) + " km";
+        valueDistanceTextView.setText(distanceString);
+        String avgPaceString = MainHelper.formatPace(avgPace) + " min/km";
+        valueAvgPaceTextView.setText(avgPaceString);
+        String caloriesString = MainHelper.formatCalories(totalCalories) + " kcal";
+        valueCaloriesTextView.setText(caloriesString);
+    }
+
+    private void mapButtonVisibilityCheck() {
+        if (finalPositionList == null || finalPositionList.size() == 1 && finalPositionList.get(0).size() < 2) {
+            showMapButton.setVisibility(View.GONE);
+            showMapTextView.setVisibility(View.GONE);
+        }
+    }
+
+    private void createShareAlertDialog() {
+        String shareMessage = this.shareMessage;
+        shareMessage = shareMessage
+                .replace("WORKOUT_TYPE", SportActivities.getSportActivityStringFromInt(sportActivity).toLowerCase())
+                .replace("DISTANCE", MainHelper.formatDistance(distance)
+                        .replace("UNIT", "km")
+                        .replace("DURATION", MainHelper.formatDuration(MainHelper.msToS(duration))));
+
+        EditText editText = new EditText(this);
+        editText.setText(shareMessage);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        editText.setLayoutParams(lp);
+
+        alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder
+                .setView(editText)
+                .setTitle("Share results")
+                .setPositiveButton(R.string.share, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         OpenHelperManager.releaseHelper();
+    }
+
+    @OnClick(R.id.button_workoutdetail_showmap)
+    public void showMapsActivity(View view) {
+        Intent mapsIntent = new Intent(this, MapsActivity.class);
+        mapsIntent.putExtra(IntentHelper.DATA_POSITIONS, finalPositionList);
+        startActivity(mapsIntent);
+    }
+
+    @OnClick({ R.id.button_workoutdetail_emailshare, R.id.button_workoutdetail_fbsharebtn, R.id.button_workoutdetail_twittershare, R.id.button_workoutdetail_gplusshare })
+    public void showAlertDialogEmail(View view) {
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
     @Override
@@ -154,75 +217,5 @@ public class WorkoutDetailActivity extends AppCompatActivity {
             default:
                 throw new UnsupportedOperationException();
         }
-    }
-
-    private void renderValues() {
-        workoutTitleTextView.setText(workoutTitle);
-        sportActivityTextView.setText(SportActivities.getSportActivityStringFromInt(sportActivity));
-        activityDateTextView.setText(MainHelper.sToDate(workoutDate.getTime()));
-        valueDurationTextView.setText(MainHelper.formatDuration(MainHelper.msToS(duration)));
-        String distanceString = MainHelper.formatDistance(distance) + " km";
-        valueDistanceTextView.setText(distanceString);
-        String avgPaceString = MainHelper.formatPace(avgPace) + " min/km";
-        valueAvgPaceTextView.setText(avgPaceString);
-        String caloriesString = MainHelper.formatCalories(totalCalories) + " kcal";
-        valueCaloriesTextView.setText(caloriesString);
-    }
-
-
-    private void mapButtonVisibilityCheck() {
-        if (finalPositionList == null || finalPositionList.size() == 1 && finalPositionList.get(0).size() < 2) {
-            showMapButton.setVisibility(View.GONE);
-            showMapTextView.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    private void createShareAlertDialog() {
-        String shareMessage = this.shareMessage;
-        shareMessage = shareMessage
-                .replace("WORKOUT_TYPE", SportActivities.getSportActivityStringFromInt(sportActivity).toLowerCase())
-                .replace("DISTANCE", MainHelper.formatDistance(distance)
-                .replace("UNIT", "km")
-                .replace("DURATION", MainHelper.formatDuration(MainHelper.msToS(duration))));
-
-        EditText editText = new EditText(this);
-        editText.setText(shareMessage);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        editText.setLayoutParams(lp);
-
-        alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder
-                .setView(editText)
-                .setTitle("Share results")
-                .setPositiveButton(R.string.share, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                })
-                .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                });
-    }
-
-    @OnClick(R.id.button_workoutdetail_showmap)
-    public void showMapsActivity(View view) {
-        Intent mapsIntent = new Intent(this, MapsActivity.class);
-        mapsIntent.putExtra(IntentHelper.DATA_POSITIONS, finalPositionList);
-        startActivity(mapsIntent);
-    }
-
-    @OnClick({ R.id.button_workoutdetail_emailshare, R.id.button_workoutdetail_fbsharebtn, R.id.button_workoutdetail_twittershare, R.id.button_workoutdetail_gplusshare })
-    public void showAlertDialogEmail(View view) {
-        alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
     }
 }
