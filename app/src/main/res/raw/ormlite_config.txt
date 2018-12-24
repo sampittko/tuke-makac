@@ -1,5 +1,5 @@
 #
-# generated on 2018/12/24 04:13:08
+# generated on 2018/12/24 08:47:38
 #
 # --table-start--
 dataClass=sk.tuke.smart.makac.model.GpsPoint
@@ -83,10 +83,6 @@ fieldName=sportActivity
 # --field-end--
 # --field-start--
 fieldName=lastUpdate
-# --field-end--
-# --field-start--
-fieldName=finalPositionList
-dataPersister=SERIALIZABLE
 # --field-end--
 # --table-fields-end--
 # --table-end--

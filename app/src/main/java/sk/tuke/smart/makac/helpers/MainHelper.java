@@ -1,5 +1,8 @@
 package sk.tuke.smart.makac.helpers;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 public final class MainHelper {
     private static final float MpS_TO_MIpH = 2.23694f;
     private static final float KM_TO_MI = 0.62137119223734f;
@@ -75,5 +78,9 @@ public final class MainHelper {
 
     public static long msToS(long n) {
         return n / 1000;
+    }
+
+    public static String sToDate(long n) {
+        return new SimpleDateFormat("HH:mm - dd.MM. yyyy", Locale.ENGLISH).format(n);
     }
 }

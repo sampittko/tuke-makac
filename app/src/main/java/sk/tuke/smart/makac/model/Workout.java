@@ -1,15 +1,11 @@
 package sk.tuke.smart.makac.model;
 
-import android.location.Location;
 import android.support.annotation.NonNull;
 
-import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import sk.tuke.smart.makac.helpers.MainHelper;
 import sk.tuke.smart.makac.helpers.SportActivities;
@@ -58,8 +54,6 @@ public class Workout {
     private int sportActivity;
     @DatabaseField
     private Date lastUpdate;
-    @DatabaseField(dataType=DataType.SERIALIZABLE)
-    private ArrayList<List<Location>> finalPositionList;
 
     public Workout() {
 
@@ -156,14 +150,6 @@ public class Workout {
 
     public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
-    }
-
-    public ArrayList<List<Location>> getFinalPositionList() {
-        return finalPositionList;
-    }
-
-    public void setFinalPositionList(ArrayList<List<Location>> finalPositionList) {
-        this.finalPositionList = finalPositionList;
     }
 
     @NonNull

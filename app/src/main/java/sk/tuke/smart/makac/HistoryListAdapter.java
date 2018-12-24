@@ -9,10 +9,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 
+import sk.tuke.smart.makac.helpers.MainHelper;
 import sk.tuke.smart.makac.model.Workout;
 
 public class HistoryListAdapter extends ArrayAdapter<String> {
@@ -49,8 +48,7 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
 
     private void setDate(View convertView, int position) {
         TextView dateTimeTextView = convertView.findViewById(R.id.textview_history_datetime);
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm - dd.MM. yyyy", Locale.ENGLISH);
-        dateTimeTextView.setText(sdf.format(workouts.get(position).getCreated().getTime()));
+        dateTimeTextView.setText(MainHelper.sToDate(workouts.get(position).getCreated().getTime()));
     }
 
     private void setSportActivity(View convertView, int position) {

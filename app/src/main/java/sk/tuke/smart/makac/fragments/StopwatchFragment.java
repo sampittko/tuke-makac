@@ -186,25 +186,18 @@ public class StopwatchFragment extends Fragment {
                     }
 
                     private void startWorkoutDetailActivity() {
-                        Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
-                        intent.putExtra(IntentHelper.DATA_SPORT, sportActivity);
-                        intent.putExtra(IntentHelper.DATA_DURATION, duration);
-                        intent.putExtra(IntentHelper.DATA_DISTANCE, distance);
-                        intent.putExtra(IntentHelper.DATA_PACE, SportActivities.getAveragePace(paceList));
-                        intent.putExtra(IntentHelper.DATA_CALORIES, calories);
-                        intent.putExtra(IntentHelper.DATA_POSITIONS, finalPositionList);
-                        intent.putExtra(IntentHelper.DATA_WORKOUT, getWorkoutId());
-                        startActivity(intent);
-                    }
-
-                    private long getWorkoutId() {
                         try {
-                            return Workout.ID_OFFSET + workoutDao.countOf();
+                            Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
+                            intent.putExtra(IntentHelper.DATA_WORKOUT, getCurrentWorkoutId());
+                            startActivity(intent);
                         }
                         catch (SQLException e) {
                             e.printStackTrace();
-                            return 0;
                         }
+                    }
+
+                    private long getCurrentWorkoutId() throws SQLException {
+                        return Workout.ID_OFFSET + workoutDao.countOf();
                     }
                 })
                 .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -226,6 +219,7 @@ public class StopwatchFragment extends Fragment {
     private void databaseSetup() {
         try {
             DatabaseHelper databaseHelper = OpenHelperManager.getHelper(thisFragmentActivity, DatabaseHelper.class);
+            // databaseHelper.onUpgrade(databaseHelper.getWritableDatabase(), databaseHelper.getConnectionSource(), 4, 5);
             workoutDao = databaseHelper.workoutDao();
             gpsPointDao = databaseHelper.gpsPointDao();
             Log.i(TAG, "Local database is ready");

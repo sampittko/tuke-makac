@@ -1,7 +1,7 @@
 <resources>
     <!-- STOPWATCH FRAGMENT -->
     <string name="textview_stopwatch_labelduration">Duration</string>
-    <string name="textview_stopwatch_duration">00:00:00</string>
+    <string name="textview_stopwatch_duration">0:00:00</string>
     <string name="textview_stopwatch_labeldistance">Distance</string>
     <string name="textview_stopwatch_distance">0.0</string>
     <string name="textview_stopwatch_distanceunit">km</string>
@@ -19,7 +19,6 @@
 
     <!-- WORKOUTDETAIL ACTIVITY -->
     <string name="textview_workoutdetail_labelshowmap">Map</string>
-    <string name="workoutdetail_workoutname">My Workout</string>
     <string name="textview_workoutdetail_labelsport">Sport</string>
     <string name="textview_workoutdetail_labelsummary">Summary</string>
     <string name="textview_workoutdetail_labelduration">Duration</string>

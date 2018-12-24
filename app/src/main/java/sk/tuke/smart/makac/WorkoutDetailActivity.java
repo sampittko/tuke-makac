@@ -16,7 +16,10 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.j256.ormlite.dao.Dao;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,6 +31,8 @@ import butterknife.OnClick;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
 import sk.tuke.smart.makac.helpers.SportActivities;
+import sk.tuke.smart.makac.model.Workout;
+import sk.tuke.smart.makac.model.config.DatabaseHelper;
 import sk.tuke.smart.makac.settings.SettingsActivity;
 
 public class WorkoutDetailActivity extends AppCompatActivity {
@@ -41,38 +46,82 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     @BindView(R.id.textview_workoutdetail_labelshowmap) TextView showMapTextView;
     @BindView(R.id.button_workoutdetail_showmap) Button showMapButton;
 
-    @BindString(R.string.workoutdetail_workoutname) String workoutTitle;
     @BindString(R.string.share_message) String shareMessage;
-
-    private ArrayList<List<Location>> finalPositionList;
-
-    private Intent intent;
 
     private AlertDialog.Builder alertDialogBuilder;
     private AlertDialog alertDialog;
 
+    private long currentWorkoutId;
+
+    private Dao<Workout, Long> workoutDao;
+
     private final String TAG = "WorkoutDetailActivity";
+
+    private ArrayList<List<Location>> finalPositionList;
+    private int sportActivity;
+    private long duration;
+    private double distance, avgPace, totalCalories;
+    private Date workoutDate;
+    private String workoutTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_workout_detail);
-
-        ButterKnife.bind(this);
-
-        setTitle(R.string.workout_review);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        initializeLayout();
+        databaseSetup();
         try {
-            intent = getIntent();
-            renderExtras();
-            finalPositionList = (ArrayList<List<Location>>) intent.getSerializableExtra(IntentHelper.DATA_POSITIONS);
-            mapButtonVisibilityCheck();
-            createShareAlertDialog();
+            currentWorkoutId = getIntent().getLongExtra(IntentHelper.DATA_WORKOUT, -1);
         }
         catch(NullPointerException e) {
-            Log.e(TAG, "Intent is missing values.");
+            Log.e(TAG, "Intent is missing workout ID.");
         }
+        retrieveWorkoutValues();
+        mapButtonVisibilityCheck();
+        createShareAlertDialog();
+        renderValues();
+    }
+
+    private void initializeLayout() {
+        setContentView(R.layout.activity_workout_detail);
+        ButterKnife.bind(this);
+        setTitle(R.string.workout_review);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    private void databaseSetup() {
+        try {
+            DatabaseHelper databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
+            workoutDao = databaseHelper.workoutDao();
+            Log.i(TAG, "Local database is ready");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void retrieveWorkoutValues() {
+        try {
+            Workout currentWorkout = workoutDao.queryForId(currentWorkoutId);
+            sportActivity = currentWorkout.getSportActivity();
+            duration = currentWorkout.getDuration();
+            totalCalories = currentWorkout.getTotalCalories();
+            avgPace = currentWorkout.getPaceAvg();
+            distance = currentWorkout.getDistance();
+            // TODO
+            finalPositionList = null;
+            workoutDate = currentWorkout.getCreated();
+            workoutTitle = currentWorkout.getTitle();
+            Log.i(TAG, "Values from local database retrieved successfully");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        OpenHelperManager.releaseHelper();
     }
 
     @Override
@@ -107,48 +156,19 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         }
     }
 
-    private void renderExtras() {
-        workoutTitleRenderer();
-        sportActivityRenderer(intent.getIntExtra(IntentHelper.DATA_SPORT, 0));
-        activityDateRenderer();
-        durationRenderer(intent.getLongExtra(IntentHelper.DATA_DURATION, 0));
-        distanceRenderer(intent.getDoubleExtra(IntentHelper.DATA_DISTANCE, 0));
-        avgPaceRenderer(intent.getDoubleExtra(IntentHelper.DATA_PACE, 0));
-        caloriesRenderer(intent.getDoubleExtra(IntentHelper.DATA_CALORIES, 0));
-    }
-
-    private void workoutTitleRenderer() {
+    private void renderValues() {
         workoutTitleTextView.setText(workoutTitle);
-    }
-
-    private void sportActivityRenderer(int sportActivity) {
         sportActivityTextView.setText(SportActivities.getSportActivityStringFromInt(sportActivity));
-    }
-
-    private void activityDateRenderer() {
-        String activityDateString = SimpleDateFormat.getDateTimeInstance().format(new Date());
-        activityDateTextView.setText(activityDateString);
-    }
-
-    private void durationRenderer(long duration) {
-        String durationString = MainHelper.formatDuration(duration);
-        valueDurationTextView.setText(durationString);
-    }
-
-    private void distanceRenderer(double distance) {
+        activityDateTextView.setText(MainHelper.sToDate(workoutDate.getTime()));
+        valueDurationTextView.setText(MainHelper.formatDuration(MainHelper.msToS(duration)));
         String distanceString = MainHelper.formatDistance(distance) + " km";
         valueDistanceTextView.setText(distanceString);
-    }
-
-    private void avgPaceRenderer(double avgPace) {
         String avgPaceString = MainHelper.formatPace(avgPace) + " min/km";
         valueAvgPaceTextView.setText(avgPaceString);
-    }
-
-    private void caloriesRenderer(double calories) {
-        String caloriesString = MainHelper.formatCalories(calories) + " kcal";
+        String caloriesString = MainHelper.formatCalories(totalCalories) + " kcal";
         valueCaloriesTextView.setText(caloriesString);
     }
+
 
     private void mapButtonVisibilityCheck() {
         if (finalPositionList == null || finalPositionList.size() == 1 && finalPositionList.get(0).size() < 2) {
@@ -165,10 +185,10 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     private void createShareAlertDialog() {
         String shareMessage = this.shareMessage;
         shareMessage = shareMessage
-                .replace("WORKOUT_TYPE", SportActivities.getSportActivityStringFromInt(intent.getIntExtra(IntentHelper.DATA_SPORT, 0)).toLowerCase())
-                .replace("DISTANCE", MainHelper.formatDistance(intent.getDoubleExtra(IntentHelper.DATA_DISTANCE, 0)))
+                .replace("WORKOUT_TYPE", SportActivities.getSportActivityStringFromInt(sportActivity).toLowerCase())
+                .replace("DISTANCE", MainHelper.formatDistance(distance)
                 .replace("UNIT", "km")
-                .replace("DURATION", MainHelper.formatDuration(intent.getLongExtra(IntentHelper.DATA_DURATION, 0)));
+                .replace("DURATION", MainHelper.formatDuration(MainHelper.msToS(duration))));
 
         EditText editText = new EditText(this);
         editText.setText(shareMessage);
