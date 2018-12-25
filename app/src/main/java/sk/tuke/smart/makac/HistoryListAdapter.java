@@ -25,8 +25,9 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        if (convertView == null)
+        if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.adapter_history, parent, false);
+        }
         setIcon(convertView);
         setTitle(convertView, position);
         setDate(convertView, position);
@@ -55,5 +56,12 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
         String workout = getItem(position);
         TextView sportActivityTextView = convertView.findViewById(R.id.textview_history_sportactivity);
         sportActivityTextView.setText(workout);
+    }
+
+    @Override
+    public int getCount() {
+        if (workouts.get(workouts.size() - 1).getStatus() != Workout.statusEnded)
+            return workouts.size() - 1;
+        return workouts.size();
     }
 }
