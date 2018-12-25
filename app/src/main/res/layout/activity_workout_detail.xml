@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/constraintlayout_workoutdetail_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="8dp"
     tools:context=".WorkoutDetailActivity">
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/fragment_workoutdetail_map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="150dp" />
     <LinearLayout
+        app:layout_constraintTop_toTopOf="@id/constraintlayout_workoutdetail_content"
+        android:layout_marginTop="92dp"
         android:baselineAligned="false"
         android:id="@+id/headingpack"
         android:layout_width="match_parent"
@@ -23,6 +31,10 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold|italic"
                 android:textSize="35sp"
+                android:textColor="#fff"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:background="@color/colorPrimary"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="11dp"/>
 
@@ -56,7 +68,7 @@
                     android:layout_below="@+id/textview_workoutdetail_sportactivity" />
                 <TextView
                     android:id="@+id/textview_workoutdetail_labelsummary"
-                    android:layout_marginTop="30dp"
+                    android:layout_marginTop="20dp"
                     android:textSize="25sp"
                     android:textStyle="bold|italic"
                     android:layout_below="@id/textview_workoutdetail_activitydate"
@@ -132,6 +144,7 @@
             android:layout_weight="4">
             <Button
                 android:id="@+id/button_workoutdetail_showmap"
+                android:layout_marginTop="66dp"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/ic_map_blue"
@@ -150,7 +163,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold|italic"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="15dp"
                 android:layout_below="@+id/textview_workoutdetail_labelshowmap"
                 android:text="@string/textview_workoutdetail_labelsocialshare" />
             <Button

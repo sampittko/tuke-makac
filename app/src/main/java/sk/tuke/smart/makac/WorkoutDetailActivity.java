@@ -6,6 +6,7 @@ import android.location.Location;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,6 +17,14 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
 
@@ -36,7 +45,7 @@ import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 import sk.tuke.smart.makac.settings.SettingsActivity;
 
-public class WorkoutDetailActivity extends AppCompatActivity {
+public class WorkoutDetailActivity extends AppCompatActivity implements OnMapReadyCallback {
     @BindView(R.id.textview_workoutdetail_workouttitle) TextView workoutTitleTextView;
     @BindView(R.id.textview_workoutdetail_sportactivity) TextView sportActivityTextView;
     @BindView(R.id.textview_workoutdetail_activitydate) TextView activityDateTextView;
@@ -65,14 +74,18 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     private Date workoutDate;
     private String workoutTitle;
 
+    private SupportMapFragment mapFragment;
+
+    private GoogleMap mMap;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initializeLayout();
         databaseSetup();
+        initializeLayout();
         retrieveWorkoutValues();
         renderValues();
-        mapButtonVisibilityCheck();
+        mapEntitiesVisibilityCheck();
         createShareAlertDialog();
     }
 
@@ -81,6 +94,9 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         setTitle(R.string.workout_review);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_workoutdetail_map);
+        mapFragment.getMapAsync(this);
     }
 
     private void databaseSetup() {
@@ -128,8 +144,9 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         valueCaloriesTextView.setText(caloriesString);
     }
 
-    private void mapButtonVisibilityCheck() {
+    private void mapEntitiesVisibilityCheck() {
         if (finalPositionList == null || finalPositionList.size() == 1 && finalPositionList.get(0).size() < 2) {
+            getSupportFragmentManager().beginTransaction().hide(mapFragment).commit();
             showMapButton.setVisibility(View.GONE);
             showMapTextView.setVisibility(View.GONE);
         }
@@ -179,6 +196,10 @@ public class WorkoutDetailActivity extends AppCompatActivity {
 
     @OnClick(R.id.button_workoutdetail_showmap)
     public void showMapsActivity(View view) {
+        showMapsActivity();
+    }
+
+    public void showMapsActivity() {
         Intent mapsIntent = new Intent(this, MapsActivity.class);
         mapsIntent.putExtra(IntentHelper.DATA_WORKOUT, currentWorkoutId);
         startActivity(mapsIntent);
@@ -220,5 +241,66 @@ public class WorkoutDetailActivity extends AppCompatActivity {
             default:
                 throw new UnsupportedOperationException();
         }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                showMapsActivity();
+            }
+        });
+        mMap.getUiSettings().setScrollGesturesEnabled(false);
+        mMap.getUiSettings().setZoomGesturesEnabled(false);
+        renderRoute();
+        try {
+            setCamera();
+        }
+        catch (IndexOutOfBoundsException e) {
+            Log.i(TAG, "No map to render");
+        }
+    }
+
+    private void renderRoute() {
+        for (List<Location> locationList : finalPositionList) {
+            PolylineOptions polylineOptions = new PolylineOptions().clickable(true);
+            for (Location location : locationList)
+                polylineOptions.add(new LatLng(location.getLatitude(), location.getLongitude()));
+            mMap.addPolyline(polylineOptions);
+        }
+        Log.i(TAG, "Route was rendered");
+    }
+
+    private void setCamera() throws IndexOutOfBoundsException {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+        LatLng startPoint = getStartPoint();
+        LatLng endPoint = getEndPoint();
+
+        builder.include(startPoint);
+        builder.include(endPoint);
+
+        LatLngBounds bounds = builder.build();
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int widthPixels = displayMetrics.widthPixels;
+        int heightPixels = displayMetrics.heightPixels;
+
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, widthPixels, heightPixels, 100);
+        mMap.animateCamera(cu);
+
+        Log.i(TAG, "Camera setup successful");
+    }
+
+    private LatLng getStartPoint() throws IndexOutOfBoundsException {
+        return new LatLng(finalPositionList.get(0).get(0).getLatitude(), finalPositionList.get(0).get(0).getLongitude());
+    }
+
+    private LatLng getEndPoint() {
+        List<Location> lastLocationList = finalPositionList.get(finalPositionList.size() - 1);
+        return new LatLng(lastLocationList.get(lastLocationList.size() - 1).getLatitude(), lastLocationList.get(lastLocationList.size() - 1).getLongitude());
     }
 }
