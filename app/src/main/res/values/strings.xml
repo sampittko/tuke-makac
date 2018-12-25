@@ -65,10 +65,10 @@
         <item>Kilometers</item>
         <item>Miles</item>
     </string-array>
-    <string-array name="pref_list_values_unit">
+    <integer-array name="pref_list_values_unit">
+        <item>0</item>
         <item>1</item>
-        <item>2</item>
-    </string-array>
+    </integer-array>
     <string name="pref_ringtone_silent">Silent</string>
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="pref_header_data_sync">Data &amp; sync</string>

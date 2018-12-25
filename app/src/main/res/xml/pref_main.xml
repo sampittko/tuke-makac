@@ -2,14 +2,14 @@
     <PreferenceCategory android:title="GENERAL SETTINGS">
         <SwitchPreference
             android:defaultValue="true"
-            android:key="gps_checking_switch"
+            android:key="gps"
             android:summary="@string/pref_description_gps_checking"
             android:title="@string/pref_title_gps_checking" />
         <ListPreference
             android:defaultValue="1"
             android:entries="@array/pref_list_titles_unit"
             android:entryValues="@array/pref_list_values_unit"
-            android:key="list_unit"
+            android:key="unit"
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"
             android:title="@string/pref_title_unit" />
