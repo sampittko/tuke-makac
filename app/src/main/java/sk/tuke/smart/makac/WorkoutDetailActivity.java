@@ -287,7 +287,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int widthPixels = displayMetrics.widthPixels;
-        int heightPixels = displayMetrics.heightPixels;
+        int heightPixels = displayMetrics.heightPixels / 3;
 
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, widthPixels, heightPixels, 100);
         mMap.animateCamera(cu);
