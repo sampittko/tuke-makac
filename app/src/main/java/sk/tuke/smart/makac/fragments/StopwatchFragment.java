@@ -1,6 +1,7 @@
 package sk.tuke.smart.makac.fragments;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -68,16 +69,15 @@ public class StopwatchFragment extends Fragment {
 
     private AlertDialog.Builder alertDialogBuilder;
 
-    private long duration;
-
     private double distance, pace, calories, totalCalories, latestBiggestNonZeroCalories;
 
-    private ArrayList<Double> paceList;
     private List<Location> latestPositionList;
 
     private IntentFilter intentFilter;
 
     private FragmentActivity thisFragmentActivity;
+
+    private StopwatchFragment stopwatchFragment;
 
     private Dao<Workout, Long> workoutDao;
     private Dao<GpsPoint, Long> gpsPointDao;
@@ -106,6 +106,10 @@ public class StopwatchFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
+    public void setmListener(OnFragmentInteractionListener mListener) {
+        this.mListener = mListener;
+    }
+
     public StopwatchFragment() {}
 
     public static StopwatchFragment newInstance() {
@@ -130,7 +134,6 @@ public class StopwatchFragment extends Fragment {
     }
 
     private void initializeVariables() {
-        paceList = new ArrayList<>();
         latestPositionList = new ArrayList<>();
         thisFragmentActivity = getActivity();
         thisFragmentActivity.setTitle(R.string.app_name);
@@ -170,7 +173,6 @@ public class StopwatchFragment extends Fragment {
                         stopTrackerService();
                         startWorkoutDetailActivity();
                         dialogInterface.dismiss();
-                        thisFragmentActivity.finish();
                     }
 
                     private void stopTrackerService() {
@@ -183,7 +185,7 @@ public class StopwatchFragment extends Fragment {
                         try {
                             Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
                             intent.putExtra(IntentHelper.DATA_WORKOUT, getCurrentWorkoutId());
-                            startActivity(intent);
+                            startActivityForResult(intent, 1);
                         }
                         catch (SQLException e) {
                             e.printStackTrace();
@@ -196,6 +198,12 @@ public class StopwatchFragment extends Fragment {
                         dialogInterface.dismiss();
                     }
                 });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1 && resultCode == 1)
+            mListener.onWorkoutStopped();
     }
 
     private void registerBroadcastReceiver() {
@@ -312,6 +320,12 @@ public class StopwatchFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         Intent intent = new Intent(thisFragmentActivity, TrackerService.class);
+        try {
+            thisFragmentActivity.unregisterReceiver(broadcastReceiver);
+        }
+        catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
         thisFragmentActivity.stopService(intent);
         OpenHelperManager.releaseHelper();
         Log.i(TAG, "Service stopped");
@@ -397,7 +411,7 @@ public class StopwatchFragment extends Fragment {
     }
 
     private void durationRenderer(long broadcastIntentDuration) {
-        duration = broadcastIntentDuration;
+        long duration = broadcastIntentDuration;
 
         String newDuration = String.valueOf(MainHelper.formatDuration(duration));
         durationTextView.setText(newDuration);
@@ -417,7 +431,6 @@ public class StopwatchFragment extends Fragment {
     private void paceRenderer(double broadcastIntentPace) {
         if (pace != broadcastIntentPace) {
             pace = broadcastIntentPace;
-            paceList.add(pace);
 
             String newPace = MainHelper.formatPace(pace);
             paceTextView.setText(newPace);
@@ -492,5 +505,7 @@ public class StopwatchFragment extends Fragment {
         return Workout.ID_OFFSET + workoutDao.countOf();
     }
 
-    public interface OnFragmentInteractionListener {}
+    public interface OnFragmentInteractionListener {
+        void onWorkoutStopped();
+    }
 }

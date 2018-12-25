@@ -72,7 +72,6 @@ public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapR
         if (initialLatLng == null) {
             getInitialLatLng();
             if (initialLatLng == null) {
-                getInitialLatLng();
                 Log.w(TAG, "Initial latitude and longitude is null.");
                 return;
             }
@@ -172,9 +171,13 @@ public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapR
     }
 
     private void getInitialLatLng() {
-        if (finalPositionList.size() != 0) {
+        try {
             List<Location> lastLocationList = finalPositionList.get(finalPositionList.size() - 1);
             initialLatLng = new LatLng(lastLocationList.get(lastLocationList.size() - 1).getLatitude(), lastLocationList.get(lastLocationList.size() - 1).getLongitude());
+            Log.i(TAG, "Initial LatLng set");
+        }
+        catch (IndexOutOfBoundsException e) {
+            Log.i(TAG, "Cannot set initial LatLng");
         }
     }
 
@@ -191,8 +194,10 @@ public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapR
         mMap = googleMap;
         if (initialLatLng == null) {
             getInitialLatLng();
-            if (initialLatLng == null)
+            if (initialLatLng == null) {
+                Log.w(TAG, "Initial latitude and longitude is null.");
                 return;
+            }
         }
         setupMarkerAndCamera();
         mMap.animateCamera(CameraUpdateFactory.newLatLng(initialLatLng));

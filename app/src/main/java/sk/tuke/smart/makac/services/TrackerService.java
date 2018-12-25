@@ -406,8 +406,11 @@ public class TrackerService extends Service implements LocationListener {
             workoutDao.update(pendingWorkout);
             Log.i(TAG, "Workout data saved to database");
         }
-        catch (SQLException e) {
-            e.printStackTrace();
+        catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
+        catch (NullPointerException npe) {
+            Log.e(TAG, "Workout is null");
         }
     }
 

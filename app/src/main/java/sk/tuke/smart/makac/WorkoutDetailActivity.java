@@ -46,17 +46,17 @@ import sk.tuke.smart.makac.model.config.DatabaseHelper;
 import sk.tuke.smart.makac.settings.SettingsActivity;
 
 public class WorkoutDetailActivity extends AppCompatActivity implements OnMapReadyCallback {
-    @BindView(R.id.textview_workoutdetail_workouttitle) TextView workoutTitleTextView;
-    @BindView(R.id.textview_workoutdetail_sportactivity) TextView sportActivityTextView;
-    @BindView(R.id.textview_workoutdetail_activitydate) TextView activityDateTextView;
-    @BindView(R.id.textview_workoutdetail_valueduration) TextView valueDurationTextView;
-    @BindView(R.id.textview_workoutdetail_valuecalories) TextView valueCaloriesTextView;
-    @BindView(R.id.textview_workoutdetail_valuedistance) TextView valueDistanceTextView;
-    @BindView(R.id.textview_workoutdetail_valueavgpace) TextView valueAvgPaceTextView;
-    @BindView(R.id.textview_workoutdetail_labelshowmap) TextView showMapTextView;
-    @BindView(R.id.button_workoutdetail_showmap) Button showMapButton;
+    @BindView(R.id.textview_workoutdetail_workouttitle) public TextView workoutTitleTextView;
+    @BindView(R.id.textview_workoutdetail_sportactivity) public TextView sportActivityTextView;
+    @BindView(R.id.textview_workoutdetail_activitydate) public TextView activityDateTextView;
+    @BindView(R.id.textview_workoutdetail_valueduration) public TextView valueDurationTextView;
+    @BindView(R.id.textview_workoutdetail_valuecalories) public TextView valueCaloriesTextView;
+    @BindView(R.id.textview_workoutdetail_valuedistance) public TextView valueDistanceTextView;
+    @BindView(R.id.textview_workoutdetail_valueavgpace) public TextView valueAvgPaceTextView;
+    @BindView(R.id.textview_workoutdetail_labelshowmap) public TextView showMapTextView;
+    @BindView(R.id.button_workoutdetail_showmap) public Button showMapButton;
 
-    @BindString(R.string.share_message) String shareMessage;
+    @BindString(R.string.share_message) public String shareMessage;
 
     private AlertDialog.Builder alertDialogBuilder;
 
@@ -87,6 +87,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         renderValues();
         mapEntitiesVisibilityCheck();
         createShareAlertDialog();
+        setResult(1);
     }
 
     private void initializeLayout() {
@@ -235,7 +236,6 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
                 break;
             // TODO on back pressed, perform back action
             case 16908332:
-                startActivity(new Intent(this, MainActivity.class));
                 finish();
                 break;
             default:

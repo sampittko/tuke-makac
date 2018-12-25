@@ -3,6 +3,7 @@ package sk.tuke.smart.makac;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -155,5 +156,21 @@ public class MainActivity extends AppCompatActivity
             default:
                 throw new UnsupportedOperationException();
         }
+    }
+
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        if (fragment instanceof StopwatchFragment) {
+            StopwatchFragment stopwatchFragment = (StopwatchFragment) fragment;
+            stopwatchFragment.setmListener(this);
+        }
+    }
+
+    @Override
+    public void onWorkoutStopped() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.main_replaceable, StopwatchFragment.newInstance())
+                .commit();
     }
 }
