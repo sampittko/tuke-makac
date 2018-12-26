@@ -359,6 +359,7 @@ public class LoginActivity extends AppCompatActivity {
             userProfileDao.update(currentUserProfile);
             Log.i(TAG, "User profile values updated to: " + newWeight + ", " + newAge + ", " + newHeight);
             saveChangesButton.setVisibility(View.GONE);
+            Toast.makeText(this, "Changes saved", Toast.LENGTH_SHORT).show();
         }
         catch (SQLException e) {
             e.printStackTrace();
