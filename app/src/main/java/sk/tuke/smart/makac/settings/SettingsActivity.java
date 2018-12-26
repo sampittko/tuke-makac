@@ -2,6 +2,7 @@ package sk.tuke.smart.makac.settings;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,59 +11,21 @@ import android.preference.Preference;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 
 import sk.tuke.smart.makac.R;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
-
-    /**
-     * A preference value change listener that updates the preference's summary
-     * to reflect its new value.
-     */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object value) {
-            String stringValue = value.toString();
-
-            if (preference instanceof ListPreference) {
-                ListPreference listPreference = (ListPreference) preference;
-                int index = listPreference.findIndexOfValue(stringValue);
-                preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
-            }
-            else {
-                preference.setSummary(stringValue);
-            }
-            return true;
-        }
-    };
-
+    private static String TAG = "SettingsActivity";
     /**
      * Helper method to determine if the device has an extra-large screen. For
      * example, 10" tablets are extra-large.
      */
-    private static boolean isXLargeTablet(Context context) {
+    private boolean isXLargeTablet(Context context) {
         return (context.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
-    }
-
-    /**
-     * Binds a preference's summary to its value. More specifically, when the
-     * preference's value is changed, its summary (line of text below the
-     * preference title) is updated to reflect the value. The summary is also
-     * immediately updated upon calling this method. The exact display format is
-     * dependent on the type of preference.
-     *
-     * @see #sBindPreferenceSummaryToValueListener
-     */
-    private static void bindPreferenceSummaryToValue(Preference preference) {
-        preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
-
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                PreferenceManager
-                        .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), "0"));
     }
 
     @Override
@@ -106,11 +69,82 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class MainPreferenceFragment extends PreferenceFragment {
+        private SharedPreferences shpr;
+
+        private int unit;
+        private boolean gps;
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_main);
             bindPreferenceSummaryToValue(findPreference("unit"));
+            bindPreferenceSummaryToValue(findPreference("gps"));
+            shpr = getActivity().getSharedPreferences("app_settings", Context.MODE_PRIVATE);
         }
+
+        /**
+         * Binds a preference's summary to its value. More specifically, when the
+         * preference's value is changed, its summary (line of text below the
+         * preference title) is updated to reflect the value. The summary is also
+         * immediately updated upon calling this method. The exact display format is
+         * dependent on the type of preference.
+         *
+         * @see #sBindPreferenceSummaryToValueListener
+         */
+        private void bindPreferenceSummaryToValue(Preference preference) {
+            preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+
+            if (preference instanceof ListPreference) {
+                sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
+                        PreferenceManager
+                                .getDefaultSharedPreferences(preference.getContext())
+                                .getString(preference.getKey(), "0"));
+            }
+            else {
+                sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
+                        PreferenceManager
+                                .getDefaultSharedPreferences(preference.getContext())
+                                .getBoolean(preference.getKey(), true));
+            }
+        }
+
+        /**
+         * A preference value change listener that updates the preference's summary
+         * to reflect its new value.
+         */
+        private Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object value) {
+                String stringValue = value.toString();
+
+                if (preference instanceof ListPreference) {
+                    ListPreference listPreference = (ListPreference) preference;
+                    int index = listPreference.findIndexOfValue(stringValue);
+                    preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
+                    if (index >= 0) {
+                        unit = Integer.valueOf(listPreference.getEntryValues()[index].toString());
+                        Log.i(TAG, "Unit: " + unit);
+                        if (shpr != null) {
+                            SharedPreferences.Editor shprEditor = shpr.edit();
+                            shprEditor.putInt("unit", unit);
+                            shprEditor.apply();
+                            Log.i(TAG, "Shared preferences set");
+                        }
+                    }
+                }
+                else {
+                    gps = Boolean.valueOf(stringValue);
+                    Log.i(TAG, "GPS: " + gps);
+                    if (shpr != null) {
+                        SharedPreferences.Editor shprEditor = shpr.edit();
+                        shprEditor.putBoolean("gps", gps);
+                        shprEditor.apply();
+                        Log.i(TAG, "Shared preferences set");
+                    }
+                }
+                return true;
+            }
+        };
     }
 }
