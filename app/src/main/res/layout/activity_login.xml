@@ -58,7 +58,8 @@
             <RelativeLayout
                 android:layout_weight="7"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:focusableInTouchMode="true">
                 <LinearLayout
                     android:id="@+id/weight"
                     android:orientation="horizontal"

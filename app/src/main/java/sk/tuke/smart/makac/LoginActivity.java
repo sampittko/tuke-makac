@@ -71,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        shpr = getPreferences(Context.MODE_PRIVATE);
+        shpr = getSharedPreferences("user", Context.MODE_PRIVATE);
         initializeLayout();
         thisActivity = this;
         configureGoogleSignIn();

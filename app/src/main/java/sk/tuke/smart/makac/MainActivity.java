@@ -1,6 +1,8 @@
 package sk.tuke.smart.makac;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -9,6 +11,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,9 +31,13 @@ public class MainActivity extends AppCompatActivity
         AboutFragment.OnFragmentInteractionListener,
         HistoryFragment.OnFragmentInteractionListener,
         StopwatchFragment.OnFragmentInteractionListener {
+    private static final String TAG = "MainActivity";
+
     private NavigationView navigationView;
 
     private MainActivity thisActivity;
+
+    private SharedPreferences shpr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +46,7 @@ public class MainActivity extends AppCompatActivity
         // live DB
         Stetho.initializeWithDefaults(this);
         initializeLayout();
+        shpr = getSharedPreferences("user", Context.MODE_PRIVATE);
     }
 
     private void initializeLayout() {
@@ -86,6 +94,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onPause() {
         super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i(TAG, "User signed in: " + shpr.getBoolean("userSignedIn", true));
     }
 
     @Override
