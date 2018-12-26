@@ -56,7 +56,6 @@ public class LoginActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         configureOnClickListeners();
         configureSignOutButton();
-        saveChangesButton.setVisibility(View.VISIBLE);
     }
 
     private void configureOnClickListeners() {
