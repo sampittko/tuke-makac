@@ -134,7 +134,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="18sp"
-                    android:text="kg"
+                    android:text="@string/weight_unit"
                     android:layout_marginBottom="30dp" />
                 <TextView
                     android:layout_below="@id/weight_unit"
@@ -142,14 +142,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="18sp"
-                    android:text="years"
+                    android:text="@string/age_unit"
                     android:layout_marginBottom="30dp" />
                 <TextView
                     android:layout_below="@id/age_unit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="18sp"
-                    android:text="cm"/>
+                    android:text="@string/height_unit"/>
             </RelativeLayout>
         </LinearLayout>
     </RelativeLayout>
