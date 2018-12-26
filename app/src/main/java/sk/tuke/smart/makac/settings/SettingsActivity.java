@@ -124,23 +124,21 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
                     if (index >= 0) {
                         unit = Integer.valueOf(listPreference.getEntryValues()[index].toString());
-                        Log.i(TAG, "Unit: " + unit);
                         if (shPr != null) {
                             SharedPreferences.Editor shprEditor = shPr.edit();
                             shprEditor.putInt("unit", unit);
                             shprEditor.apply();
-                            Log.i(TAG, "Shared preferences set");
+                            Log.i(TAG, "Shared preferences updated");
                         }
                     }
                 }
                 else {
                     gps = Boolean.valueOf(stringValue);
-                    Log.i(TAG, "GPS: " + gps);
                     if (shPr != null) {
                         SharedPreferences.Editor shprEditor = shPr.edit();
                         shprEditor.putBoolean("gps", gps);
                         shprEditor.apply();
-                        Log.i(TAG, "Shared preferences set");
+                        Log.i(TAG, "Shared preferences updated");
                     }
                 }
                 return true;

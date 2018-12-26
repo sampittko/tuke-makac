@@ -18,7 +18,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.facebook.stetho.Stetho;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
 
@@ -45,11 +48,16 @@ public class MainActivity extends AppCompatActivity
 
     private MainActivity thisActivity;
 
+    private GoogleSignInAccount account;
+
     private Dao<User, Long> userDao;
     private Dao<UserProfile, Long> userProfileDao;
 
     private SharedPreferences userShPr;
     private SharedPreferences appShPr;
+
+    private TextView userNameTextView;
+    private ImageView userImageImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,22 +94,14 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        setNavigationView();
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        setNavigationHeaderView();
 
         displayStopwatchFragment();
     }
 
-    private void setNavigationView() {
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        setOnClicksForNavigationView();
-        setNavigationViewUserValues();
-    }
-
-    private void setNavigationViewUserValues() {
-    }
-
-    private void setOnClicksForNavigationView() {
+    private void setNavigationHeaderView() {
         View.OnClickListener openLoginOnClick = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -111,10 +111,10 @@ public class MainActivity extends AppCompatActivity
 
         View headerview = navigationView.getHeaderView(0);
 
-        ImageView userImageImageView = headerview.findViewById(R.id.menu_loggedInUserImage);
+        userImageImageView = headerview.findViewById(R.id.menu_loggedInUserImage);
         userImageImageView.setOnClickListener(openLoginOnClick);
 
-        TextView userNameTextView = headerview.findViewById(R.id.menu_loggedInUserFullName);
+        userNameTextView = headerview.findViewById(R.id.menu_loggedInUserFullName);
         userNameTextView.setOnClickListener(openLoginOnClick);
     }
 
@@ -132,6 +132,23 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        renderNavigationViewUserValues();
+        logSharedPreferences();
+    }
+
+    private void renderNavigationViewUserValues() {
+        account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null) {
+            Glide.with(this).load(account.getPhotoUrl()).into(userImageImageView);
+            userNameTextView.setText(account.getDisplayName());
+        }
+        else {
+            userImageImageView.setImageResource(R.mipmap.ic_launcher_round);
+            userNameTextView.setText(R.string.all_unknownuser);
+        }
+    }
+
+    private void logSharedPreferences() {
         Log.i(TAG, "userSignedIn " + userShPr.getBoolean("userSignedIn", true));
         Log.i(TAG, "userId " + userShPr.getLong("userId", 0));
         Log.i(TAG, "gps " + appShPr.getBoolean("gps", true));
