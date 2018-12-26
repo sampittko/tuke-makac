@@ -44,18 +44,25 @@
     <string name="nav_header_desc">Navigation header</string>
 
     <!-- LOGIN ACTIVITY -->
+    <string name="account_benefits">We are able to synchronize your workouts with our servers if you are signed in.</string>
+    <string name="user_profile">User profile</string>
     <string name="title_activity_login">Sign in</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password (optional)</string>
     <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_out">Sign out</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
+    <string name="weight_label">Weight:</string>
+    <string name="weight_hint">80 kg</string>
+    <string name="age_label">Age:</string>
+    <string name="age_hint">25 years</string>
+    <string name="height_label">Height:</string>
+    <string name="height_hint">183 cm</string>
 
     <!-- ACTIVEWORKOUTMAP ACTIVITY -->
     <string name="title_activity_active_workout_map">Map</string>
@@ -86,6 +93,7 @@
     <string name="history_general_image">Item Image</string>
     <string name="historysettings_actionsync">Sync with server</string>
     <string name="historysettings_actionclearhistory">Clear history</string>
+    <string name="history_nohistorydata">No data</string>
 
     <!-- ABOUT FRAGMENT -->
     <string name="textview_about_baseinfo">All rights reserved</string>
@@ -102,8 +110,4 @@
     <string name="close">Close</string>
     <string name="share">Share</string>
     <string name="share_message">I was out for WORKOUT_TYPE. I tracked DISTANCE UNIT in DURATION.</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="history_nohistorydata">No data</string>
 </resources>
