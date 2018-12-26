@@ -33,6 +33,14 @@
                 android:id="@+id/sign_in_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+            <TextView
+                android:text="@string/all_unknownuser"
+                android:layout_below="@id/sign_in_button"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="19dp"
+                android:textSize="15sp"
+                android:id="@+id/textview_username_unknown" />
             <com.google.android.gms.common.SignInButton
                 android:layout_below="@id/text_info"
                 android:layout_centerHorizontal="true"
@@ -41,11 +49,10 @@
                 android:layout_height="wrap_content"
                 android:visibility="invisible" />
             <TextView
-                android:text="@string/all_unknownuser"
                 android:layout_below="@id/sign_out_button"
                 android:layout_centerHorizontal="true"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="19dp"
                 android:textSize="15sp"
                 android:id="@+id/textview_username" />
         </RelativeLayout>

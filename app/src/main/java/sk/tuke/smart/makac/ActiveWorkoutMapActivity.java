@@ -32,7 +32,7 @@ import sk.tuke.smart.makac.helpers.MainHelper;
 import sk.tuke.smart.makac.model.GpsPoint;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 
-public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapReadyCallback {
+public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapReadyCallback, DatabaseConnection {
     private static final String TAG = "ActiveWorkoutMapA";
     private final float ZOOM_LEVEL = 17.0f;
     int lastRenderBeforeSeconds = 0;
@@ -141,7 +141,7 @@ public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapR
         mapFragment.getMapAsync(this);
     }
 
-    private void databaseSetup() {
+    public void databaseSetup() {
         try {
             DatabaseHelper databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
             gpsPointDao = databaseHelper.gpsPointDao();
@@ -182,7 +182,7 @@ public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapR
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         OpenHelperManager.releaseHelper();
         unregisterReceiver(broadcastReceiver);

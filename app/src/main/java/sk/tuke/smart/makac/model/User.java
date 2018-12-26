@@ -5,6 +5,9 @@ import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable
 public class User {
+    public static int ACC_TYPE_OFFLINE = 0;
+    public static int ACC_TYPE_GOOGLE = 1;
+
     @DatabaseField(generatedId = true, unique = true)
     private long id;
     /**

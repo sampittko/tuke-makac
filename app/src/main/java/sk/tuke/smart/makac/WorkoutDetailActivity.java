@@ -45,7 +45,7 @@ import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 import sk.tuke.smart.makac.settings.SettingsActivity;
 
-public class WorkoutDetailActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class WorkoutDetailActivity extends AppCompatActivity implements OnMapReadyCallback, DatabaseConnection {
     @BindView(R.id.textview_workoutdetail_workouttitle) public TextView workoutTitleTextView;
     @BindView(R.id.textview_workoutdetail_sportactivity) public TextView sportActivityTextView;
     @BindView(R.id.textview_workoutdetail_activitydate) public TextView activityDateTextView;
@@ -100,7 +100,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         mapFragment.getMapAsync(this);
     }
 
-    private void databaseSetup() {
+    public void databaseSetup() {
         try {
             DatabaseHelper databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
             workoutDao = databaseHelper.workoutDao();
@@ -203,7 +203,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         OpenHelperManager.releaseHelper();
     }

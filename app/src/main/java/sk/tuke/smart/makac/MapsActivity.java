@@ -25,7 +25,7 @@ import sk.tuke.smart.makac.helpers.MainHelper;
 import sk.tuke.smart.makac.model.GpsPoint;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, DatabaseConnection {
     private GoogleMap mMap;
 
     private Dao<GpsPoint, Long> gpsPointDao;
@@ -45,7 +45,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
-    private void databaseSetup() {
+    public void databaseSetup() {
         try {
             DatabaseHelper databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
             gpsPointDao = databaseHelper.gpsPointDao();
@@ -68,7 +68,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         OpenHelperManager.releaseHelper();
     }

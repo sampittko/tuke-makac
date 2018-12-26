@@ -39,6 +39,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import sk.tuke.smart.makac.ActiveWorkoutMapActivity;
+import sk.tuke.smart.makac.DatabaseConnection;
 import sk.tuke.smart.makac.R;
 import sk.tuke.smart.makac.WorkoutDetailActivity;
 import sk.tuke.smart.makac.exceptions.SensorNotPresentException;
@@ -49,7 +50,7 @@ import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 import sk.tuke.smart.makac.services.TrackerService;
 
-public class StopwatchFragment extends Fragment {
+public class StopwatchFragment extends Fragment implements DatabaseConnection {
     @BindView(R.id.button_stopwatch_start) public Button startWorkoutButton;
     @BindView(R.id.button_stopwatch_endworkout) public Button endWorkoutButton;
     @BindView(R.id.textview_stopwatch_duration) public TextView durationTextView;
@@ -214,7 +215,7 @@ public class StopwatchFragment extends Fragment {
         Log.i(TAG, "Broadcast receiver registered");
     }
 
-    private void databaseSetup() {
+    public void databaseSetup() {
         try {
             DatabaseHelper databaseHelper = OpenHelperManager.getHelper(thisFragmentActivity, DatabaseHelper.class);
             // databaseHelper.onUpgrade(databaseHelper.getWritableDatabase(), databaseHelper.getConnectionSource(), 4, 5);

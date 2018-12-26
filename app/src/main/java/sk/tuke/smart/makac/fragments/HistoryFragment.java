@@ -25,6 +25,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import sk.tuke.smart.makac.DatabaseConnection;
 import sk.tuke.smart.makac.HistoryListAdapter;
 import sk.tuke.smart.makac.R;
 import sk.tuke.smart.makac.WorkoutDetailActivity;
@@ -32,7 +33,7 @@ import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 
-public class HistoryFragment extends Fragment {
+public class HistoryFragment extends Fragment implements DatabaseConnection {
     @BindView(R.id.textview_history_noHistoryData) public TextView noHistoryDataTextView;
     @BindView(R.id.listview_history_workouts) public ListView workoutsListView;
 
@@ -60,7 +61,7 @@ public class HistoryFragment extends Fragment {
         databaseSetup();
     }
 
-    private void databaseSetup() {
+    public void databaseSetup() {
         try {
             DatabaseHelper databaseHelper = OpenHelperManager.getHelper(thisFragmentActivity, DatabaseHelper.class);
             workoutDao = databaseHelper.workoutDao();

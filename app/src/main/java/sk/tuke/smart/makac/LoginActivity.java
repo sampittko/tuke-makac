@@ -38,8 +38,9 @@ import sk.tuke.smart.makac.model.UserProfile;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 import sk.tuke.smart.makac.settings.SettingsActivity;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements DatabaseConnection {
     @BindView(R.id.textview_username) public TextView usernameTextView;
+    @BindView(R.id.textview_username_unknown) public TextView usernameUnknownTextView;
     @BindView(R.id.sign_in_button) public SignInButton signInButton;
     @BindView(R.id.sign_out_button) public SignInButton signOutButton;
     @BindView(R.id.button_save_changes) public Button saveChangesButton;
@@ -182,7 +183,7 @@ public class LoginActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
     }
 
-    private void databaseSetup() {
+    public void databaseSetup() {
         try {
             DatabaseHelper databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
             userDao = databaseHelper.userDao();
@@ -257,6 +258,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void performUserDependingActions() {
         checkUser();
+        updateSharedPreferences();
         updateUI();
     }
 
@@ -264,12 +266,8 @@ public class LoginActivity extends AppCompatActivity {
         try {
             if (account == null)
                 setUnknownUserData();
-            else {
-                Log.e(TAG, "Setting unknown user because other not implemented");
-                account = null;
-                setUnknownUserData();
-            }
-            updateSharedPreferences();
+            else
+                setGoogleUserData();
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -285,7 +283,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void setUnknownUser() throws SQLException {
         try {
-            List<User> offlineUsers = userDao.queryForEq("accType", 0);
+            List<User> offlineUsers = userDao.queryForEq("accType", User.ACC_TYPE_OFFLINE);
             currentUser = offlineUsers.get(0);
             Log.i(TAG, "Unknown user exists");
         }
@@ -310,6 +308,40 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    private void setGoogleUserData() throws SQLException {
+        setGoogleUser();
+        setGoogleUserProfile();
+        userSignedIn = true;
+        Log.i(TAG, "Google user set");
+    }
+
+    private void setGoogleUser() throws SQLException {
+        try {
+            List<User> users = userDao.queryForEq("accId", String.valueOf(account.getId()));
+            currentUser = users.get(0);
+            Log.i(TAG, "Google user exists");
+        }
+        catch (IndexOutOfBoundsException e) {
+            currentUser = new User(User.ACC_TYPE_GOOGLE, String.valueOf(account.getId()));
+            userDao.create(currentUser);
+            Log.i(TAG, "Google user created");
+        }
+    }
+
+    private void setGoogleUserProfile() throws SQLException {
+        try {
+            List<UserProfile> userProfiles = userProfileDao.queryForEq("user_id", currentUser.getId());
+            currentUserProfile = userProfiles.get(0);
+            Log.i(TAG, "Google user profile exists");
+        }
+        catch (IndexOutOfBoundsException e) {
+            currentUserProfile = new UserProfile();
+            currentUserProfile.setUser(currentUser);
+            userProfileDao.create(currentUserProfile);
+            Log.i(TAG, "Google user profile created");
+        }
+    }
+
     private void updateSharedPreferences() {
         SharedPreferences.Editor shprEditor = shPr.edit();
         shprEditor.putLong("userId", currentUser.getId());
@@ -320,23 +352,23 @@ public class LoginActivity extends AppCompatActivity {
 
     private void updateUI() {
         if (account != null) {
-            changeVisibility(View.VISIBLE, View.GONE, View.VISIBLE);
-            usernameTextView.setText(account.getDisplayName());
             fillInputsWithValues(currentUserProfile.getHeight(), currentUserProfile.getAge(), currentUserProfile.getWeight());
+            changeVisibility(View.GONE, View.VISIBLE, View.VISIBLE, View.GONE);
+            usernameTextView.setText(account.getDisplayName());
             Toast.makeText(this, "You are signed in", Toast.LENGTH_SHORT).show();
         }
         else {
-            changeVisibility(View.INVISIBLE, View.VISIBLE, View.GONE);
-            usernameTextView.setText(R.string.all_unknownuser);
             fillInputsWithValues(currentUserProfile.getHeight(), currentUserProfile.getAge(), currentUserProfile.getWeight());
+            changeVisibility(View.VISIBLE, View.GONE, View.GONE, View.VISIBLE);
             Toast.makeText(this, "You are signed out", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void changeVisibility(int usernameVisibility, int signInVisibility, int signOutVisibility) {
-        usernameTextView.setVisibility(usernameVisibility);
+    private void changeVisibility(int signInVisibility, int signOutVisibility, int usernameVisibility, int usernameUnknownVisiblity) {
         signInButton.setVisibility(signInVisibility);
         signOutButton.setVisibility(signOutVisibility);
+        usernameTextView.setVisibility(usernameVisibility);
+        usernameUnknownTextView.setVisibility(usernameUnknownVisiblity);
         Log.i(TAG, "Visibility of layout elements changed");
     }
 
@@ -376,7 +408,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         OpenHelperManager.releaseHelper();
     }

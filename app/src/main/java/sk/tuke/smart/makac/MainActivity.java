@@ -19,10 +19,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.stetho.Stetho;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.j256.ormlite.dao.Dao;
+
+import java.sql.SQLException;
 
 import sk.tuke.smart.makac.fragments.AboutFragment;
 import sk.tuke.smart.makac.fragments.HistoryFragment;
 import sk.tuke.smart.makac.fragments.StopwatchFragment;
+import sk.tuke.smart.makac.model.User;
+import sk.tuke.smart.makac.model.UserProfile;
+import sk.tuke.smart.makac.model.config.DatabaseHelper;
 import sk.tuke.smart.makac.settings.SettingsActivity;
 
 public class MainActivity extends AppCompatActivity
@@ -30,12 +37,16 @@ public class MainActivity extends AppCompatActivity
         NavigationView.OnNavigationItemSelectedListener,
         AboutFragment.OnFragmentInteractionListener,
         HistoryFragment.OnFragmentInteractionListener,
-        StopwatchFragment.OnFragmentInteractionListener {
+        StopwatchFragment.OnFragmentInteractionListener,
+        DatabaseConnection {
     private static final String TAG = "MainActivity";
 
     private NavigationView navigationView;
 
     private MainActivity thisActivity;
+
+    private Dao<User, Long> userDao;
+    private Dao<UserProfile, Long> userProfileDao;
 
     private SharedPreferences userShPr;
     private SharedPreferences appShPr;
@@ -44,11 +55,23 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         thisActivity = this;
-        // live DB
         Stetho.initializeWithDefaults(this);
+        databaseSetup();
         initializeLayout();
         userShPr = getSharedPreferences("user", Context.MODE_PRIVATE);
         appShPr = getSharedPreferences("app_settings", Context.MODE_PRIVATE);
+    }
+
+    public void databaseSetup() {
+        try {
+            DatabaseHelper databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
+            userDao = databaseHelper.userDao();
+            userProfileDao = databaseHelper.userProfileDao();
+            Log.i(TAG, "Local database is ready");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initializeLayout() {
@@ -63,11 +86,19 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        setNavigationView();
+
+        displayStopwatchFragment();
+    }
+
+    private void setNavigationView() {
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         setOnClicksForNavigationView();
+        setNavigationViewUserValues();
+    }
 
-        displayStopwatchFragment();
+    private void setNavigationViewUserValues() {
     }
 
     private void setOnClicksForNavigationView() {
@@ -102,6 +133,7 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         Log.i(TAG, "userSignedIn " + userShPr.getBoolean("userSignedIn", true));
+        Log.i(TAG, "userId " + userShPr.getLong("userId", 0));
         Log.i(TAG, "gps " + appShPr.getBoolean("gps", true));
         Log.i(TAG, "unit " + appShPr.getInt("unit", 0));
     }
@@ -190,5 +222,11 @@ public class MainActivity extends AppCompatActivity
                 .beginTransaction()
                 .replace(R.id.main_replaceable, StopwatchFragment.newInstance())
                 .commit();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        OpenHelperManager.releaseHelper();
     }
 }

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import sk.tuke.smart.makac.DatabaseConnection;
 import sk.tuke.smart.makac.exceptions.InsufficientDistanceException;
 import sk.tuke.smart.makac.exceptions.NotEnoughLocationsException;
 import sk.tuke.smart.makac.helpers.IntentHelper;
@@ -33,7 +34,7 @@ import sk.tuke.smart.makac.model.GpsPoint;
 import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 
-public class TrackerService extends Service implements LocationListener {
+public class TrackerService extends Service implements LocationListener, DatabaseConnection {
     private final double SESSION_DIFF_LIMIT = 100;
     private final IBinder mBinder = new LocalBinder();
     private final String TAG = "TrackerService";
@@ -127,7 +128,7 @@ public class TrackerService extends Service implements LocationListener {
         }
     }
 
-    private void databaseSetup() {
+    public void databaseSetup() {
         try {
             DatabaseHelper databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
             gpsPointDao = databaseHelper.gpsPointDao();
