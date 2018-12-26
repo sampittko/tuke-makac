@@ -69,7 +69,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class MainPreferenceFragment extends PreferenceFragment {
-        private SharedPreferences shpr;
+        private SharedPreferences shPr;
 
         private int unit;
         private boolean gps;
@@ -80,7 +80,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             addPreferencesFromResource(R.xml.pref_main);
             bindPreferenceSummaryToValue(findPreference("unit"));
             bindPreferenceSummaryToValue(findPreference("gps"));
-            shpr = getActivity().getSharedPreferences("app_settings", Context.MODE_PRIVATE);
+            shPr = getActivity().getSharedPreferences("app_settings", Context.MODE_PRIVATE);
         }
 
         /**
@@ -125,8 +125,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     if (index >= 0) {
                         unit = Integer.valueOf(listPreference.getEntryValues()[index].toString());
                         Log.i(TAG, "Unit: " + unit);
-                        if (shpr != null) {
-                            SharedPreferences.Editor shprEditor = shpr.edit();
+                        if (shPr != null) {
+                            SharedPreferences.Editor shprEditor = shPr.edit();
                             shprEditor.putInt("unit", unit);
                             shprEditor.apply();
                             Log.i(TAG, "Shared preferences set");
@@ -136,8 +136,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 else {
                     gps = Boolean.valueOf(stringValue);
                     Log.i(TAG, "GPS: " + gps);
-                    if (shpr != null) {
-                        SharedPreferences.Editor shprEditor = shpr.edit();
+                    if (shPr != null) {
+                        SharedPreferences.Editor shprEditor = shPr.edit();
                         shprEditor.putBoolean("gps", gps);
                         shprEditor.apply();
                         Log.i(TAG, "Shared preferences set");

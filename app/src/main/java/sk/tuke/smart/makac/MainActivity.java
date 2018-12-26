@@ -37,7 +37,8 @@ public class MainActivity extends AppCompatActivity
 
     private MainActivity thisActivity;
 
-    private SharedPreferences shpr;
+    private SharedPreferences userShPr;
+    private SharedPreferences appShPr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +47,8 @@ public class MainActivity extends AppCompatActivity
         // live DB
         Stetho.initializeWithDefaults(this);
         initializeLayout();
-        shpr = getSharedPreferences("user", Context.MODE_PRIVATE);
+        userShPr = getSharedPreferences("user", Context.MODE_PRIVATE);
+        appShPr = getSharedPreferences("app_settings", Context.MODE_PRIVATE);
     }
 
     private void initializeLayout() {
@@ -99,7 +101,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        Log.i(TAG, "User signed in: " + shpr.getBoolean("userSignedIn", true));
+        Log.i(TAG, "userSignedIn " + userShPr.getBoolean("userSignedIn", true));
+        Log.i(TAG, "gps " + appShPr.getBoolean("gps", true));
+        Log.i(TAG, "unit " + appShPr.getInt("unit", 0));
     }
 
     @Override
