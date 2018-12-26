@@ -56,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         configureOnClickListeners();
         configureSignOutButton();
+        fillInputsWithValues();
     }
 
     private void configureOnClickListeners() {
@@ -79,6 +80,18 @@ public class LoginActivity extends AppCompatActivity {
                 });
             }
         });
+
+        saveChangesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                saveProfileChanges();
+            }
+        });
+    }
+
+    // TODO
+    private void fillInputsWithValues() {
+
     }
 
     private void configureGoogleSignIn() {
@@ -178,5 +191,10 @@ public class LoginActivity extends AppCompatActivity {
             signOutButton.setVisibility(View.GONE);
             Toast.makeText(this, "You are signed out", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    // TODO
+    private void saveProfileChanges() {
+
     }
 }
