@@ -1,5 +1,5 @@
 #
-# generated on 2018/12/24 08:47:38
+# generated on 2018/12/26 05:38:10
 #
 # --table-start--
 dataClass=sk.tuke.smart.makac.model.GpsPoint
@@ -124,6 +124,12 @@ foreign=true
 # --field-end--
 # --field-start--
 fieldName=weight
+# --field-end--
+# --field-start--
+fieldName=height
+# --field-end--
+# --field-start--
+fieldName=age
 # --field-end--
 # --table-fields-end--
 # --table-end--

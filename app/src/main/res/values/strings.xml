@@ -58,11 +58,11 @@
     <string name="error_field_required">This field is required</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
     <string name="weight_label">Weight:</string>
-    <string name="weight_hint">80 kg</string>
+    <string name="weight_hint">80.3</string>
     <string name="age_label">Age:</string>
-    <string name="age_hint">25 years</string>
+    <string name="age_hint">25</string>
     <string name="height_label">Height:</string>
-    <string name="height_hint">183 cm</string>
+    <string name="height_hint">183.7</string>
 
     <!-- ACTIVEWORKOUTMAP ACTIVITY -->
     <string name="title_activity_active_workout_map">Map</string>

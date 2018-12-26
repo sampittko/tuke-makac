@@ -17,9 +17,19 @@ public class UserProfile {
      */
     @DatabaseField
     private float weight;
+    @DatabaseField
+    private float height;
+    @DatabaseField
+    private int age;
 
     public UserProfile() {
 
+    }
+
+    public UserProfile(float weight, int age, float height) {
+        this.weight = weight;
+        this.age = age;
+        this.height = height;
     }
 
     public long getId() {
@@ -44,5 +54,21 @@ public class UserProfile {
 
     public void setWeight(float weight) {
         this.weight = weight;
+    }
+
+    public float getHeight() {
+        return height;
+    }
+
+    public void setHeight(float height) {
+        this.height = height;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
     }
 }
