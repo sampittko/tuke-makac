@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +32,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import sk.tuke.smart.makac.model.User;
 import sk.tuke.smart.makac.model.UserProfile;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
@@ -107,13 +109,6 @@ public class LoginActivity extends AppCompatActivity {
                 });
             }
         });
-
-        saveChangesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                saveProfileChanges();
-            }
-        });
     }
 
     private void configureSignOutButton() {
@@ -131,8 +126,10 @@ public class LoginActivity extends AppCompatActivity {
         View.OnFocusChangeListener onFocusChangeListener = new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
-                if (!hasFocus)
-                    verifyIfContentsHasChanged(view);
+                if (!hasFocus) {
+                    if (saveChangesButton.getVisibility() != View.VISIBLE && contentsHasChanged(view))
+                        saveChangesButton.setVisibility(View.VISIBLE);
+                }
             }
         };
         weightInput.setOnFocusChangeListener(onFocusChangeListener);
@@ -140,8 +137,38 @@ public class LoginActivity extends AppCompatActivity {
         heightInput.setOnFocusChangeListener(onFocusChangeListener);
     }
 
-    // TODO
-    private void verifyIfContentsHasChanged(View view) {
+    private boolean contentsHasChanged(View view) {
+        if (!(view instanceof EditText))
+            throw new UnsupportedOperationException();
+        EditText input = (EditText) view;
+        switch ((String) input.getTag()) {
+            case "weight_input":
+                if (inputValueDiffersFromUserValue(weightInput.getText(), currentUserProfile.getWeight())) {
+                    Log.i(TAG, "Weight is different");
+                    return true;
+                }
+                Log.i(TAG, "Weight is not different");
+                break;
+            case "age_input":
+                if (inputValueDiffersFromUserValue(ageInput.getText(), currentUserProfile.getAge())) {
+                    Log.i(TAG, "Age is different");
+                    return true;
+                }
+                Log.i(TAG, "Age is not different");
+                break;
+            case "height_input":
+                if (inputValueDiffersFromUserValue(heightInput.getText(), currentUserProfile.getHeight())) {
+                    Log.i(TAG, "Height is different");
+                    return true;
+                }
+                Log.i(TAG, "Height is not different");
+                break;
+        }
+        return false;
+    }
+
+    private boolean inputValueDiffersFromUserValue(Editable inputValue, Number userValue) {
+        return !inputValue.toString().equals(String.valueOf(userValue));
     }
 
     private void configureGoogleSignIn() {
@@ -320,9 +347,31 @@ public class LoginActivity extends AppCompatActivity {
         Log.i(TAG, "Input values were filled");
     }
 
-    // TODO
-    private void saveProfileChanges() {
-        Log.e(TAG, "Cannot save profile changes");
+    @OnClick(R.id.button_save_changes)
+    public void saveProfileChanges(View view) {
+        try {
+            int newAge = getNewAge();
+            float newHeight = Float.valueOf(heightInput.getText().toString());
+            float newWeight = Float.valueOf(weightInput.getText().toString());
+            currentUserProfile.setAge(newAge);
+            currentUserProfile.setHeight(newHeight);
+            currentUserProfile.setWeight(newWeight);
+            userProfileDao.update(currentUserProfile);
+            Log.i(TAG, "User profile values updated to: " + newWeight + ", " + newAge + ", " + newHeight);
+            saveChangesButton.setVisibility(View.GONE);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private int getNewAge() {
+        try {
+            return Integer.valueOf(ageInput.getText().toString());
+        }
+        catch (NumberFormatException e) {
+            return currentUserProfile.getAge();
+        }
     }
 
     @Override
