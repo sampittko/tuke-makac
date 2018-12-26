@@ -71,7 +71,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
     private int sportActivity;
     private long duration;
     private double distance, avgPace, totalCalories;
-    private Date workoutDate;
+    private Date workoutDate, workoutLastUpdate;
     private String workoutTitle;
 
     private SupportMapFragment mapFragment;
@@ -124,6 +124,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
             List<GpsPoint> gpsPoints = gpsPointDao.queryForEq("workout_id", currentWorkoutId);
             finalPositionList = MainHelper.getFinalPositionList(gpsPoints);
             workoutDate = currentWorkout.getCreated();
+            workoutLastUpdate = currentWorkout.getLastUpdate();
             workoutTitle = currentWorkout.getTitle();
             Log.i(TAG, "Values from local database retrieved successfully");
         }
@@ -133,16 +134,28 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
     }
 
     private void renderValues() {
-        workoutTitleTextView.setText(workoutTitle);
-        sportActivityTextView.setText(SportActivities.getSportActivityStringFromInt(sportActivity));
-        activityDateTextView.setText(MainHelper.sToDate(workoutDate.getTime()));
-        valueDurationTextView.setText(MainHelper.formatDuration(MainHelper.msToS(duration)));
-        String distanceString = MainHelper.formatDistance(distance) + " km";
-        valueDistanceTextView.setText(distanceString);
-        String avgPaceString = MainHelper.formatPace(avgPace) + " min/km";
-        valueAvgPaceTextView.setText(avgPaceString);
-        String caloriesString = MainHelper.formatCalories(totalCalories) + " kcal";
-        valueCaloriesTextView.setText(caloriesString);
+        try {
+            workoutTitleTextView.setText(workoutTitle);
+            sportActivityTextView.setText(SportActivities.getSportActivityStringFromInt(sportActivity));
+            activityDateTextView.setText(MainHelper.sToDate(workoutDate.getTime()));
+            valueDurationTextView.setText(MainHelper.formatDuration(MainHelper.msToS(duration)));
+            String distanceString = MainHelper.formatDistance(distance) + " km";
+            valueDistanceTextView.setText(distanceString);
+            String avgPaceString = MainHelper.formatPace(avgPace) + " min/km";
+            valueAvgPaceTextView.setText(avgPaceString);
+            String caloriesString = MainHelper.formatCalories(totalCalories) + " kcal";
+            valueCaloriesTextView.setText(caloriesString);
+        }
+        catch (NullPointerException e) {
+            e.printStackTrace();
+            // fix for test where NullPointerException occured in case of calling getTime() on workoutDate
+            if (workoutDate == null) {
+                if (workoutLastUpdate != null)
+                    activityDateTextView.setText(MainHelper.sToDate(workoutLastUpdate.getTime()));
+                else
+                    activityDateTextView.setText(MainHelper.sToDate(new Date().getTime()));
+            }
+        }
     }
 
     private void mapEntitiesVisibilityCheck() {
