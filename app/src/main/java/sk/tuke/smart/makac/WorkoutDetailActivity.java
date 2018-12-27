@@ -59,8 +59,6 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
 
     @BindString(R.string.share_message) public String shareMessage;
 
-    private AlertDialog.Builder alertDialogBuilderShare;
-    private AlertDialog.Builder alertDialogBuilderTitle;
     private AlertDialog alertDialog;
 
     private Workout currentWorkout;
@@ -336,7 +334,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         editText.setLayoutParams(lp);
 
-        alertDialogBuilderShare = new AlertDialog.Builder(this);
+        AlertDialog.Builder alertDialogBuilderShare = new AlertDialog.Builder(this);
         alertDialogBuilderShare
             .setView(editText)
             .setTitle("Share results")
@@ -370,7 +368,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         editText.setLayoutParams(lp);
         editText.setFocusableInTouchMode(true);
 
-        alertDialogBuilderTitle = new AlertDialog.Builder(this);
+        AlertDialog.Builder alertDialogBuilderTitle = new AlertDialog.Builder(this);
         alertDialogBuilderTitle
             .setView(editText)
             .setTitle("Edit workout title")
