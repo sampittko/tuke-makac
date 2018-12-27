@@ -4,6 +4,9 @@
     <string name="back4app_app_id">yspmq99eXpYFBjBd1TXPXaBkqooJuXvui6xjvPKS</string>
     <string name="back4app_client_key">wOEC7PB0X39HTpLJX9KXiQ3HaYzyWZYWQcFxrooK</string>
 
+    <!-- SHARED PREFERENCES -->
+
+
     <!-- STOPWATCH FRAGMENT -->
     <string name="textview_stopwatch_labelduration">Duration</string>
     <string name="textview_stopwatch_duration">0:00:00</string>

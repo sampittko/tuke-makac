@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.facebook.stetho.Stetho;
@@ -219,6 +220,16 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
+                break;
+            case R.id.action_sync_with_server:
+                // TODO sync with server
+                Toast.makeText(this, "Sync is not available", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Sync not implemetned.");
+                break;
+            case R.id.action_clear_history:
+                // TODO clear history
+                Toast.makeText(this, "Clearing history is not available", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "History cleaning not implemetned.");
                 break;
             default:
                 throw new UnsupportedOperationException();

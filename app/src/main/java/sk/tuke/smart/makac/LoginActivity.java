@@ -52,7 +52,7 @@ public class LoginActivity extends AppCompatActivity implements DatabaseConnecti
 
     private static final int SIGN_IN_CODE = 777;
 
-    private SharedPreferences shPr;
+    private SharedPreferences userShPr;
 
     private GoogleSignInAccount account;
 
@@ -72,7 +72,7 @@ public class LoginActivity extends AppCompatActivity implements DatabaseConnecti
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        shPr = getSharedPreferences("user", Context.MODE_PRIVATE);
+        userShPr = getSharedPreferences("user", Context.MODE_PRIVATE);
         initializeLayout();
         thisActivity = this;
         configureGoogleSignIn();
@@ -343,11 +343,11 @@ public class LoginActivity extends AppCompatActivity implements DatabaseConnecti
     }
 
     private void updateSharedPreferences() {
-        SharedPreferences.Editor shprEditor = shPr.edit();
+        SharedPreferences.Editor shprEditor = userShPr.edit();
         shprEditor.putLong("userId", currentUser.getId());
         shprEditor.putBoolean("userSignedIn", userSignedIn);
         shprEditor.apply();
-        Log.i(TAG, "Shared preferences updated to values: " + shPr.getLong("userId", 1337) + ", " + shPr.getBoolean("userSignedIn", true));
+        Log.i(TAG, "Shared preferences updated to values: " + userShPr.getLong("userId", 1337) + ", " + userShPr.getBoolean("userSignedIn", true));
     }
 
     private void updateUI() {

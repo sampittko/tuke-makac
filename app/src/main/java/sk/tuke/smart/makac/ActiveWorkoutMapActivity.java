@@ -34,8 +34,10 @@ import sk.tuke.smart.makac.model.config.DatabaseHelper;
 
 public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapReadyCallback, DatabaseConnection {
     private static final String TAG = "ActiveWorkoutMapA";
+
     private final float ZOOM_LEVEL = 17.0f;
-    int lastRenderBeforeSeconds = 0;
+
+    private int lastRenderBeforeSeconds = 0;
 
     private ArrayList<List<Location>> finalPositionList = new ArrayList<>();
     private ArrayList<Location> locationList = new ArrayList<>();

@@ -244,10 +244,9 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
-            // TODO delete workout
             case R.id.action_delete:
+                // TODO delete workout
                 break;
-            // TODO on back pressed, perform back action
             case 16908332:
                 finish();
                 break;

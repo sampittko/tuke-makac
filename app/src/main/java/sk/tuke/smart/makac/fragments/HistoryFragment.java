@@ -2,6 +2,7 @@ package sk.tuke.smart.makac.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -9,7 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -45,6 +45,8 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
 
     private FragmentActivity thisFragmentActivity;
 
+    private SharedPreferences userShPr;
+
     public HistoryFragment() {
     }
 
@@ -59,6 +61,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
         thisFragmentActivity.setTitle(R.string.menu_history);
         setHasOptionsMenu(true);
         databaseSetup();
+        userShPr = thisFragmentActivity.getSharedPreferences("user", Context.MODE_PRIVATE);
     }
 
     public void databaseSetup() {
@@ -70,6 +73,12 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
         catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        thisFragmentActivity.invalidateOptionsMenu();
     }
 
     private void displayHistoryItems() throws SQLException {
@@ -97,26 +106,8 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.clear_history, menu);
-        inflater.inflate(R.menu.sync_with_server, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        performCorrespondingActionForMenuItem(item.getItemId());
-        return true;
-    }
-
-    private void performCorrespondingActionForMenuItem(int itemId) {
-        switch(itemId) {
-            case R.id.action_clear_history:
-                // TODO clear history
-                break;
-            case R.id.action_sync_with_server:
-                // TODO sync with server
-                break;
-            default:
-                throw new UnsupportedOperationException();
-        }
+        if (userShPr.getBoolean("userSignedIn", false))
+            inflater.inflate(R.menu.sync_with_server, menu);
     }
 
     @Override

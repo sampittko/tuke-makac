@@ -1,12 +1,12 @@
 package sk.tuke.smart.makac.fragments;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -19,7 +19,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -83,6 +82,9 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
     private Dao<Workout, Long> workoutDao;
     private Dao<GpsPoint, Long> gpsPointDao;
 
+    private SharedPreferences userShPr;
+    private SharedPreferences appShPr;
+
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent broadcastIntent) {
@@ -132,6 +134,8 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
         createStopWorkoutAlertDialog();
         registerBroadcastReceiver();
         databaseSetup();
+        userShPr = thisFragmentActivity.getSharedPreferences("user", Context.MODE_PRIVATE);
+        appShPr = thisFragmentActivity.getSharedPreferences("app_settings", Context.MODE_PRIVATE);
     }
 
     private void initializeVariables() {
@@ -230,21 +234,8 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.sync_with_server, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.action_sync_with_server:
-                // TODO sync with server
-                Log.e(TAG, "Sync not implemetned.");
-                break;
-            default:
-                throw new UnsupportedOperationException();
-        }
-
-        return true;
+        if (userShPr.getBoolean("userSignedIn", false))
+            inflater.inflate(R.menu.sync_with_server, menu);
     }
 
     @Override
@@ -314,6 +305,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
         thisFragmentActivity.registerReceiver(broadcastReceiver, intentFilter);
         if (!workoutStarted)
             thisFragmentActivity.startService(new Intent(thisFragmentActivity, TrackerService.class));
+        thisFragmentActivity.invalidateOptionsMenu();
         Log.i(TAG, "Receiver registered");
     }
 
