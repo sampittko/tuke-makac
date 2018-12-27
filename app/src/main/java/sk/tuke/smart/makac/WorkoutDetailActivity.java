@@ -134,6 +134,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         }
     }
 
+    // TODO unit switch
     private void renderValues() {
         try {
             workoutTitleTextView.setText(workoutTitle);

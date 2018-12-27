@@ -152,6 +152,7 @@ public class Workout {
         this.lastUpdate = lastUpdate;
     }
 
+    // TODO unit switch
     @NonNull
     @Override
     public String toString() {

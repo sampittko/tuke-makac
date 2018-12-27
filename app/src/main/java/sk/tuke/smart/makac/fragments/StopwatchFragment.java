@@ -414,19 +414,12 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
         Log.i(TAG, "New duration: " + newDuration);
     }
 
+    // TODO unit switch
     private void distanceRenderer(double broadcastIntentDistance) {
         if (distance != broadcastIntentDistance) {
             distance = broadcastIntentDistance;
 
-            String newDistance;
-            if (appShPr.getInt(getString(R.string.appshpr_unit), Integer.valueOf(getString(R.string.appshpr_unit_default))) == SportActivities.UNIT_KILOMETERS) {
-                newDistance = MainHelper.formatDistance(distance);
-                distanceUnitTextView.setText(R.string.all_labeldistanceunitkilometers);
-            }
-            else {
-                newDistance = MainHelper.formatDistanceMiles(distance);
-                distanceUnitTextView.setText(R.string.all_labeldistanceunitmiles);
-            }
+            String newDistance = MainHelper.formatDistance(distance);
             distanceTextView.setText(newDistance);
             Log.i(TAG, "New distance: " + newDistance);
         }
