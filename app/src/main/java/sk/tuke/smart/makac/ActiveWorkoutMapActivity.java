@@ -56,7 +56,7 @@ public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapR
             try {
                 lastRenderBeforeSeconds++;
                 if (broadcastIntent.getAction().equals(IntentHelper.ACTION_TICK)) {
-                    Location newestLocation = broadcastIntent.getParcelableExtra(IntentHelper.DATA_LOCATION);
+                    Location newestLocation = broadcastIntent.getParcelableExtra(IntentHelper.DATA_WORKOUT_LOCATION);
                     updateMapLocation(newestLocation);
                     if (lastRenderBeforeSeconds == 15)
                         performRouteRender();
@@ -156,7 +156,7 @@ public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapR
 
     private void retrieveVariables() {
         try {
-            long currentWorkoutId = getIntent().getLongExtra(IntentHelper.DATA_WORKOUT, -1);
+            long currentWorkoutId = getIntent().getLongExtra(IntentHelper.DATA_WORKOUT_ID, -1);
             List<GpsPoint> gpsPoints = gpsPointDao.queryForEq("workout_id", currentWorkoutId);
             finalPositionList = MainHelper.getFinalPositionList(gpsPoints);
         }

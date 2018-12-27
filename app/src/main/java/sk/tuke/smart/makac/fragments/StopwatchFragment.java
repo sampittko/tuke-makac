@@ -44,7 +44,6 @@ import sk.tuke.smart.makac.WorkoutDetailActivity;
 import sk.tuke.smart.makac.exceptions.SensorNotPresentException;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
-import sk.tuke.smart.makac.helpers.SportActivities;
 import sk.tuke.smart.makac.model.GpsPoint;
 import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
@@ -95,7 +94,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
                 if (broadcastIntent.getAction().equals(IntentHelper.ACTION_TICK)) {
                     Log.i(TAG, IntentHelper.ACTION_TICK);
                     renderValues(broadcastIntent);
-                    verifyNewestLocation((Location)broadcastIntent.getParcelableExtra(IntentHelper.DATA_LOCATION));
+                    verifyNewestLocation((Location)broadcastIntent.getParcelableExtra(IntentHelper.DATA_WORKOUT_LOCATION));
                 }
                 else if (broadcastIntent.getAction().equals(IntentHelper.ACTION_GPS)) {
                     Log.i(TAG, IntentHelper.ACTION_GPS);
@@ -192,7 +191,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
                     private void startWorkoutDetailActivity() {
                         try {
                             Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
-                            intent.putExtra(IntentHelper.DATA_WORKOUT, getCurrentWorkoutId());
+                            intent.putExtra(IntentHelper.DATA_WORKOUT_ID, getCurrentWorkoutId());
                             startActivityForResult(intent, 1);
                         }
                         catch (SQLException e) {
@@ -212,6 +211,13 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1 && resultCode == 1)
             mListener.onWorkoutStopped();
+        else if (requestCode == Workout.DELETE_REQUEST && resultCode == Workout.DELETE_RESULT) {
+            long deletedWorkoutId = data.getLongExtra(IntentHelper.DATA_WORKOUT_ID, 0);
+            String deletedWorkoutTitle = data.getStringExtra(IntentHelper.DATA_WORKOUT_TITLE);
+            String toastMessage = deletedWorkoutTitle + " was deleted (ID: " + deletedWorkoutId + ")";
+            Toast.makeText(thisFragmentActivity, toastMessage, Toast.LENGTH_SHORT).show();
+            mListener.onWorkoutStopped();
+        }
     }
 
     private void registerBroadcastReceiver() {
@@ -390,13 +396,13 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
 
     private void renderValues(Intent broadcastIntent) {
         durationRenderer(broadcastIntent.getLongExtra(
-                IntentHelper.DATA_DURATION, 0));
+                IntentHelper.DATA_WORKOUT_DURATION, 0));
         distanceRenderer(broadcastIntent.getDoubleExtra(
-                IntentHelper.DATA_DISTANCE, 0));
+                IntentHelper.DATA_WORKOUT_DISTANCE, 0));
         paceRenderer(broadcastIntent.getDoubleExtra(
-                IntentHelper.DATA_PACE, 0));
+                IntentHelper.DATA_WORKOUT_PACE, 0));
         caloriesRenderer(broadcastIntent.getDoubleExtra(
-                IntentHelper.DATA_CALORIES, 0));
+                IntentHelper.DATA_WORKOUT_CALORIES, 0));
     }
 
     private void renderValues(long duration, double distance, double pace, double totalCalories) {
@@ -490,7 +496,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
     public void showActiveWorkoutMap(View view) {
         try {
             Intent intent = new Intent(thisFragmentActivity, ActiveWorkoutMapActivity.class);
-            intent.putExtra(IntentHelper.DATA_WORKOUT, getCurrentWorkoutId());
+            intent.putExtra(IntentHelper.DATA_WORKOUT_ID, getCurrentWorkoutId());
             startActivity(intent);
             Log.i(TAG, "Showing active workout map");
         }

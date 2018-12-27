@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
@@ -81,16 +82,23 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
         thisFragmentActivity.invalidateOptionsMenu();
     }
 
-    private void displayHistoryItems() throws SQLException {
-        List<Workout> workouts = workoutDao.queryForAll();
-        HistoryListAdapter historyListAdapter = new HistoryListAdapter(thisFragmentActivity, R.layout.adapter_history, getStringifiedWorkouts(workouts), workouts);
+    private void displayHistoryItems(List<Workout> endedWorkouts) {
+        HistoryListAdapter historyListAdapter = new HistoryListAdapter(thisFragmentActivity, R.layout.adapter_history, getStringifiedWorkouts(endedWorkouts), endedWorkouts);
         workoutsListView.setAdapter(historyListAdapter);
         workoutsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                 Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
-                 intent.putExtra(IntentHelper.DATA_WORKOUT, (long)(i+1));
-                 startActivityForResult(intent, Workout.DELETE_REQUEST);
+                long workoutId = getWorkoutId(view);
+                Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
+                intent.putExtra(IntentHelper.DATA_WORKOUT_ID, workoutId);
+                startActivityForResult(intent, Workout.DELETE_REQUEST);
+            }
+
+            private long getWorkoutId(View view) {
+                ViewGroup viewGroup1 = (ViewGroup) view;
+                ViewGroup viewGroup2 = (ViewGroup) viewGroup1.getChildAt(1);
+                TextView workoutTitleTextView = (TextView) viewGroup2.getChildAt(0);
+                return Long.valueOf(workoutTitleTextView.getTag().toString());
             }
         });
         Log.i(TAG, "Workouts displayed successfully");
@@ -103,7 +111,11 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
     }
 
     private void removeWorkoutFromList(Intent data) {
-        Log.e(TAG, "Cannot remove workout from list");
+        long deletedWorkoutId = data.getLongExtra(IntentHelper.DATA_WORKOUT_ID, 0);
+        String deletedWorkoutTitle = data.getStringExtra(IntentHelper.DATA_WORKOUT_TITLE);
+        String toastMessage = deletedWorkoutTitle + " was deleted (ID: " + deletedWorkoutId + ")";
+        Toast.makeText(thisFragmentActivity, toastMessage, Toast.LENGTH_SHORT).show();
+        displayContent();
     }
 
     private List<String> getStringifiedWorkouts(List<Workout> workouts) {
@@ -131,8 +143,9 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
 
     private void displayContent() {
         try {
-            if (workoutDao.countOf() != 0)
-                displayHistoryItems();
+            List<Workout> endedWorkouts = workoutDao.queryForEq("status", Workout.statusEnded);
+            if (endedWorkouts.size() > 0)
+                displayHistoryItems(endedWorkouts);
             else {
                 noHistoryDataTextView.setVisibility(View.VISIBLE);
                 Log.i(TAG, "There is no data to display");

@@ -89,7 +89,6 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         renderValues();
         mapEntitiesVisibilityCheck();
         createShareAlertDialog();
-        setResult(1);
     }
 
     private void initializeLayout() {
@@ -116,7 +115,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
 
     private void retrieveWorkoutValues() {
         try {
-            Long currentWorkoutId = getIntent().getLongExtra(IntentHelper.DATA_WORKOUT, -1);
+            Long currentWorkoutId = getIntent().getLongExtra(IntentHelper.DATA_WORKOUT_ID, -1);
             currentWorkout = workoutDao.queryForId(currentWorkoutId);
             sportActivity = currentWorkout.getSportActivity();
             duration = currentWorkout.getDuration();
@@ -218,7 +217,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
 
     public void showMapsActivity() {
         Intent mapsIntent = new Intent(this, MapsActivity.class);
-        mapsIntent.putExtra(IntentHelper.DATA_WORKOUT, currentWorkout.getId());
+        mapsIntent.putExtra(IntentHelper.DATA_WORKOUT_ID, currentWorkout.getId());
         startActivity(mapsIntent);
     }
 
@@ -251,6 +250,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
                 deleteWorkout();
                 break;
             case 16908332:
+                setResult(1);
                 finish();
                 break;
             default:
@@ -261,10 +261,12 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
     private void deleteWorkout() {
         try {
             currentWorkout.setStatus(Workout.statusDeleted);
+            workoutDao.update(currentWorkout);
             gpsPointDao.delete(currentGpsPoints);
             Log.i(TAG, "Workout data deleted");
             Intent data = new Intent();
-            data.putExtra(IntentHelper.DATA_WORKOUT, currentWorkout.getId());
+            data.putExtra(IntentHelper.DATA_WORKOUT_ID, currentWorkout.getId());
+            data.putExtra(IntentHelper.DATA_WORKOUT_TITLE, currentWorkout.getTitle());
             setResult(Workout.DELETE_RESULT, data);
             finish();
         }

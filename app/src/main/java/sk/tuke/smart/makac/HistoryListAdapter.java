@@ -28,9 +28,10 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.adapter_history, parent, false);
         }
+        Workout currentWorkout = workouts.get(position);
         setIcon(convertView);
-        setTitle(convertView, position);
-        setDate(convertView, position);
+        setTitle(convertView, currentWorkout);
+        setDate(convertView, currentWorkout);
         setSportActivity(convertView, position);
         return convertView;
     }
@@ -42,26 +43,20 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
     }
 
     // TODO workout title set by user
-    private void setTitle(View convertView, int position) {
+    private void setTitle(View convertView, Workout currentWorkout) {
         TextView titleTextView = convertView.findViewById(R.id.textview_history_title);
-        titleTextView.setText(workouts.get(position).getTitle());
+        titleTextView.setText(currentWorkout.getTitle());
+        titleTextView.setTag(currentWorkout.getId());
     }
 
-    private void setDate(View convertView, int position) {
+    private void setDate(View convertView, Workout currentWorkout) {
         TextView dateTimeTextView = convertView.findViewById(R.id.textview_history_datetime);
-        dateTimeTextView.setText(MainHelper.sToDate(workouts.get(position).getCreated().getTime()));
+        dateTimeTextView.setText(MainHelper.sToDate(currentWorkout.getCreated().getTime()));
     }
 
     private void setSportActivity(View convertView, int position) {
         String workout = getItem(position);
         TextView sportActivityTextView = convertView.findViewById(R.id.textview_history_sportactivity);
         sportActivityTextView.setText(workout);
-    }
-
-    @Override
-    public int getCount() {
-        if (workouts.get(workouts.size() - 1).getStatus() != Workout.statusEnded)
-            return workouts.size() - 1;
-        return workouts.size();
     }
 }

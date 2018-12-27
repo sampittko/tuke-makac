@@ -290,6 +290,7 @@ public class MainActivity extends AppCompatActivity
                 .beginTransaction()
                 .replace(R.id.main_replaceable, StopwatchFragment.newInstance())
                 .commit();
+        Log.i(TAG, "Stopwatch fragment replaced with the new one");
     }
 
     @Override

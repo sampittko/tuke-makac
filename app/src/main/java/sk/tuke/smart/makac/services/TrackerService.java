@@ -99,13 +99,13 @@ public class TrackerService extends Service implements LocationListener, Databas
 
         private Intent createNewIntent() {
             return new Intent().setAction(IntentHelper.ACTION_TICK)
-                    .putExtra(IntentHelper.DATA_DURATION, MainHelper.msToS(duration))
-                    .putExtra(IntentHelper.DATA_DISTANCE, distance)
-                    .putExtra(IntentHelper.DATA_STATE, state)
-                    .putExtra(IntentHelper.DATA_LOCATION, currentLocation)
-                    .putExtra(IntentHelper.DATA_SPORT, sportActivity)
-                    .putExtra(IntentHelper.DATA_PACE, pace)
-                    .putExtra(IntentHelper.DATA_CALORIES, calories);
+                    .putExtra(IntentHelper.DATA_WORKOUT_DURATION, MainHelper.msToS(duration))
+                    .putExtra(IntentHelper.DATA_WORKOUT_DISTANCE, distance)
+                    .putExtra(IntentHelper.DATA_SERVICE_STATE, state)
+                    .putExtra(IntentHelper.DATA_WORKOUT_LOCATION, currentLocation)
+                    .putExtra(IntentHelper.DATA_WORKOUT_SPORT_ACTIVITY, sportActivity)
+                    .putExtra(IntentHelper.DATA_WORKOUT_PACE, pace)
+                    .putExtra(IntentHelper.DATA_WORKOUT_CALORIES, calories);
         }
     };
 
