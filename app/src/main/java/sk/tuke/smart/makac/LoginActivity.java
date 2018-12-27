@@ -252,7 +252,6 @@ public class LoginActivity extends AppCompatActivity implements DatabaseConnecti
         super.onStart();
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
-         account = GoogleSignIn.getLastSignedInAccount(this);
          performUserDependingActions();
     }
 
@@ -263,6 +262,7 @@ public class LoginActivity extends AppCompatActivity implements DatabaseConnecti
     }
 
     private void checkUser() {
+        account = GoogleSignIn.getLastSignedInAccount(this);
         try {
             if (account == null)
                 setUnknownUserData();
@@ -382,7 +382,7 @@ public class LoginActivity extends AppCompatActivity implements DatabaseConnecti
     @OnClick(R.id.button_save_changes)
     public void saveProfileChanges(View view) {
         try {
-            int newAge = getNewAge();
+            int newAge = Integer.valueOf(ageInput.getText().toString());
             float newHeight = Float.valueOf(heightInput.getText().toString());
             float newWeight = Float.valueOf(weightInput.getText().toString());
             currentUserProfile.setAge(newAge);
@@ -396,14 +396,8 @@ public class LoginActivity extends AppCompatActivity implements DatabaseConnecti
         catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    private int getNewAge() {
-        try {
-            return Integer.valueOf(ageInput.getText().toString());
-        }
         catch (NumberFormatException e) {
-            return currentUserProfile.getAge();
+            Toast.makeText(this, "Age value is invalid", Toast.LENGTH_SHORT).show();
         }
     }
 

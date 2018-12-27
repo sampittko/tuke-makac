@@ -27,6 +27,7 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import sk.tuke.smart.makac.fragments.AboutFragment;
 import sk.tuke.smart.makac.fragments.HistoryFragment;
@@ -59,6 +60,9 @@ public class MainActivity extends AppCompatActivity
 
     private TextView userNameTextView;
     private ImageView userImageImageView;
+
+    private User currentUser;
+    private UserProfile currentUserProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +127,61 @@ public class MainActivity extends AppCompatActivity
         MenuItem workoutMenuItem = navigationView.getMenu().findItem(R.id.nav_workout);
         onNavigationItemSelected(workoutMenuItem);
         workoutMenuItem.setChecked(true);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account == null) {
+            setUnknownUserData();
+            updateSharedPreferencesForOfflineUser();
+        }
+    }
+
+    private void setUnknownUserData() {
+        try {
+            setUnknownUser();
+            setUnknownUserProfile();
+            Log.i(TAG, "Unknown user set");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setUnknownUser() throws SQLException {
+        try {
+            List<User> offlineUsers = userDao.queryForEq("accType", User.ACC_TYPE_OFFLINE);
+            currentUser = offlineUsers.get(0);
+            Log.i(TAG, "Unknown user exists");
+        }
+        catch (IndexOutOfBoundsException e) {
+            currentUser = new User(0, "0");
+            userDao.create(currentUser);
+            Log.i(TAG, "Unknown user created");
+        }
+    }
+
+    private void setUnknownUserProfile() throws SQLException {
+        try {
+            List<UserProfile> offlineUserProfiles = userProfileDao.queryForEq("user_id", currentUser.getId());
+            currentUserProfile = offlineUserProfiles.get(0);
+            Log.i(TAG, "Unknown user profile exists");
+        }
+        catch (IndexOutOfBoundsException e) {
+            currentUserProfile = new UserProfile();
+            currentUserProfile.setUser(currentUser);
+            userProfileDao.create(currentUserProfile);
+            Log.i(TAG, "Unknown user profile created");
+        }
+    }
+
+    private void updateSharedPreferencesForOfflineUser() {
+        SharedPreferences.Editor userShPrEditor = userShPr.edit();
+        userShPrEditor.putBoolean(getString(R.string.usershpr_usersignedin), false);
+        userShPrEditor.putLong(getString(R.string.usershpr_userid), currentUser.getId());
+        userShPrEditor.apply();
     }
 
     @Override
