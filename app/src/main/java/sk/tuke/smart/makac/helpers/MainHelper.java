@@ -45,6 +45,15 @@ public final class MainHelper {
     }
 
     /**
+     * convert m to miles and round to 2 decimal places and return as string
+     */
+    public static String formatDistanceMiles(double n) {
+        double kilometers = n / 1000;
+        double miles = kilometers * KM_TO_MI;
+        return String.valueOf(Math.round(miles * 100) / 100);
+    }
+
+    /**
      * round number to 2 decimal places and return as string
      */
     public static String formatPace(double n) {
@@ -79,7 +88,7 @@ public final class MainHelper {
 
     /* convert kmph to miph (multiply with corresponding constant) */
     public static double kmphToMiph(double n) {
-        return n * MINpKM_TO_MINpMI * 60;
+        return n * MINpKM_TO_MINpMI;
     }
 
     public static long msToS(long n) {

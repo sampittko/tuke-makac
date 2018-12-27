@@ -38,6 +38,7 @@
                 android:layout_below="@id/sign_in_button"
                 android:layout_centerHorizontal="true"
                 android:layout_width="wrap_content"
+                android:textStyle="bold"
                 android:layout_height="19dp"
                 android:textSize="15sp"
                 android:id="@+id/textview_username_unknown" />
@@ -51,6 +52,7 @@
             <TextView
                 android:layout_below="@id/sign_out_button"
                 android:layout_centerHorizontal="true"
+                android:textStyle="bold"
                 android:layout_width="wrap_content"
                 android:layout_height="19dp"
                 android:textSize="15sp"

@@ -19,6 +19,9 @@ public final class SportActivities {
     public static final int WALKING = 1;
     public static final int CYCLING = 2;
 
+    public static final int UNIT_KILOMETERS = 0;
+    public static final int UNIT_MILES = 1;
+
     private static final String TAG = "SportActivities";
 
     public SportActivities() {

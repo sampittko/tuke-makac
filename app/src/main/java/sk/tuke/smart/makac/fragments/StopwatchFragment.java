@@ -44,6 +44,7 @@ import sk.tuke.smart.makac.WorkoutDetailActivity;
 import sk.tuke.smart.makac.exceptions.SensorNotPresentException;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
+import sk.tuke.smart.makac.helpers.SportActivities;
 import sk.tuke.smart.makac.model.GpsPoint;
 import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
@@ -56,6 +57,8 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
     @BindView(R.id.textview_stopwatch_distance) public TextView distanceTextView;
     @BindView(R.id.textview_stopwatch_pace) public TextView paceTextView;
     @BindView(R.id.textview_stopwatch_calories) public TextView caloriesTextView;
+    @BindView(R.id.textview_stopwatch_distanceunit) public TextView distanceUnitTextView;
+    @BindView(R.id.textview_stopwatch_unitpace) public TextView paceUnitTextview;
 
     @BindDrawable(R.drawable.ic_pause_circle_filled_green) public Drawable pauseDrawable;
     @BindDrawable(R.drawable.ic_play_circle_filled_green) public Drawable playDrawable;
@@ -415,12 +418,21 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
         if (distance != broadcastIntentDistance) {
             distance = broadcastIntentDistance;
 
-            String newDistance = MainHelper.formatDistance(distance);
+            String newDistance;
+            if (appShPr.getInt(getString(R.string.appshpr_unit), Integer.valueOf(getString(R.string.appshpr_unit_default))) == SportActivities.UNIT_KILOMETERS) {
+                newDistance = MainHelper.formatDistance(distance);
+                distanceUnitTextView.setText(R.string.all_labeldistanceunitkilometers);
+            }
+            else {
+                newDistance = MainHelper.formatDistanceMiles(distance);
+                distanceUnitTextView.setText(R.string.all_labeldistanceunitmiles);
+            }
             distanceTextView.setText(newDistance);
             Log.i(TAG, "New distance: " + newDistance);
         }
     }
 
+    // TODO unit switch
     private void paceRenderer(double broadcastIntentPace) {
         if (pace != broadcastIntentPace) {
             pace = broadcastIntentPace;
