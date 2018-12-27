@@ -111,9 +111,8 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
     }
 
     private void removeWorkoutFromList(Intent data) {
-        long deletedWorkoutId = data.getLongExtra(IntentHelper.DATA_WORKOUT_ID, 0);
         String deletedWorkoutTitle = data.getStringExtra(IntentHelper.DATA_WORKOUT_TITLE);
-        String toastMessage = deletedWorkoutTitle + " was deleted (ID: " + deletedWorkoutId + ")";
+        String toastMessage = deletedWorkoutTitle + " was deleted";
         Toast.makeText(thisFragmentActivity, toastMessage, Toast.LENGTH_SHORT).show();
         displayContent();
     }

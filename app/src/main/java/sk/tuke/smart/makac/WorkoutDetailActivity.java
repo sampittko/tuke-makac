@@ -249,8 +249,8 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
             case R.id.action_delete:
                 deleteWorkout();
                 break;
-            case 16908332:
-                setResult(1);
+            case android.R.id.home:
+                setResult(Workout.STOPWATCH_RESULT);
                 finish();
                 break;
             default:
@@ -265,7 +265,6 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
             gpsPointDao.delete(currentGpsPoints);
             Log.i(TAG, "Workout data deleted");
             Intent data = new Intent();
-            data.putExtra(IntentHelper.DATA_WORKOUT_ID, currentWorkout.getId());
             data.putExtra(IntentHelper.DATA_WORKOUT_TITLE, currentWorkout.getTitle());
             setResult(Workout.DELETE_RESULT, data);
             finish();
@@ -273,6 +272,12 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        setResult(Workout.STOPWATCH_RESULT);
+        super.onBackPressed();
     }
 
     @Override

@@ -192,7 +192,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
                         try {
                             Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
                             intent.putExtra(IntentHelper.DATA_WORKOUT_ID, getCurrentWorkoutId());
-                            startActivityForResult(intent, 1);
+                            startActivityForResult(intent, Workout.STOPWATCH_REQUEST);
                         }
                         catch (SQLException e) {
                             e.printStackTrace();
@@ -209,12 +209,11 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1 && resultCode == 1)
+        if (requestCode == Workout.STOPWATCH_REQUEST && resultCode == Workout.STOPWATCH_RESULT)
             mListener.onWorkoutStopped();
-        else if (requestCode == Workout.DELETE_REQUEST && resultCode == Workout.DELETE_RESULT) {
-            long deletedWorkoutId = data.getLongExtra(IntentHelper.DATA_WORKOUT_ID, 0);
+        else if (requestCode == Workout.STOPWATCH_REQUEST && resultCode == Workout.DELETE_RESULT) {
             String deletedWorkoutTitle = data.getStringExtra(IntentHelper.DATA_WORKOUT_TITLE);
-            String toastMessage = deletedWorkoutTitle + " was deleted (ID: " + deletedWorkoutId + ")";
+            String toastMessage = deletedWorkoutTitle + " was deleted";
             Toast.makeText(thisFragmentActivity, toastMessage, Toast.LENGTH_SHORT).show();
             mListener.onWorkoutStopped();
         }

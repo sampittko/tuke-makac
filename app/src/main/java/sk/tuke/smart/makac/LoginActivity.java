@@ -239,7 +239,7 @@ public class LoginActivity extends AppCompatActivity implements DatabaseConnecti
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
-            case 16908332:
+            case android.R.id.home:
                 finish();
                 break;
             default:

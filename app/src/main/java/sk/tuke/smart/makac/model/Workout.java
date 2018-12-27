@@ -26,6 +26,10 @@ public class Workout {
     public static final int DELETE_REQUEST = 404;
     // workout delete result code
     public static final int DELETE_RESULT = 1337;
+    // stopwatch fragment request code
+    public static final int STOPWATCH_REQUEST = 165;
+    // stopwatch fragment result code
+    public static final int STOPWATCH_RESULT = 160459;
 
     @DatabaseField(generatedId = true, unique = true)
     private long id;
