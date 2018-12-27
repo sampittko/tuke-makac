@@ -41,7 +41,6 @@ import sk.tuke.smart.makac.ActiveWorkoutMapActivity;
 import sk.tuke.smart.makac.DatabaseConnection;
 import sk.tuke.smart.makac.R;
 import sk.tuke.smart.makac.WorkoutDetailActivity;
-import sk.tuke.smart.makac.exceptions.SensorNotPresentException;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
 import sk.tuke.smart.makac.model.GpsPoint;
