@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -25,12 +26,14 @@ import java.util.Date;
 import java.util.List;
 
 import sk.tuke.smart.makac.DatabaseConnection;
+import sk.tuke.smart.makac.R;
 import sk.tuke.smart.makac.exceptions.InsufficientDistanceException;
 import sk.tuke.smart.makac.exceptions.NotEnoughLocationsException;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
 import sk.tuke.smart.makac.helpers.SportActivities;
 import sk.tuke.smart.makac.model.GpsPoint;
+import sk.tuke.smart.makac.model.UserProfile;
 import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 
@@ -38,7 +41,6 @@ public class TrackerService extends Service implements LocationListener, Databas
     private final double SESSION_DIFF_LIMIT = 100;
     private final IBinder mBinder = new LocalBinder();
     private final String TAG = "TrackerService";
-    private final float WEIGHT = 80;
     private final int MIN_TIME_BTW_UPDATES = 3000;
     private final int MIN_DISTANCE = 10;
     private final int PACE_UPDATE_LIMIT = MIN_TIME_BTW_UPDATES / 1000 * 2;
@@ -48,6 +50,8 @@ public class TrackerService extends Service implements LocationListener, Databas
     private double calories, previousCalories, totalCalories, distance, pace;
     private long duration;
     private float speed;
+
+    private float weight;
 
     private boolean hasContinued;
 
@@ -61,6 +65,7 @@ public class TrackerService extends Service implements LocationListener, Databas
 
     private Dao<GpsPoint, Long> gpsPointDao;
     private Dao<Workout, Long> workoutDao;
+    private Dao<UserProfile, Long> userProfileDao;
 
     private LocationManager locationManager;
 
@@ -71,6 +76,8 @@ public class TrackerService extends Service implements LocationListener, Databas
     private long sessionNumber;
 
     private int lastLocationUpdateBeforeSeconds, workoutDataSavedAtSeconds;
+
+    private SharedPreferences userShPr;
 
     public class LocalBinder extends Binder {
         public TrackerService getService() {
@@ -109,6 +116,7 @@ public class TrackerService extends Service implements LocationListener, Databas
         checkLocationPermissions();
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         databaseSetup();
+        userShPr = getSharedPreferences(getString(R.string.usershpr), Context.MODE_PRIVATE);
         Log.i(TAG, "Service created");
     }
 
@@ -133,6 +141,7 @@ public class TrackerService extends Service implements LocationListener, Databas
             DatabaseHelper databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
             gpsPointDao = databaseHelper.gpsPointDao();
             workoutDao = databaseHelper.workoutDao();
+            userProfileDao = databaseHelper.userProfileDao();
             Log.i(TAG, "Local database is ready");
         }
         catch (SQLException e) {
@@ -174,9 +183,28 @@ public class TrackerService extends Service implements LocationListener, Databas
     private void performStartAction() {
         createNewWorkout();
         handler.postDelayed(timerRunnable, 1000);
+        setWeightAccordingToCurrentUser();
         updateState(IntentHelper.STATE_RUNNING);
         sessionNumber = 1;
         Log.i(TAG, "Service started");
+    }
+
+    private void setWeightAccordingToCurrentUser() {
+        try {
+            List<UserProfile> userProfiles = userProfileDao.queryForEq("user_id", userShPr.getLong(getString(R.string.usershpr_userid), Long.valueOf(getString(R.string.usershpr_userid_default))));
+            UserProfile currentUserProfile = userProfiles.get(0);
+            if (currentUserProfile.getWeight() <= 0)
+                throw new IndexOutOfBoundsException();
+            weight = currentUserProfile.getWeight();
+            Log.i(TAG, "User weight " + weight + "kg set");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        catch (IndexOutOfBoundsException e) {
+            weight = UserProfile.DEFAULT_WEIGHT;
+            Log.i(TAG, "Default weight set");
+        }
     }
 
     private void createNewWorkout() {
@@ -331,7 +359,7 @@ public class TrackerService extends Service implements LocationListener, Databas
                 countDistance();
                 countSpeed();
                 countPace();
-                calories = SportActivities.countCalories(sportActivity, WEIGHT, speedList, getTimeFillingSpeedListInHours());
+                calories = SportActivities.countCalories(sportActivity, weight, speedList, getTimeFillingSpeedListInHours());
                 persistGpsPoint();
             }
             catch (InsufficientDistanceException ide) {

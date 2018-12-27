@@ -282,30 +282,15 @@ public class LoginActivity extends AppCompatActivity implements DatabaseConnecti
     }
 
     private void setUnknownUser() throws SQLException {
-        try {
-            List<User> offlineUsers = userDao.queryForEq("accType", User.ACC_TYPE_OFFLINE);
-            currentUser = offlineUsers.get(0);
-            Log.i(TAG, "Unknown user exists");
-        }
-        catch (IndexOutOfBoundsException e) {
-            currentUser = new User(0, "0");
-            userDao.create(currentUser);
-            Log.i(TAG, "Unknown user created");
-        }
+        List<User> offlineUsers = userDao.queryForEq("accType", User.ACC_TYPE_OFFLINE);
+        currentUser = offlineUsers.get(0);
+        Log.i(TAG, "Unknown user exists");
     }
 
     private void setUnknownUserProfile() throws SQLException {
-        try {
-            List<UserProfile> offlineUserProfiles = userProfileDao.queryForEq("user_id", currentUser.getId());
-            currentUserProfile = offlineUserProfiles.get(0);
-            Log.i(TAG, "Unknown user profile exists");
-        }
-        catch (IndexOutOfBoundsException e) {
-            currentUserProfile = new UserProfile();
-            currentUserProfile.setUser(currentUser);
-            userProfileDao.create(currentUserProfile);
-            Log.i(TAG, "Unknown user profile created");
-        }
+        List<UserProfile> offlineUserProfiles = userProfileDao.queryForEq("user_id", currentUser.getId());
+        currentUserProfile = offlineUserProfiles.get(0);
+        Log.i(TAG, "Unknown user profile exists");
     }
 
     private void setGoogleUserData() throws SQLException {

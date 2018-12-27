@@ -33,7 +33,6 @@ import sk.tuke.smart.makac.fragments.AboutFragment;
 import sk.tuke.smart.makac.fragments.HistoryFragment;
 import sk.tuke.smart.makac.fragments.StopwatchFragment;
 import sk.tuke.smart.makac.model.User;
-import sk.tuke.smart.makac.model.UserProfile;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 import sk.tuke.smart.makac.settings.SettingsActivity;
 
@@ -53,7 +52,6 @@ public class MainActivity extends AppCompatActivity
     private GoogleSignInAccount account;
 
     private Dao<User, Long> userDao;
-    private Dao<UserProfile, Long> userProfileDao;
 
     private SharedPreferences userShPr;
     private SharedPreferences appShPr;
@@ -62,7 +60,6 @@ public class MainActivity extends AppCompatActivity
     private ImageView userImageImageView;
 
     private User currentUser;
-    private UserProfile currentUserProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +76,6 @@ public class MainActivity extends AppCompatActivity
         try {
             DatabaseHelper databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
             userDao = databaseHelper.userDao();
-            userProfileDao = databaseHelper.userProfileDao();
             Log.i(TAG, "Local database is ready");
         }
         catch (SQLException e) {
@@ -142,7 +138,6 @@ public class MainActivity extends AppCompatActivity
     private void setUnknownUserData() {
         try {
             setUnknownUser();
-            setUnknownUserProfile();
             Log.i(TAG, "Unknown user set");
         }
         catch (SQLException e) {
@@ -160,20 +155,6 @@ public class MainActivity extends AppCompatActivity
             currentUser = new User(0, "0");
             userDao.create(currentUser);
             Log.i(TAG, "Unknown user created");
-        }
-    }
-
-    private void setUnknownUserProfile() throws SQLException {
-        try {
-            List<UserProfile> offlineUserProfiles = userProfileDao.queryForEq("user_id", currentUser.getId());
-            currentUserProfile = offlineUserProfiles.get(0);
-            Log.i(TAG, "Unknown user profile exists");
-        }
-        catch (IndexOutOfBoundsException e) {
-            currentUserProfile = new UserProfile();
-            currentUserProfile.setUser(currentUser);
-            userProfileDao.create(currentUserProfile);
-            Log.i(TAG, "Unknown user profile created");
         }
     }
 

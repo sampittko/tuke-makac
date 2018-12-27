@@ -22,6 +22,8 @@ public class UserProfile {
     @DatabaseField
     private int age;
 
+    public static final float DEFAULT_WEIGHT = 80;
+
     public UserProfile() {
 
     }
