@@ -42,7 +42,6 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
         iconImageView.setImageResource(R.drawable.ic_launcher_foreground);
     }
 
-    // TODO workout title set by user
     private void setTitle(View convertView, Workout currentWorkout) {
         TextView titleTextView = convertView.findViewById(R.id.textview_history_title);
         titleTextView.setText(currentWorkout.getTitle());

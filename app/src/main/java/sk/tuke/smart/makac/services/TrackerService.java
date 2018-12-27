@@ -317,6 +317,7 @@ public class TrackerService extends Service implements LocationListener, Databas
         state = newState;
         if (state != IntentHelper.STATE_STOPPED) {
             try {
+                // TODO NullPointerException
                 pendingWorkout.setStatus(getWorkoutStatus());
                 workoutDao.update(pendingWorkout);
             }

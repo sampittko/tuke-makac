@@ -13,7 +13,6 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MenuItem;
-import android.support.v4.app.NavUtils;
 
 import sk.tuke.smart.makac.R;
 

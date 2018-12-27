@@ -79,8 +79,6 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
 
     private FragmentActivity thisFragmentActivity;
 
-    private StopwatchFragment stopwatchFragment;
-
     private Dao<Workout, Long> workoutDao;
     private Dao<GpsPoint, Long> gpsPointDao;
 
@@ -126,13 +124,6 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
         super.onCreate(savedInstanceState);
         initializeVariables();
         setHasOptionsMenu(true);
-        try {
-            checkGPS();
-        }
-        catch(SensorNotPresentException e) {
-            Log.e(TAG, "GPS sensor is missing so application cannot be started");
-            thisFragmentActivity.finish();
-        }
         createStopWorkoutAlertDialog();
         registerBroadcastReceiver();
         databaseSetup();
@@ -144,28 +135,6 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
         latestPositionList = new ArrayList<>();
         thisFragmentActivity = getActivity();
         thisFragmentActivity.setTitle(R.string.app_name);
-    }
-
-    private void checkGPS() throws SensorNotPresentException {
-        checkSensorPresence();
-        checkLocationPermissions();
-    }
-
-    private void checkSensorPresence() throws SensorNotPresentException {
-        if (!thisFragmentActivity.getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS)) {
-            Toast.makeText(thisFragmentActivity, "Missing GPS sensor in device. Application closing.", Toast.LENGTH_LONG).show();
-            throw new SensorNotPresentException();
-        }
-    }
-
-    private void checkLocationPermissions() {
-        if (ActivityCompat.checkSelfPermission(thisFragmentActivity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED
-                || ActivityCompat.checkSelfPermission(thisFragmentActivity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(thisFragmentActivity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},0);
-            Log.i(TAG, "Location permissions requested.");
-        }
-        else
-            Log.i(TAG, "Location permissions OK.");
     }
 
     private void createStopWorkoutAlertDialog() {
@@ -313,8 +282,24 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
         thisFragmentActivity.registerReceiver(broadcastReceiver, intentFilter);
         if (!workoutStarted)
             thisFragmentActivity.startService(new Intent(thisFragmentActivity, TrackerService.class));
+//        checkForGpsChecking();
         thisFragmentActivity.invalidateOptionsMenu();
         Log.i(TAG, "Receiver registered");
+    }
+
+    private void checkForGpsChecking() {
+        if (appShPr.getBoolean(getString(R.string.appshpr_gps), Boolean.valueOf(getString(R.string.appshpr_gps_default))))
+            checkLocationPermissions();
+    }
+
+    private void checkLocationPermissions() {
+        if (ActivityCompat.checkSelfPermission(thisFragmentActivity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED
+                || ActivityCompat.checkSelfPermission(thisFragmentActivity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(thisFragmentActivity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},0);
+            Log.i(TAG, "Location permissions requested.");
+        }
+        else
+            Log.i(TAG, "Location permissions OK.");
     }
 
     @Override
@@ -332,7 +317,6 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
         Log.i(TAG, "Service stopped");
     }
 
-    // TODO onAttach
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -344,22 +328,26 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
         }
     }
 
-    // TODO onDetach
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
     }
+
     @OnClick(R.id.button_stopwatch_start)
     public void toggleRecordingHandler(View view) {
         if (workoutStarted) {
-            if (workoutPaused)
+            if (workoutPaused) {
+                checkForGpsChecking();
                 toggleRecording(true, true, IntentHelper.ACTION_CONTINUE, false, false);
+            }
             else
                 toggleRecording(false, false, IntentHelper.ACTION_PAUSE, true, false);
         }
-        else
+        else {
+            checkForGpsChecking();
             toggleRecording(true, true, IntentHelper.ACTION_START, false, true);
+        }
     }
 
     private void toggleRecording(boolean useStopString, boolean usePauseDrawable, String intentAction, boolean endWorkoutButtonVisible, boolean changeWorkoutStarted) {

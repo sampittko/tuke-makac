@@ -14,10 +14,6 @@ import android.view.ViewGroup;
 import sk.tuke.smart.makac.R;
 
 public class AboutFragment extends Fragment {
-    private static final String TAG = "AboutFragment";
-
-    private OnFragmentInteractionListener mListener;
-
     private FragmentActivity thisFragmentActivity;
 
     private SharedPreferences userShPr;
@@ -54,25 +50,6 @@ public class AboutFragment extends Fragment {
     public void onResume() {
         super.onResume();
         thisFragmentActivity.invalidateOptionsMenu();
-    }
-
-    // TODO onAttach
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    // TODO onDetach
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
     public interface OnFragmentInteractionListener {}
