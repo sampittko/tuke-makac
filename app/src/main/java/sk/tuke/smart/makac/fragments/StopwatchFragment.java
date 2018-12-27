@@ -238,7 +238,8 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
         try {
             long workoutsCount = workoutDao.countOf();
             if (workoutsCount != 0) {
-                Workout lastWorkout = workoutDao.queryForId(workoutsCount + Workout.ID_OFFSET);
+                List<Workout> workouts = workoutDao.queryForAll();
+                Workout lastWorkout = workouts.get(workouts.size() - 1);
                 int lastWorkoutStatus = lastWorkout.getStatus();
                 if (lastWorkoutStatus == Workout.statusPaused || lastWorkoutStatus == Workout.statusUnknown)
                     performWorkoutRecovery(lastWorkout);
@@ -493,7 +494,8 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
     }
 
     private long getCurrentWorkoutId() throws SQLException {
-        return Workout.ID_OFFSET + workoutDao.countOf();
+        List<Workout> workouts = workoutDao.queryForAll();
+        return workouts.get(workouts.size() - 1).getId();
     }
 
     public interface OnFragmentInteractionListener {

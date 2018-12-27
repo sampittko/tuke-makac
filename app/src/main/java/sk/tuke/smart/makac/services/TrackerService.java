@@ -208,23 +208,15 @@ public class TrackerService extends Service implements LocationListener, Databas
     }
 
     private void createNewWorkout() {
-        List<Workout> workouts = null;
-
         try {
-            workouts = workoutDao.queryForAll();
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-
-        if (workouts != null) {
-            long workoutId = Workout.ID_OFFSET;
+            List<Workout> workouts = workoutDao.queryForAll();
+            long workoutId;
             String workoutTitle;
 
             if (workouts.size() == 0)
-                workoutId += 1;
+                workoutId = 1;
             else
-                workoutId += workouts.size() + 1;
+                workoutId = workouts.get(workouts.size() - 1).getId() + 1;
 
             workoutTitle = "Workout " + workoutId;
             pendingWorkout = new Workout(workoutTitle, sportActivity);
@@ -237,6 +229,10 @@ public class TrackerService extends Service implements LocationListener, Databas
             catch (SQLException e) {
                 e.printStackTrace();
             }
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -256,6 +252,7 @@ public class TrackerService extends Service implements LocationListener, Databas
     }
 
     private void performPauseAction() {
+        // TODO sessionNumber nemusi byt nula a ma sa robit recovery
         if (sessionNumber == 0)
             performWorkoutRecovery();
         else
@@ -268,7 +265,8 @@ public class TrackerService extends Service implements LocationListener, Databas
 
     private void performWorkoutRecovery() {
         try {
-            pendingWorkout = workoutDao.queryForId(Workout.ID_OFFSET + workoutDao.countOf());
+            List<Workout> workouts = workoutDao.queryForAll();
+            pendingWorkout = workouts.get(workouts.size() - 1);
             previousCalories = pendingWorkout.getTotalCalories();
             distance = pendingWorkout.getDistance();
             duration = pendingWorkout.getDuration();
@@ -317,7 +315,6 @@ public class TrackerService extends Service implements LocationListener, Databas
         state = newState;
         if (state != IntentHelper.STATE_STOPPED) {
             try {
-                // TODO NullPointerException
                 pendingWorkout.setStatus(getWorkoutStatus());
                 workoutDao.update(pendingWorkout);
             }

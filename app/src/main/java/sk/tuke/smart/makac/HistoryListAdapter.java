@@ -36,7 +36,7 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
         return convertView;
     }
 
-    // TODO workout icon set by user and default icon depending on sport activity
+    // TODO workout icon
     private void setIcon(View convertView) {
         ImageView iconImageView = convertView.findViewById(R.id.imageview_history_icon);
         iconImageView.setImageResource(R.drawable.ic_launcher_foreground);
