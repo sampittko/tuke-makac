@@ -91,8 +91,6 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         retrieveWorkoutValues();
         renderValues();
         mapEntitiesVisibilityCheck();
-        createShareAlertDialog();
-        createEditTitleAlertDialog();
     }
 
     private void initializeLayout() {
@@ -171,69 +169,6 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         }
     }
 
-    // TODO fix crash on dialog 2nd time
-    private void createShareAlertDialog() {
-        String shareMessage = this.shareMessage;
-        shareMessage = shareMessage
-                .replace("WORKOUT_TYPE", SportActivities.getSportActivityStringFromInt(sportActivity).toLowerCase())
-                .replace("DISTANCE", MainHelper.formatDistance(distance)
-                        .replace("UNIT", "km")
-                        .replace("DURATION", MainHelper.formatDuration(MainHelper.msToS(duration))));
-
-        EditText editText = new EditText(this);
-        editText.setText(shareMessage);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        editText.setLayoutParams(lp);
-
-        alertDialogBuilderShare = new AlertDialog.Builder(this);
-        alertDialogBuilderShare
-                .setView(editText)
-                .setTitle("Share results")
-                .setPositiveButton(R.string.share, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        alertDialog.dismiss();
-                    }
-                })
-                .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        alertDialog.dismiss();
-                    }
-                });
-    }
-
-    private void createEditTitleAlertDialog() {
-        final EditText editText = new EditText(this);
-        editText.setText(currentWorkout.getTitle());
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        editText.setLayoutParams(lp);
-        editText.setFocusableInTouchMode(true);
-
-        alertDialogBuilderTitle = new AlertDialog.Builder(this);
-        alertDialogBuilderTitle
-                .setView(editText)
-                .setTitle("Edit workout title")
-                .setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        updateWorkoutTitle(editText.getText().toString());
-                        dialogInterface.dismiss();
-                        alertDialog.dismiss();
-                    }
-                })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        editText.setText(currentWorkout.getTitle());
-                        alertDialog.dismiss();
-                    }
-                });
-    }
-
     private void updateWorkoutTitle(String newTitle) {
         try {
             currentWorkout.setTitle(newTitle);
@@ -267,12 +202,6 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         Intent mapsIntent = new Intent(this, MapsActivity.class);
         mapsIntent.putExtra(IntentHelper.DATA_WORKOUT_ID, currentWorkout.getId());
         startActivity(mapsIntent);
-    }
-
-    @OnClick({ R.id.button_workoutdetail_emailshare, R.id.button_workoutdetail_fbsharebtn, R.id.button_workoutdetail_twittershare, R.id.button_workoutdetail_gplusshare })
-    public void showAlertDialogEmail(View view) {
-        alertDialog = alertDialogBuilderShare.create();
-        alertDialog.show();
     }
 
     @Override
@@ -389,8 +318,78 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         return new LatLng(lastLocationList.get(lastLocationList.size() - 1).getLatitude(), lastLocationList.get(lastLocationList.size() - 1).getLongitude());
     }
 
+    @OnClick({ R.id.button_workoutdetail_emailshare, R.id.button_workoutdetail_fbsharebtn, R.id.button_workoutdetail_twittershare, R.id.button_workoutdetail_gplusshare })
+    public void showAlertDialogEmail(View view) {
+        createShareAlertDialog();
+    }
+
+    private void createShareAlertDialog() {
+        String shareMessage = this.shareMessage;
+        shareMessage = shareMessage
+                .replace("WORKOUT_TYPE", SportActivities.getSportActivityStringFromInt(sportActivity).toLowerCase())
+                .replace("DISTANCE", MainHelper.formatDistance(distance)
+                        .replace("UNIT", "km")
+                        .replace("DURATION", MainHelper.formatDuration(MainHelper.msToS(duration))));
+
+        EditText editText = new EditText(this);
+        editText.setText(shareMessage);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        editText.setLayoutParams(lp);
+
+        alertDialogBuilderShare = new AlertDialog.Builder(this);
+        alertDialogBuilderShare
+            .setView(editText)
+            .setTitle("Share results")
+            .setPositiveButton(R.string.share, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                    alertDialog.dismiss();
+                }
+            })
+            .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                    alertDialog.dismiss();
+                }
+            });
+        alertDialog = alertDialogBuilderShare.create();
+        alertDialog.show();
+    }
+
     @OnClick(R.id.textview_workoutdetail_workouttitle)
     public void showTitleEditText(View view) {
+        createEditTitleAlertDialog();
+    }
+
+    private void createEditTitleAlertDialog() {
+        final EditText editText = new EditText(this);
+        editText.setText(currentWorkout.getTitle());
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        editText.setLayoutParams(lp);
+        editText.setFocusableInTouchMode(true);
+
+        alertDialogBuilderTitle = new AlertDialog.Builder(this);
+        alertDialogBuilderTitle
+            .setView(editText)
+            .setTitle("Edit workout title")
+            .setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    updateWorkoutTitle(editText.getText().toString());
+                    dialogInterface.dismiss();
+                    alertDialog.dismiss();
+                }
+            })
+            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                    editText.setText(currentWorkout.getTitle());
+                    alertDialog.dismiss();
+                }
+            });
         alertDialog = alertDialogBuilderTitle.create();
         alertDialog.show();
     }
