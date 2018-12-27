@@ -1,6 +1,8 @@
 package sk.tuke.smart.makac.fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -31,6 +33,7 @@ import sk.tuke.smart.makac.HistoryListAdapter;
 import sk.tuke.smart.makac.R;
 import sk.tuke.smart.makac.WorkoutDetailActivity;
 import sk.tuke.smart.makac.helpers.IntentHelper;
+import sk.tuke.smart.makac.model.GpsPoint;
 import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 
@@ -43,10 +46,13 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
     private OnFragmentInteractionListener mListener;
 
     private Dao<Workout, Long> workoutDao;
+    private Dao<GpsPoint, Long> gpsPointDao;
 
     private FragmentActivity thisFragmentActivity;
 
     private SharedPreferences userShPr;
+
+    private AlertDialog.Builder alertDialogBuilder;
 
     public HistoryFragment() {
     }
@@ -63,17 +69,38 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
         setHasOptionsMenu(true);
         databaseSetup();
         userShPr = thisFragmentActivity.getSharedPreferences(getString(R.string.usershpr), Context.MODE_PRIVATE);
+        createClearHistoryAlertDialog();
     }
 
     public void databaseSetup() {
         try {
             DatabaseHelper databaseHelper = OpenHelperManager.getHelper(thisFragmentActivity, DatabaseHelper.class);
             workoutDao = databaseHelper.workoutDao();
+            gpsPointDao = databaseHelper.gpsPointDao();
             Log.i(TAG, "Local database is ready");
         }
         catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private void createClearHistoryAlertDialog() {
+        alertDialogBuilder = new AlertDialog.Builder(thisFragmentActivity);
+        alertDialogBuilder.setTitle("Clear history")
+                .setMessage("Do you really want to clear workout history?")
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        clearWorkoutHistory();
+                        dialogInterface.dismiss();
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
     }
 
     @Override
@@ -82,7 +109,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
         thisFragmentActivity.invalidateOptionsMenu();
     }
 
-    private void displayHistoryItems(List<Workout> endedWorkouts) {
+    private void renderHistoryItems(List<Workout> endedWorkouts) {
         HistoryListAdapter historyListAdapter = new HistoryListAdapter(thisFragmentActivity, R.layout.adapter_history, getStringifiedWorkouts(endedWorkouts), endedWorkouts);
         workoutsListView.setAdapter(historyListAdapter);
         workoutsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -114,7 +141,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
         String deletedWorkoutTitle = data.getStringExtra(IntentHelper.DATA_WORKOUT_TITLE);
         String toastMessage = deletedWorkoutTitle + " was deleted";
         Toast.makeText(thisFragmentActivity, toastMessage, Toast.LENGTH_SHORT).show();
-        displayContent();
+        renderList();
     }
 
     private List<String> getStringifiedWorkouts(List<Workout> workouts) {
@@ -136,15 +163,15 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
         ButterKnife.bind(this, view);
-        displayContent();
+        renderList();
         return view;
     }
 
-    private void displayContent() {
+    private void renderList() {
         try {
             List<Workout> endedWorkouts = workoutDao.queryForEq("status", Workout.statusEnded);
             if (endedWorkouts.size() > 0)
-                displayHistoryItems(endedWorkouts);
+                renderHistoryItems(endedWorkouts);
             else {
                 noHistoryDataTextView.setVisibility(View.VISIBLE);
                 workoutsListView.setVisibility(View.GONE);
@@ -177,6 +204,39 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
     public void onDestroy() {
         super.onDestroy();
         OpenHelperManager.releaseHelper();
+    }
+
+    public void displayClearHistoryAlertDialog() {
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+
+        Log.i(TAG, "Alert dialog is now visible.");
+    }
+
+    public void clearWorkoutHistory() {
+        try {
+            List<Workout> allEndedWorkouts = workoutDao.queryForEq("status", Workout.statusEnded);
+            if (allEndedWorkouts.size() == 0) {
+                Toast.makeText(thisFragmentActivity, "No workout to delete", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            for (Workout currentWorkout : allEndedWorkouts) {
+                currentWorkout.setStatus(Workout.statusDeleted);
+                workoutDao.update(currentWorkout);
+            }
+
+            List<GpsPoint> allGpsPoints = gpsPointDao.queryForAll();
+            gpsPointDao.delete(allGpsPoints);
+
+            renderList();
+
+            Toast.makeText(thisFragmentActivity, "All workouts deleted", Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "All workouts deleted");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public interface OnFragmentInteractionListener {}

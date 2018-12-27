@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_history:
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.main_replaceable, HistoryFragment.newInstance())
+                        .replace(R.id.main_replaceable, HistoryFragment.newInstance(), "HistoryFragment")
                         .addToBackStack(null)
                         .commit();
                 break;
@@ -267,9 +267,8 @@ public class MainActivity extends AppCompatActivity
                 Log.e(TAG, "Sync not implemetned");
                 break;
             case R.id.action_clear_history:
-                // TODO clear history
-                Toast.makeText(this, "Clearing history is not available", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "History cleaning not implemetned");
+                HistoryFragment historyFragment = (HistoryFragment) getSupportFragmentManager().findFragmentByTag("HistoryFragment");
+                historyFragment.displayClearHistoryAlertDialog();
                 break;
             default:
                 throw new UnsupportedOperationException();
