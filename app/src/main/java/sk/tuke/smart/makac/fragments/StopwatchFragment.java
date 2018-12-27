@@ -85,6 +85,8 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
     private SharedPreferences userShPr;
     private SharedPreferences appShPr;
 
+    private boolean locationChecked;
+
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent broadcastIntent) {
@@ -283,8 +285,10 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
         thisFragmentActivity.registerReceiver(broadcastReceiver, intentFilter);
         if (!workoutStarted)
             thisFragmentActivity.startService(new Intent(thisFragmentActivity, TrackerService.class));
-        // TODO onResume() GPS check
-//        checkForGpsChecking();
+        if (!locationChecked) {
+            checkForGpsChecking();
+            locationChecked = true;
+        }
         thisFragmentActivity.invalidateOptionsMenu();
         Log.i(TAG, "Receiver registered");
     }
