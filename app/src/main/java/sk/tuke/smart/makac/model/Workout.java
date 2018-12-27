@@ -22,6 +22,10 @@ public class Workout {
     public static final int statusDeleted= 3;
     // workout id offset
     public static final long ID_OFFSET = 0;
+    // workout delete request code
+    public static final int DELETE_REQUEST = 404;
+    // workout delete result code
+    public static final int DELETE_RESULT = 1337;
 
     @DatabaseField(generatedId = true, unique = true)
     private long id;

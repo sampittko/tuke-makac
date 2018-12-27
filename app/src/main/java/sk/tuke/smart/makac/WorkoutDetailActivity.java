@@ -16,7 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -61,7 +60,9 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
 
     private AlertDialog.Builder alertDialogBuilder;
 
-    private long currentWorkoutId;
+    private Workout currentWorkout;
+
+    private List<GpsPoint> currentGpsPoints;
 
     private Dao<Workout, Long> workoutDao;
     private Dao<GpsPoint, Long> gpsPointDao;
@@ -115,15 +116,15 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
 
     private void retrieveWorkoutValues() {
         try {
-            currentWorkoutId = getIntent().getLongExtra(IntentHelper.DATA_WORKOUT, -1);
-            Workout currentWorkout = workoutDao.queryForId(currentWorkoutId);
+            Long currentWorkoutId = getIntent().getLongExtra(IntentHelper.DATA_WORKOUT, -1);
+            currentWorkout = workoutDao.queryForId(currentWorkoutId);
             sportActivity = currentWorkout.getSportActivity();
             duration = currentWorkout.getDuration();
             totalCalories = currentWorkout.getTotalCalories();
             avgPace = currentWorkout.getPaceAvg();
             distance = currentWorkout.getDistance();
-            List<GpsPoint> gpsPoints = gpsPointDao.queryForEq("workout_id", currentWorkoutId);
-            finalPositionList = MainHelper.getFinalPositionList(gpsPoints);
+            currentGpsPoints = gpsPointDao.queryForEq("workout_id", currentWorkoutId);
+            finalPositionList = MainHelper.getFinalPositionList(currentGpsPoints);
             workoutDate = currentWorkout.getCreated();
             workoutLastUpdate = currentWorkout.getLastUpdate();
             workoutTitle = currentWorkout.getTitle();
@@ -217,7 +218,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
 
     public void showMapsActivity() {
         Intent mapsIntent = new Intent(this, MapsActivity.class);
-        mapsIntent.putExtra(IntentHelper.DATA_WORKOUT, currentWorkoutId);
+        mapsIntent.putExtra(IntentHelper.DATA_WORKOUT, currentWorkout.getId());
         startActivity(mapsIntent);
     }
 
@@ -247,15 +248,28 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
             case R.id.action_delete:
-                // TODO delete workout
-                Toast.makeText(this, "Delete is not available", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "Delete not implemetned");
+                deleteWorkout();
                 break;
             case 16908332:
                 finish();
                 break;
             default:
                 throw new UnsupportedOperationException();
+        }
+    }
+
+    private void deleteWorkout() {
+        try {
+            currentWorkout.setStatus(Workout.statusDeleted);
+            gpsPointDao.delete(currentGpsPoints);
+            Log.i(TAG, "Workout data deleted");
+            Intent data = new Intent();
+            data.putExtra(IntentHelper.DATA_WORKOUT, currentWorkout.getId());
+            setResult(Workout.DELETE_RESULT, data);
+            finish();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

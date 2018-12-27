@@ -90,10 +90,20 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                  Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
                  intent.putExtra(IntentHelper.DATA_WORKOUT, (long)(i+1));
-                 startActivity(intent);
+                 startActivityForResult(intent, Workout.DELETE_REQUEST);
             }
         });
         Log.i(TAG, "Workouts displayed successfully");
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == Workout.DELETE_REQUEST && resultCode == Workout.DELETE_RESULT)
+            removeWorkoutFromList(data);
+    }
+
+    private void removeWorkoutFromList(Intent data) {
+        Log.e(TAG, "Cannot remove workout from list");
     }
 
     private List<String> getStringifiedWorkouts(List<Workout> workouts) {
