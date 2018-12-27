@@ -237,7 +237,6 @@ public class TrackerService extends Service implements LocationListener, Databas
     }
 
     private void performContinueAction() {
-        // TODO null
         if (pendingWorkout == null)
             performWorkoutRecovery();
         handler.postDelayed(timerRunnable, 1000);
