@@ -6,7 +6,6 @@ import android.location.Location;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -60,8 +59,9 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
 
     @BindString(R.string.share_message) public String shareMessage;
 
-    private AlertDialog.Builder alertDialogBuilder;
+    private AlertDialog.Builder alertDialogBuilderShare;
     private AlertDialog.Builder alertDialogBuilderTitle;
+    private AlertDialog alertDialog;
 
     private Workout currentWorkout;
 
@@ -184,20 +184,22 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         editText.setLayoutParams(lp);
 
-        alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder
+        alertDialogBuilderShare = new AlertDialog.Builder(this);
+        alertDialogBuilderShare
                 .setView(editText)
                 .setTitle("Share results")
                 .setPositiveButton(R.string.share, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
+                        alertDialog.dismiss();
                     }
                 })
                 .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
+                        alertDialog.dismiss();
                     }
                 });
     }
@@ -218,6 +220,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
                     public void onClick(DialogInterface dialogInterface, int i) {
                         updateWorkoutTitle(editText.getText().toString());
                         dialogInterface.dismiss();
+                        alertDialog.dismiss();
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -225,6 +228,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
                         editText.setText(currentWorkout.getTitle());
+                        alertDialog.dismiss();
                     }
                 });
     }
@@ -266,7 +270,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
 
     @OnClick({ R.id.button_workoutdetail_emailshare, R.id.button_workoutdetail_fbsharebtn, R.id.button_workoutdetail_twittershare, R.id.button_workoutdetail_gplusshare })
     public void showAlertDialogEmail(View view) {
-        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog = alertDialogBuilderShare.create();
         alertDialog.show();
     }
 
@@ -386,7 +390,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
 
     @OnClick(R.id.textview_workoutdetail_workouttitle)
     public void showTitleEditText(View view) {
-        AlertDialog alertDialog = alertDialogBuilderTitle.create();
+        alertDialog = alertDialogBuilderTitle.create();
         alertDialog.show();
     }
 }
