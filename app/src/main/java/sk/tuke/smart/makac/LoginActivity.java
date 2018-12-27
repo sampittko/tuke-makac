@@ -72,7 +72,7 @@ public class LoginActivity extends AppCompatActivity implements DatabaseConnecti
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        userShPr = getSharedPreferences("user", Context.MODE_PRIVATE);
+        userShPr = getSharedPreferences(getString(R.string.usershpr), Context.MODE_PRIVATE);
         initializeLayout();
         thisActivity = this;
         configureGoogleSignIn();
@@ -344,10 +344,10 @@ public class LoginActivity extends AppCompatActivity implements DatabaseConnecti
 
     private void updateSharedPreferences() {
         SharedPreferences.Editor shprEditor = userShPr.edit();
-        shprEditor.putLong("userId", currentUser.getId());
-        shprEditor.putBoolean("userSignedIn", userSignedIn);
+        shprEditor.putLong(getString(R.string.usershpr_userid), currentUser.getId());
+        shprEditor.putBoolean(getString(R.string.usershpr_usersignedin), userSignedIn);
         shprEditor.apply();
-        Log.i(TAG, "Shared preferences updated to values: " + userShPr.getLong("userId", 1337) + ", " + userShPr.getBoolean("userSignedIn", true));
+        Log.i(TAG, "Shared preferences updated to values: " + userShPr.getLong(getString(R.string.usershpr_userid), Long.valueOf(getString(R.string.usershpr_userid_default))) + ", " + userShPr.getBoolean(getString(R.string.usershpr_usersignedin), Boolean.valueOf(getString(R.string.usershpr_usersignedin_default))));
     }
 
     private void updateUI() {

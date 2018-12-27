@@ -61,7 +61,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
         thisFragmentActivity.setTitle(R.string.menu_history);
         setHasOptionsMenu(true);
         databaseSetup();
-        userShPr = thisFragmentActivity.getSharedPreferences("user", Context.MODE_PRIVATE);
+        userShPr = thisFragmentActivity.getSharedPreferences(getString(R.string.usershpr), Context.MODE_PRIVATE);
     }
 
     public void databaseSetup() {
@@ -106,7 +106,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.clear_history, menu);
-        if (userShPr.getBoolean("userSignedIn", false))
+        if (userShPr.getBoolean(getString(R.string.usershpr_usersignedin), Boolean.valueOf(getString(R.string.usershpr_usersignedin_default))))
             inflater.inflate(R.menu.sync_with_server, menu);
     }
 

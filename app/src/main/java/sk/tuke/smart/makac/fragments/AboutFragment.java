@@ -35,12 +35,12 @@ public class AboutFragment extends Fragment {
         getActivity().setTitle(R.string.menu_about);
         setHasOptionsMenu(true);
         thisFragmentActivity = getActivity();
-        userShPr = thisFragmentActivity.getSharedPreferences("user", Context.MODE_PRIVATE);
+        userShPr = thisFragmentActivity.getSharedPreferences(getString(R.string.usershpr), Context.MODE_PRIVATE);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (userShPr.getBoolean("userSignedIn", false))
+        if (userShPr.getBoolean(getString(R.string.usershpr_usersignedin), Boolean.valueOf(getString(R.string.usershpr_usersignedin_default))))
             inflater.inflate(R.menu.sync_with_server, menu);
     }
 

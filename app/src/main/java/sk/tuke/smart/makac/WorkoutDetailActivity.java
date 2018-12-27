@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -246,6 +247,8 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
                 break;
             case R.id.action_delete:
                 // TODO delete workout
+                Toast.makeText(this, "Delete is not available", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Delete not implemetned");
                 break;
             case 16908332:
                 finish();

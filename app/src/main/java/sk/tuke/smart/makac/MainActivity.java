@@ -67,8 +67,8 @@ public class MainActivity extends AppCompatActivity
         Stetho.initializeWithDefaults(this);
         databaseSetup();
         initializeLayout();
-        userShPr = getSharedPreferences("user", Context.MODE_PRIVATE);
-        appShPr = getSharedPreferences("app_settings", Context.MODE_PRIVATE);
+        userShPr = getSharedPreferences(getString(R.string.usershpr), Context.MODE_PRIVATE);
+        appShPr = getSharedPreferences(getString(R.string.appshpr), Context.MODE_PRIVATE);
     }
 
     public void databaseSetup() {
@@ -150,10 +150,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void logSharedPreferences() {
-        Log.i(TAG, "userSignedIn " + userShPr.getBoolean("userSignedIn", true));
-        Log.i(TAG, "userId " + userShPr.getLong("userId", 0));
-        Log.i(TAG, "gps " + appShPr.getBoolean("gps", true));
-        Log.i(TAG, "unit " + appShPr.getInt("unit", 0));
+        Log.i(TAG, getString(R.string.usershpr_usersignedin) + " " + userShPr.getBoolean(getString(R.string.usershpr_usersignedin), Boolean.valueOf(getString(R.string.usershpr_usersignedin_default))));
+        Log.i(TAG, getString(R.string.usershpr_userid) + " " + userShPr.getLong(getString(R.string.usershpr_userid), Integer.valueOf(getString(R.string.usershpr_userid_default))));
+        Log.i(TAG, getString(R.string.appshpr_gps) + " " + appShPr.getBoolean(getString(R.string.appshpr_gps), Boolean.valueOf(getString(R.string.appshpr_gps_default))));
+        Log.i(TAG, getString(R.string.appshpr_unit) + " " + appShPr.getInt(getString(R.string.appshpr_unit), Integer.valueOf(getString(R.string.appshpr_unit_default))));
     }
 
     @Override
@@ -224,12 +224,12 @@ public class MainActivity extends AppCompatActivity
             case R.id.action_sync_with_server:
                 // TODO sync with server
                 Toast.makeText(this, "Sync is not available", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "Sync not implemetned.");
+                Log.e(TAG, "Sync not implemetned");
                 break;
             case R.id.action_clear_history:
                 // TODO clear history
                 Toast.makeText(this, "Clearing history is not available", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "History cleaning not implemetned.");
+                Log.e(TAG, "History cleaning not implemetned");
                 break;
             default:
                 throw new UnsupportedOperationException();

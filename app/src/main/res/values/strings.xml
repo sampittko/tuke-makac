@@ -5,7 +5,16 @@
     <string name="back4app_client_key">wOEC7PB0X39HTpLJX9KXiQ3HaYzyWZYWQcFxrooK</string>
 
     <!-- SHARED PREFERENCES -->
-
+    <string name="appshpr">app_settings</string>
+    <string name="appshpr_unit">unit</string>
+    <string name="appshpr_unit_default">0</string>
+    <string name="appshpr_gps">gps</string>
+    <string name="appshpr_gps_default">true</string>
+    <string name="usershpr">user</string>
+    <string name="usershpr_userid">userId</string>
+    <string name="usershpr_userid_default">0</string>
+    <string name="usershpr_usersignedin">userSignedIn</string>
+    <string name="usershpr_usersignedin_default">false</string>
 
     <!-- STOPWATCH FRAGMENT -->
     <string name="textview_stopwatch_labelduration">Duration</string>

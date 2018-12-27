@@ -78,9 +78,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_main);
-            bindPreferenceSummaryToValue(findPreference("unit"));
-            bindPreferenceSummaryToValue(findPreference("gps"));
-            appShPr = getActivity().getSharedPreferences("app_settings", Context.MODE_PRIVATE);
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.appshpr_unit)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.appshpr_gps)));
+            appShPr = getActivity().getSharedPreferences(getString(R.string.appshpr), Context.MODE_PRIVATE);
         }
 
         /**
@@ -99,13 +99,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
                         PreferenceManager
                                 .getDefaultSharedPreferences(preference.getContext())
-                                .getString(preference.getKey(), "0"));
+                                .getString(preference.getKey(), getString(R.string.appshpr_unit_default)));
             }
             else {
                 sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
                         PreferenceManager
                                 .getDefaultSharedPreferences(preference.getContext())
-                                .getBoolean(preference.getKey(), true));
+                                .getBoolean(preference.getKey(), Boolean.valueOf(getString(R.string.appshpr_gps_default))));
             }
         }
 
@@ -126,7 +126,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         unit = Integer.valueOf(listPreference.getEntryValues()[index].toString());
                         if (appShPr != null) {
                             SharedPreferences.Editor shprEditor = appShPr.edit();
-                            shprEditor.putInt("unit", unit);
+                            shprEditor.putInt(getString(R.string.appshpr_unit), unit);
                             shprEditor.apply();
                             Log.i(TAG, "Shared preferences updated");
                         }
@@ -136,7 +136,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     gps = Boolean.valueOf(stringValue);
                     if (appShPr != null) {
                         SharedPreferences.Editor shprEditor = appShPr.edit();
-                        shprEditor.putBoolean("gps", gps);
+                        shprEditor.putBoolean(getString(R.string.appshpr_gps), gps);
                         shprEditor.apply();
                         Log.i(TAG, "Shared preferences updated");
                     }

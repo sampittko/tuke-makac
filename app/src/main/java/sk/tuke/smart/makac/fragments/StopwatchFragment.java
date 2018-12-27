@@ -134,8 +134,8 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
         createStopWorkoutAlertDialog();
         registerBroadcastReceiver();
         databaseSetup();
-        userShPr = thisFragmentActivity.getSharedPreferences("user", Context.MODE_PRIVATE);
-        appShPr = thisFragmentActivity.getSharedPreferences("app_settings", Context.MODE_PRIVATE);
+        userShPr = thisFragmentActivity.getSharedPreferences(getString(R.string.usershpr), Context.MODE_PRIVATE);
+        appShPr = thisFragmentActivity.getSharedPreferences(getString(R.string.appshpr), Context.MODE_PRIVATE);
     }
 
     private void initializeVariables() {
@@ -234,7 +234,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (userShPr.getBoolean("userSignedIn", false))
+        if (userShPr.getBoolean(getString(R.string.usershpr_usersignedin), Boolean.valueOf(getString(R.string.usershpr_usersignedin_default))))
             inflater.inflate(R.menu.sync_with_server, menu);
     }
 
