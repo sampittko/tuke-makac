@@ -6,6 +6,7 @@ import android.location.Location;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -16,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -59,6 +61,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
     @BindString(R.string.share_message) public String shareMessage;
 
     private AlertDialog.Builder alertDialogBuilder;
+    private AlertDialog.Builder alertDialogBuilderTitle;
 
     private Workout currentWorkout;
 
@@ -89,6 +92,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         renderValues();
         mapEntitiesVisibilityCheck();
         createShareAlertDialog();
+        createEditTitleAlertDialog();
     }
 
     private void initializeLayout() {
@@ -159,7 +163,6 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
             }
         }
     }
-
     private void mapEntitiesVisibilityCheck() {
         if (finalPositionList == null || finalPositionList.size() == 1 && finalPositionList.get(0).size() < 2) {
             getSupportFragmentManager().beginTransaction().hide(mapFragment).commit();
@@ -197,6 +200,46 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
                         dialogInterface.dismiss();
                     }
                 });
+    }
+
+    private void createEditTitleAlertDialog() {
+        final EditText editText = new EditText(this);
+        editText.setText(currentWorkout.getTitle());
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        editText.setLayoutParams(lp);
+        editText.setFocusableInTouchMode(true);
+
+        alertDialogBuilderTitle = new AlertDialog.Builder(this);
+        alertDialogBuilderTitle
+                .setView(editText)
+                .setTitle("Edit workout title")
+                .setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        updateWorkoutTitle(editText.getText().toString());
+                        dialogInterface.dismiss();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        editText.setText(currentWorkout.getTitle());
+                    }
+                });
+    }
+
+    private void updateWorkoutTitle(String newTitle) {
+        try {
+            currentWorkout.setTitle(newTitle);
+            workoutDao.update(currentWorkout);
+            workoutTitleTextView.setText(newTitle);
+            Toast.makeText(this, "Workout title updated", Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "Workout title updated");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -339,5 +382,11 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
     private LatLng getEndPoint() {
         List<Location> lastLocationList = finalPositionList.get(finalPositionList.size() - 1);
         return new LatLng(lastLocationList.get(lastLocationList.size() - 1).getLatitude(), lastLocationList.get(lastLocationList.size() - 1).getLongitude());
+    }
+
+    @OnClick(R.id.textview_workoutdetail_workouttitle)
+    public void showTitleEditText(View view) {
+        AlertDialog alertDialog = alertDialogBuilderTitle.create();
+        alertDialog.show();
     }
 }
