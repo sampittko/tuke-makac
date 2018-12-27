@@ -23,13 +23,13 @@ public class Workout {
     // workout id offset
     public static final long ID_OFFSET = 0;
     // workout delete request code
-    public static final int DELETE_REQUEST = 404;
+    public static final int HISTORY_REQUEST = 404;
     // workout delete result code
     public static final int DELETE_RESULT = 1337;
     // stopwatch fragment request code
     public static final int STOPWATCH_REQUEST = 165;
     // stopwatch fragment result code
-    public static final int STOPWATCH_RESULT = 160459;
+    public static final int CLOSE_RESULT = 160459;
 
     @DatabaseField(generatedId = true, unique = true)
     private long id;

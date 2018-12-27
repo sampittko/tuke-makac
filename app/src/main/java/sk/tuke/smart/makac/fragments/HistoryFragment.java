@@ -91,7 +91,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
                 long workoutId = getWorkoutId(view);
                 Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
                 intent.putExtra(IntentHelper.DATA_WORKOUT_ID, workoutId);
-                startActivityForResult(intent, Workout.DELETE_REQUEST);
+                startActivityForResult(intent, Workout.HISTORY_REQUEST);
             }
 
             private long getWorkoutId(View view) {
@@ -106,7 +106,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == Workout.DELETE_REQUEST && resultCode == Workout.DELETE_RESULT)
+        if (requestCode == Workout.HISTORY_REQUEST && resultCode == Workout.DELETE_RESULT)
             removeWorkoutFromList(data);
     }
 
@@ -147,6 +147,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
                 displayHistoryItems(endedWorkouts);
             else {
                 noHistoryDataTextView.setVisibility(View.VISIBLE);
+                workoutsListView.setVisibility(View.GONE);
                 Log.i(TAG, "There is no data to display");
             }
         }

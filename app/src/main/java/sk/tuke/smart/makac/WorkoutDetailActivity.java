@@ -250,7 +250,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
                 deleteWorkout();
                 break;
             case android.R.id.home:
-                setResult(Workout.STOPWATCH_RESULT);
+                setResult(Workout.CLOSE_RESULT);
                 finish();
                 break;
             default:
@@ -276,7 +276,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
 
     @Override
     public void onBackPressed() {
-        setResult(Workout.STOPWATCH_RESULT);
+        setResult(Workout.CLOSE_RESULT);
         super.onBackPressed();
     }
 

@@ -209,7 +209,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == Workout.STOPWATCH_REQUEST && resultCode == Workout.STOPWATCH_RESULT)
+        if (requestCode == Workout.STOPWATCH_REQUEST && resultCode == Workout.CLOSE_RESULT)
             mListener.onWorkoutStopped();
         else if (requestCode == Workout.STOPWATCH_REQUEST && resultCode == Workout.DELETE_RESULT) {
             String deletedWorkoutTitle = data.getStringExtra(IntentHelper.DATA_WORKOUT_TITLE);
