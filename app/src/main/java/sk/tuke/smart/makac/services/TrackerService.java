@@ -237,6 +237,9 @@ public class TrackerService extends Service implements LocationListener, Databas
     }
 
     private void performContinueAction() {
+        // TODO null
+        if (pendingWorkout == null)
+            performWorkoutRecovery();
         handler.postDelayed(timerRunnable, 1000);
         previousLocation = positionList.isEmpty() ? null : positionList.get(positionList.size() - 1);
         positionList = new ArrayList<>();
@@ -252,8 +255,7 @@ public class TrackerService extends Service implements LocationListener, Databas
     }
 
     private void performPauseAction() {
-        // TODO sessionNumber nemusi byt nula a ma sa robit recovery
-        if (sessionNumber == 0)
+        if (pendingWorkout == null)
             performWorkoutRecovery();
         else
             saveWorkoutData();
@@ -275,6 +277,7 @@ public class TrackerService extends Service implements LocationListener, Databas
                 retrievePreviousLocation(previousGpsPoint);
                 sessionNumber = previousGpsPoint.getSessionNumber();
             }
+            setWeightAccordingToCurrentUser();
             Log.i(TAG, "Workout recovery successful");
         }
         catch (SQLException e) {
@@ -448,7 +451,7 @@ public class TrackerService extends Service implements LocationListener, Databas
             double currentPace;
             for (GpsPoint gpsPoint : gpsPoints) {
                 currentPace = gpsPoint.getPace();
-                if (currentPace != 0.0)
+                if (currentPace != 0.0 && currentPace != Double.POSITIVE_INFINITY)
                     paceList.add(currentPace);
             }
             return SportActivities.getAveragePace(paceList);

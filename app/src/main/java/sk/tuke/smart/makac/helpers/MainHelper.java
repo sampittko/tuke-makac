@@ -57,8 +57,6 @@ public final class MainHelper {
      * round number to 2 decimal places and return as string
      */
     public static String formatPace(double n) {
-        if (n == 0.0)
-            return "00:00";
         int MM = (int) (n / 60);
         int SS = (int) Math.round(n % 60);
         return (String.format("%02d:%02d", MM, SS));

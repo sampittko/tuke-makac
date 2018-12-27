@@ -283,6 +283,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
         thisFragmentActivity.registerReceiver(broadcastReceiver, intentFilter);
         if (!workoutStarted)
             thisFragmentActivity.startService(new Intent(thisFragmentActivity, TrackerService.class));
+        // TODO onResume() GPS check
 //        checkForGpsChecking();
         thisFragmentActivity.invalidateOptionsMenu();
         Log.i(TAG, "Receiver registered");
@@ -421,6 +422,9 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
 
     // TODO unit switch
     private void paceRenderer(double broadcastIntentPace) {
+        if (broadcastIntentPace == Double.POSITIVE_INFINITY)
+            broadcastIntentPace = 0;
+
         if (pace != broadcastIntentPace) {
             pace = broadcastIntentPace;
 

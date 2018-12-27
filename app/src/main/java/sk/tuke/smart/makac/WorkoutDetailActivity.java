@@ -171,6 +171,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         }
     }
 
+    // TODO fix crash on dialog 2nd time
     private void createShareAlertDialog() {
         String shareMessage = this.shareMessage;
         shareMessage = shareMessage
