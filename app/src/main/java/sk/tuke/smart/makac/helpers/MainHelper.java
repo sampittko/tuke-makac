@@ -50,7 +50,9 @@ public final class MainHelper {
     public static String formatDistanceMiles(double n) {
         double kilometers = n / 1000;
         double miles = kilometers * KM_TO_MI;
-        return String.valueOf(Math.round(miles * 100) / 100);
+        int M = (int) (Math.round(miles * 100) / 100);
+        int MM = (int) (Math.round(miles * 100) % 100);
+        return String.format("%d.%02d", M, MM);
     }
 
     /**
@@ -59,7 +61,14 @@ public final class MainHelper {
     public static String formatPace(double n) {
         int MM = (int) (n / 60);
         int SS = (int) Math.round(n % 60);
-        return (String.format("%02d:%02d", MM, SS));
+        return String.format("%02d:%02d", MM, SS);
+    }
+
+    /**
+     * round number to 2 decimal places and return as string
+     */
+    public static String formatPaceMiles(double n) {
+        return formatPace(n / KM_TO_MI);
     }
 
     /**

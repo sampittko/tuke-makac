@@ -113,7 +113,7 @@
 
     <!-- OTHERS -->
     <string name="app_name">Makač</string>
-    <string name="all_min">%1$d min</string>
+    <string name="all_min">min</string>
     <string name="all_labelcaloriesunit">kcal</string>
     <string name="all_labeldistanceunitkilometers">km</string>
     <string name="all_labeldistanceunitmiles">mi</string>

@@ -94,12 +94,12 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         intent = getIntent();
+        appShPr = getSharedPreferences(getString(R.string.appshpr), Context.MODE_PRIVATE);
         databaseSetup();
         initializeLayout();
         retrieveWorkoutValues();
         renderValues();
         mapEntitiesVisibilityCheck();
-        appShPr = getSharedPreferences(getString(R.string.appshpr), Context.MODE_PRIVATE);
     }
 
     private void initializeLayout() {
@@ -152,12 +152,20 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
             sportActivityTextView.setText(SportActivities.getSportActivityStringFromInt(sportActivity));
             activityDateTextView.setText(MainHelper.sToDate(workoutDate.getTime()));
             valueDurationTextView.setText(MainHelper.formatDuration(MainHelper.msToS(duration)));
-            String distanceString = MainHelper.formatDistance(distance) + " km";
-            valueDistanceTextView.setText(distanceString);
-            String avgPaceString = MainHelper.formatPace(avgPace) + " min/km";
-            valueAvgPaceTextView.setText(avgPaceString);
             String caloriesString = MainHelper.formatCalories(totalCalories) + " kcal";
             valueCaloriesTextView.setText(caloriesString);
+            String distanceString;
+            String avgPaceString;
+            if (appShPr.getInt(getString(R.string.appshpr_unit), Integer.valueOf(getString(R.string.appshpr_unit_default))) == SportActivities.UNIT_KILOMETERS) {
+                distanceString = MainHelper.formatDistance(distance) + " km";
+                avgPaceString = MainHelper.formatPace(avgPace) + " min/km";
+            }
+            else {
+                distanceString = MainHelper.formatDistanceMiles(distance) + " mi";
+                avgPaceString = MainHelper.formatPaceMiles(avgPace) + " min/mi";
+            }
+            valueDistanceTextView.setText(distanceString);
+            valueAvgPaceTextView.setText(avgPaceString);
         }
         catch (NullPointerException e) {
             e.printStackTrace();
