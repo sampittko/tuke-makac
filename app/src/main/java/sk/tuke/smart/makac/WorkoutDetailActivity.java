@@ -1,7 +1,9 @@
 package sk.tuke.smart.makac;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -86,6 +88,8 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
 
     private Intent intent;
 
+    private SharedPreferences appShPr;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,6 +99,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         retrieveWorkoutValues();
         renderValues();
         mapEntitiesVisibilityCheck();
+        appShPr = getSharedPreferences(getString(R.string.appshpr), Context.MODE_PRIVATE);
     }
 
     private void initializeLayout() {
@@ -290,7 +295,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
 
     private void renderRoute() {
         for (List<Location> locationList : finalPositionList) {
-            PolylineOptions polylineOptions = new PolylineOptions().clickable(true);
+            PolylineOptions polylineOptions = new PolylineOptions().clickable(false);
             for (Location location : locationList)
                 polylineOptions.add(new LatLng(location.getLatitude(), location.getLongitude()));
             mMap.addPolyline(polylineOptions);
@@ -378,7 +383,6 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         editText.setText(currentWorkout.getTitle());
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         editText.setLayoutParams(lp);
-        editText.setFocusableInTouchMode(true);
 
         AlertDialog.Builder alertDialogBuilderTitle = new AlertDialog.Builder(this);
         alertDialogBuilderTitle

@@ -38,7 +38,6 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
         return convertView;
     }
 
-    // TODO user set workout icon
     private void setIcon(View convertView, int sportActivity) {
         ImageView iconImageView = convertView.findViewById(R.id.imageview_history_icon);
         switch (sportActivity) {

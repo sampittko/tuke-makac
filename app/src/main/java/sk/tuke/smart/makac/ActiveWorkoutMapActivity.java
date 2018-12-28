@@ -125,9 +125,9 @@ public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapR
         MarkerOptions markerOptions = new MarkerOptions().position(currentMarker.getPosition());
         currentMarker = mMap.addMarker(markerOptions);
         for (List<Location> locationList : finalPositionList) {
-            PolylineOptions polylineOptions = new PolylineOptions().clickable(true);
-            for (Location location : locationList)
-                polylineOptions.add(new LatLng(location.getLatitude(), location.getLongitude()));
+            PolylineOptions polylineOptions = new PolylineOptions().clickable(false);
+            for (Location currentLocation : locationList)
+                polylineOptions.add(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
             mMap.addPolyline(polylineOptions);
         }
         lastRenderBeforeSeconds = 0;
