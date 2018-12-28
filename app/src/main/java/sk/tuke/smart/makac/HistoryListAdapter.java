@@ -28,9 +28,8 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        if (convertView == null) {
+        if (convertView == null)
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.adapter_history, parent, false);
-        }
         Workout currentWorkout = workouts.get(workouts.size() - position - 1);
         setIcon(convertView);
         setTitle(convertView, currentWorkout);
