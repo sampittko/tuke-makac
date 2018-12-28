@@ -109,8 +109,8 @@ public final class MainHelper {
             currentSessionNumber = currentGpsPoint.getSessionNumber();
             if (index != currentSessionNumber) {
                 index = currentSessionNumber;
-                latestPositionList = new ArrayList<>();
                 finalPositionList.add(latestPositionList);
+                latestPositionList = new ArrayList<>();
             }
             currentLocation.setLongitude(currentGpsPoint.getLongitude());
             currentLocation.setLatitude(currentGpsPoint.getLatitude());
