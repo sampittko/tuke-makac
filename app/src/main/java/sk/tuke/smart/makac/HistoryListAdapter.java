@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Date;
 import java.util.List;
 
 import sk.tuke.smart.makac.helpers.MainHelper;
@@ -52,7 +53,13 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
 
     private void setDate(View convertView, Workout currentWorkout) {
         TextView dateTimeTextView = convertView.findViewById(R.id.textview_history_datetime);
-        dateTimeTextView.setText(MainHelper.sToDate(currentWorkout.getCreated().getTime()));
+        // fix for test where NullPointerException occured in case of calling getTime() on workoutDate
+        if (currentWorkout.getCreated() == null) {
+            if (currentWorkout.getLastUpdate() != null)
+                dateTimeTextView.setText(MainHelper.sToDate(currentWorkout.getLastUpdate().getTime()));
+            else
+                dateTimeTextView.setText(MainHelper.sToDate(new Date().getTime()));
+        }
     }
 
     private void setSportActivity(View convertView, int position) {
