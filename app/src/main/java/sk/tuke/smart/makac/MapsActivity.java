@@ -1,18 +1,26 @@
 package sk.tuke.smart.makac;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.ui.IconGenerator;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
 
@@ -76,18 +84,90 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+        } else {
+            Toast.makeText(this, "Permissions for GPS are missing", Toast.LENGTH_SHORT).show();
+        }
+
         renderRoute();
         setCamera();
     }
 
     private void renderRoute() {
+        IconGenerator startendIG = new IconGenerator(this);
+        startendIG.setTextAppearance(R.style.iconGenText);
+        startendIG.setColor(R.color.design_default_color_primary_dark);
+
+        IconGenerator breakIG = new IconGenerator(this);
+        breakIG.setTextAppearance(R.style.iconGenText);
+        breakIG.setColor(R.color.design_default_color_primary);
+
+        LatLng currentLatLng;
+        Location previousLocation = null;
+        boolean startCreated = false;
+        int locationListIndex = 1;
+        int finalPositionListIndex = 0;
+        int continue_offset = 0;
+
         for (List<Location> locationList : finalPositionList) {
             PolylineOptions polylineOptions = new PolylineOptions().clickable(true);
-            for (Location location : locationList)
+            finalPositionListIndex++;
+            for (Location location : locationList) {
+                currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                if (startCreated && locationListIndex == 1) {
+                    if (location.distanceTo(previousLocation) <= 100) {
+                        polylineOptions.add(new LatLng(previousLocation.getLatitude(), previousLocation.getLongitude()));
+                        continue_offset++;
+                    }
+                    else {
+                        mMap.addMarker(new MarkerOptions()
+                                .position(currentLatLng)
+                                .icon(BitmapDescriptorFactory.fromBitmap(breakIG.makeIcon("Continue " + (locationListIndex + continue_offset))))
+                                .anchor(0.5f, 1)
+                        );
+                    }
+                }
+                else if (!startCreated) {
+                    mMap.addMarker(new MarkerOptions()
+                            .position(currentLatLng)
+                            .icon(BitmapDescriptorFactory.fromBitmap(startendIG.makeIcon("START")))
+                            .anchor(0.5f, 1)
+                    );
+                    startCreated = true;
+                }
+                else if (locationListIndex == locationList.size() && finalPositionListIndex != finalPositionList.size()) {
+                    mMap.addMarker(new MarkerOptions()
+                            .position(currentLatLng)
+                            .icon(BitmapDescriptorFactory.fromBitmap(breakIG.makeIcon("Break " + finalPositionListIndex)))
+                            .anchor(0.5f, 1)
+                    );
+                }
+                else if (locationListIndex == locationList.size() && finalPositionListIndex == finalPositionList.size()) {
+                    mMap.addMarker(new MarkerOptions()
+                            .position(currentLatLng)
+                            .icon(BitmapDescriptorFactory.fromBitmap(startendIG.makeIcon("END")))
+                            .anchor(0.5f, 1)
+                    );
+                }
                 polylineOptions.add(new LatLng(location.getLatitude(), location.getLongitude()));
+                locationListIndex++;
+                previousLocation = location;
+            }
             mMap.addPolyline(polylineOptions);
+            locationListIndex = 1;
         }
+
         Log.i(TAG, "Route was rendered");
+    }
+
+    private void addNewPolyline(LatLng currentLatLng, Location previousLocation) {
+        PolylineOptions polylineOptions = new PolylineOptions().clickable(true);
+        polylineOptions.add(new LatLng(previousLocation.getLatitude(), previousLocation.getLongitude()));
+        polylineOptions.add(currentLatLng);
+        mMap.addPolyline(polylineOptions);
     }
 
     private void setCamera() {
@@ -101,7 +181,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         LatLngBounds bounds = builder.build();
 
-        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 100);
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 150);
         mMap.animateCamera(cu);
 
         Log.i(TAG, "Camera setup successful");
