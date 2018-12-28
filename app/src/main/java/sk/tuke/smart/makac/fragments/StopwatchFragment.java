@@ -43,6 +43,7 @@ import sk.tuke.smart.makac.R;
 import sk.tuke.smart.makac.WorkoutDetailActivity;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
+import sk.tuke.smart.makac.helpers.SportActivities;
 import sk.tuke.smart.makac.model.GpsPoint;
 import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
@@ -73,19 +74,23 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
 
     private double distance, pace, calories, totalCalories, latestBiggestNonZeroCalories;
 
+    private long duration;
+
     private List<Location> latestPositionList;
 
     private IntentFilter intentFilter;
 
     private FragmentActivity thisFragmentActivity;
 
-    private int userSelectedSportActivity;
+    private int userSelectedSportActivity, currentDistanceUnit;
 
     private Dao<Workout, Long> workoutDao;
     private Dao<GpsPoint, Long> gpsPointDao;
 
     private SharedPreferences userShPr;
     private SharedPreferences appShPr;
+
+    private boolean unitChanged;
 
     private boolean locationChecked;
 
@@ -131,14 +136,15 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
         createStopWorkoutAlertDialog();
         registerBroadcastReceiver();
         databaseSetup();
-        userShPr = thisFragmentActivity.getSharedPreferences(getString(R.string.usershpr), Context.MODE_PRIVATE);
-        appShPr = thisFragmentActivity.getSharedPreferences(getString(R.string.appshpr), Context.MODE_PRIVATE);
     }
 
     private void initializeVariables() {
         latestPositionList = new ArrayList<>();
         thisFragmentActivity = getActivity();
         thisFragmentActivity.setTitle(R.string.app_name);
+        appShPr = thisFragmentActivity.getSharedPreferences(getString(R.string.appshpr), Context.MODE_PRIVATE);
+        userShPr = thisFragmentActivity.getSharedPreferences(getString(R.string.usershpr), Context.MODE_PRIVATE);
+        currentDistanceUnit = appShPr.getInt(getString(R.string.appshpr_unit), Integer.valueOf(getString(R.string.appshpr_unit_default)));
     }
 
     private void createStopWorkoutAlertDialog() {
@@ -292,8 +298,19 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
             checkForGpsChecking();
             locationChecked = true;
         }
+        checkForUnitChange();
         thisFragmentActivity.invalidateOptionsMenu();
         Log.i(TAG, "Receiver registered");
+    }
+
+    private void checkForUnitChange() {
+        int newUnit = appShPr.getInt(getString(R.string.appshpr_unit), Integer.valueOf(getString(R.string.appshpr_unit_default)));
+        if (currentDistanceUnit != newUnit) {
+            unitChanged = true;
+            currentDistanceUnit = newUnit;
+            reRenderUnitDependentValues();
+            Log.i(TAG, "Unit dependent values re-rendered after unit change");
+        }
     }
 
     private void checkForGpsChecking() {
@@ -408,34 +425,56 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
         caloriesRenderer(totalCalories);
     }
 
+    private void reRenderUnitDependentValues() {
+        if (duration > 0) {
+            distanceRenderer(distance);
+            paceRenderer(pace);
+        }
+        if (currentDistanceUnit == SportActivities.UNIT_KILOMETERS) {
+            distanceUnitTextView.setText(R.string.all_labeldistanceunitkilometers);
+            paceUnitTextview.setText(R.string.textview_stopwatch_unitpace);
+        }
+        else {
+            distanceUnitTextView.setText(R.string.all_labeldistanceunitmiles);
+            paceUnitTextview.setText(R.string.textview_stopwatch_unitpace_min_mi);
+        }
+        unitChanged = false;
+    }
+
     private void durationRenderer(long broadcastIntentDuration) {
-        long duration = broadcastIntentDuration;
+        duration = broadcastIntentDuration;
 
         String newDuration = String.valueOf(MainHelper.formatDuration(duration));
         durationTextView.setText(newDuration);
         Log.i(TAG, "New duration: " + newDuration);
     }
 
-    // TODO unit switch
     private void distanceRenderer(double broadcastIntentDistance) {
-        if (distance != broadcastIntentDistance) {
+        if (distance != broadcastIntentDistance || unitChanged) {
             distance = broadcastIntentDistance;
 
-            String newDistance = MainHelper.formatDistance(distance);
+            String newDistance;
+            if (currentDistanceUnit == SportActivities.UNIT_KILOMETERS)
+                newDistance = MainHelper.formatDistance(distance);
+            else
+                newDistance = MainHelper.formatDistanceMiles(distance);
             distanceTextView.setText(newDistance);
             Log.i(TAG, "New distance: " + newDistance);
         }
     }
 
-    // TODO unit switch
     private void paceRenderer(double broadcastIntentPace) {
         if (broadcastIntentPace == Double.POSITIVE_INFINITY)
             broadcastIntentPace = 0;
 
-        if (pace != broadcastIntentPace) {
+        if (pace != broadcastIntentPace || unitChanged) {
             pace = broadcastIntentPace;
 
-            String newPace = MainHelper.formatPace(pace);
+            String newPace;
+            if (currentDistanceUnit == SportActivities.UNIT_KILOMETERS)
+                newPace = MainHelper.formatPace(pace);
+            else
+                newPace = MainHelper.formatPaceMiles(pace);
             paceTextView.setText(newPace);
             Log.i(TAG, "New pace: " + newPace);
         }
