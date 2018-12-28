@@ -97,13 +97,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void renderRoute() {
-        IconGenerator startendIG = new IconGenerator(this);
-        startendIG.setTextAppearance(R.style.iconGenText);
-        startendIG.setColor(R.color.design_default_color_primary_dark);
+        IconGenerator startEndIconGenerator = new IconGenerator(this);
+        startEndIconGenerator.setTextAppearance(R.style.iconGenText);
+        startEndIconGenerator.setColor(R.color.design_default_color_primary_dark);
 
-        IconGenerator breakIG = new IconGenerator(this);
-        breakIG.setTextAppearance(R.style.iconGenText);
-        breakIG.setColor(R.color.design_default_color_primary);
+        IconGenerator breaksIconGenerator = new IconGenerator(this);
+        breaksIconGenerator.setTextAppearance(R.style.iconGenText);
+        breaksIconGenerator.setColor(R.color.design_default_color_primary);
 
         LatLng currentLatLng;
         Location previousLocation = null;
@@ -113,48 +113,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         int continue_offset = 0;
 
         for (List<Location> locationList : finalPositionList) {
-            PolylineOptions polylineOptions = new PolylineOptions().clickable(true);
+            PolylineOptions polylineOptions = new PolylineOptions().clickable(false);
             finalPositionListIndex++;
-            for (Location location : locationList) {
-                currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+            for (Location currentLocation : locationList) {
+                currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
                 if (startCreated && locationListIndex == 1) {
-                    if (location.distanceTo(previousLocation) <= 100) {
+                    if (currentLocation.distanceTo(previousLocation) <= 100) {
                         polylineOptions.add(new LatLng(previousLocation.getLatitude(), previousLocation.getLongitude()));
                         continue_offset++;
                     }
-                    else {
-                        mMap.addMarker(new MarkerOptions()
-                                .position(currentLatLng)
-                                .icon(BitmapDescriptorFactory.fromBitmap(breakIG.makeIcon("Continue " + (locationListIndex + continue_offset))))
-                                .anchor(0.5f, 1)
-                        );
-                    }
+                    else
+                        addNewMarker(currentLatLng, breaksIconGenerator, "Continue " + (locationListIndex + continue_offset));
                 }
                 else if (!startCreated) {
-                    mMap.addMarker(new MarkerOptions()
-                            .position(currentLatLng)
-                            .icon(BitmapDescriptorFactory.fromBitmap(startendIG.makeIcon("START")))
-                            .anchor(0.5f, 1)
-                    );
+                    addNewMarker(currentLatLng, startEndIconGenerator, "START");
                     startCreated = true;
                 }
-                else if (locationListIndex == locationList.size() && finalPositionListIndex != finalPositionList.size()) {
-                    mMap.addMarker(new MarkerOptions()
-                            .position(currentLatLng)
-                            .icon(BitmapDescriptorFactory.fromBitmap(breakIG.makeIcon("Break " + finalPositionListIndex)))
-                            .anchor(0.5f, 1)
-                    );
-                }
-                else if (locationListIndex == locationList.size() && finalPositionListIndex == finalPositionList.size()) {
-                    mMap.addMarker(new MarkerOptions()
-                            .position(currentLatLng)
-                            .icon(BitmapDescriptorFactory.fromBitmap(startendIG.makeIcon("END")))
-                            .anchor(0.5f, 1)
-                    );
-                }
-                polylineOptions.add(new LatLng(location.getLatitude(), location.getLongitude()));
+                else if (locationListIndex == locationList.size() && finalPositionListIndex != finalPositionList.size())
+                    addNewMarker(currentLatLng, breaksIconGenerator, "Break " + finalPositionListIndex);
+                else if (locationListIndex == locationList.size() && finalPositionListIndex == finalPositionList.size())
+                    addNewMarker(currentLatLng, startEndIconGenerator, "END");
+                polylineOptions.add(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
                 locationListIndex++;
-                previousLocation = location;
+                previousLocation = currentLocation;
             }
             mMap.addPolyline(polylineOptions);
             locationListIndex = 1;
@@ -163,11 +144,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.i(TAG, "Route was rendered");
     }
 
-    private void addNewPolyline(LatLng currentLatLng, Location previousLocation) {
-        PolylineOptions polylineOptions = new PolylineOptions().clickable(true);
-        polylineOptions.add(new LatLng(previousLocation.getLatitude(), previousLocation.getLongitude()));
-        polylineOptions.add(currentLatLng);
-        mMap.addPolyline(polylineOptions);
+    private void addNewMarker(LatLng latLng, IconGenerator iconGenerator, String iconGeneratorText) {
+        mMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .icon(BitmapDescriptorFactory.fromBitmap(iconGenerator.makeIcon(iconGeneratorText)))
+                .anchor(0.5f, 1)
+        );
     }
 
     private void setCamera() {

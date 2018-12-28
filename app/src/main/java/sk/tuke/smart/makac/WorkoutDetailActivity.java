@@ -235,7 +235,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
                 deleteWorkout();
                 break;
             case android.R.id.home:
-                if (intent.getIntExtra(IntentHelper.DATA_HISTORY_REQUEST, 0) != 0)
+                if (intent.getIntExtra(IntentHelper.DATA_HISTORY_REQUEST, 0) != 0 && titleUpdated)
                     setResult(Workout.UPDATE_RESULT);
                 else
                     setResult(Workout.CLOSE_RESULT);

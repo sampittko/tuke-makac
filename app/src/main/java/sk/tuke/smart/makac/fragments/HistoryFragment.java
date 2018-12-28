@@ -138,8 +138,6 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
             removeWorkoutFromList(data);
         else if (requestCode == Workout.HISTORY_REQUEST && resultCode == Workout.UPDATE_RESULT)
             renderList();
-
-        Log.i(TAG, "" + resultCode);
     }
 
     private void removeWorkoutFromList(Intent data) {
