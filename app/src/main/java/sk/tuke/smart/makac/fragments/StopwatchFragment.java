@@ -309,6 +309,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
             currentDistanceUnit = newUnit;
             reRenderUnitDependentValues();
             Log.i(TAG, "Unit dependent values re-rendered after unit change");
+            Toast.makeText(thisFragmentActivity, "Units changed", Toast.LENGTH_SHORT).show();
         }
     }
 

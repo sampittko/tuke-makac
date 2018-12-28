@@ -160,14 +160,11 @@ public class Workout {
         this.lastUpdate = lastUpdate;
     }
 
-    // TODO unit switch
-    @NonNull
-    @Override
-    public String toString() {
+    public String toString(int distanceUnit) {
         return MainHelper.formatDuration(MainHelper.msToS(duration)) + " "
                 + SportActivities.getSportActivityStringFromInt(sportActivity) + " | "
-                + MainHelper.formatDistance(distance) + " km | "
+                + ((distanceUnit == SportActivities.UNIT_KILOMETERS) ? (MainHelper.formatDistance(distance) + " km | ") : (MainHelper.formatDistanceMiles(distance) + " mi | "))
                 + MainHelper.formatCalories(totalCalories) + " kcal | Φ "
-                + MainHelper.formatPace(paceAvg) + " min/km";
+                + ((distanceUnit == SportActivities.UNIT_KILOMETERS) ? (MainHelper.formatPace(paceAvg) + " min/km") : (MainHelper.formatPaceMiles(paceAvg) + " min/mi"));
     }
 }

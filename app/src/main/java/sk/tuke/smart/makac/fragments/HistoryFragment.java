@@ -51,6 +51,9 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
     private FragmentActivity thisFragmentActivity;
 
     private SharedPreferences userShPr;
+    private SharedPreferences appShPr;
+
+    private int currentDistanceUnit;
 
     private AlertDialog.Builder alertDialogBuilder;
 
@@ -64,12 +67,18 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        thisFragmentActivity = getActivity();
-        thisFragmentActivity.setTitle(R.string.menu_history);
-        userShPr = thisFragmentActivity.getSharedPreferences(getString(R.string.usershpr), Context.MODE_PRIVATE);
+        initializeVariables();
         setHasOptionsMenu(true);
+        thisFragmentActivity.setTitle(R.string.menu_history);
         databaseSetup();
         createClearHistoryAlertDialog();
+    }
+
+    private void initializeVariables() {
+        thisFragmentActivity = getActivity();
+        userShPr = thisFragmentActivity.getSharedPreferences(getString(R.string.usershpr), Context.MODE_PRIVATE);
+        appShPr = thisFragmentActivity.getSharedPreferences(getString(R.string.appshpr), Context.MODE_PRIVATE);
+        currentDistanceUnit = appShPr.getInt(getString(R.string.appshpr_unit), Integer.valueOf(getString(R.string.appshpr_unit_default)));
     }
 
     public void databaseSetup() {
@@ -107,6 +116,17 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
     public void onResume() {
         super.onResume();
         thisFragmentActivity.invalidateOptionsMenu();
+        checkForUnitChange();
+    }
+
+    private void checkForUnitChange() {
+        int newUnit = appShPr.getInt(getString(R.string.appshpr_unit), Integer.valueOf(getString(R.string.appshpr_unit_default)));
+        if (currentDistanceUnit != newUnit) {
+            currentDistanceUnit = newUnit;
+            renderList();
+            Log.i(TAG, "History list was re-rendered after unit change");
+            Toast.makeText(thisFragmentActivity, "Units changed", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void renderHistoryItems(List<Workout> endedWorkouts) {
@@ -150,7 +170,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
     private List<String> getStringifiedWorkouts(List<Workout> workouts) {
         List<String> stringifiedWorkouts = new ArrayList<>();
         for (Workout workout : workouts)
-            stringifiedWorkouts.add(workout.toString());
+            stringifiedWorkouts.add(workout.toString(currentDistanceUnit));
         return stringifiedWorkouts;
     }
 
