@@ -171,7 +171,7 @@ public class TrackerService extends Service implements LocationListener, Databas
                     performPauseAction();
                     break;
                 case IntentHelper.ACTION_STOP:
-                    performStopAction();
+                    performStopAction(intent);
                     break;
                 default:
                     Log.w(TAG, "Intent action was not specified or does not correspond to any defined action");
@@ -305,8 +305,9 @@ public class TrackerService extends Service implements LocationListener, Databas
             Log.i(TAG, "There is no previous gps point to retrieve last location from");
     }
 
-    private void performStopAction() {
+    private void performStopAction(Intent intent) {
         handler.removeCallbacks(timerRunnable);
+        sportActivity = intent.getIntExtra(IntentHelper.DATA_WORKOUT_SPORT_ACTIVITY, 0);
         updateState(IntentHelper.STATE_STOPPED);
         saveWorkoutData();
         Log.i(TAG, "Stopping service");
@@ -432,6 +433,7 @@ public class TrackerService extends Service implements LocationListener, Databas
             pendingWorkout.setLastUpdate(new Date());
             pendingWorkout.setPaceAvg(getAveragePace());
             pendingWorkout.setStatus(getWorkoutStatus());
+            pendingWorkout.setSportActivity(sportActivity);
             workoutDao.update(pendingWorkout);
             Log.i(TAG, "Workout data saved to database");
         }

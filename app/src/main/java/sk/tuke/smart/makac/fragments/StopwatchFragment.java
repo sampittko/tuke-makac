@@ -57,6 +57,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
     @BindView(R.id.textview_stopwatch_calories) public TextView caloriesTextView;
     @BindView(R.id.textview_stopwatch_distanceunit) public TextView distanceUnitTextView;
     @BindView(R.id.textview_stopwatch_unitpace) public TextView paceUnitTextview;
+    @BindView(R.id.button_stopwatch_selectsport) public Button selectSportButton;
 
     @BindDrawable(R.drawable.ic_pause_circle_filled_green) public Drawable pauseDrawable;
     @BindDrawable(R.drawable.ic_play_circle_filled_green) public Drawable playDrawable;
@@ -77,6 +78,8 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
     private IntentFilter intentFilter;
 
     private FragmentActivity thisFragmentActivity;
+
+    private int userSelectedSportActivity;
 
     private Dao<Workout, Long> workoutDao;
     private Dao<GpsPoint, Long> gpsPointDao;
@@ -153,9 +156,10 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
                     }
 
                     private void stopTrackerService() {
-                        Intent intent1 = new Intent(thisFragmentActivity, TrackerService.class);
-                        intent1.setAction(IntentHelper.ACTION_STOP);
-                        thisFragmentActivity.startService(intent1);
+                        Intent intent = new Intent(thisFragmentActivity, TrackerService.class);
+                        intent.putExtra(IntentHelper.DATA_WORKOUT_SPORT_ACTIVITY, userSelectedSportActivity);
+                        intent.setAction(IntentHelper.ACTION_STOP);
+                        thisFragmentActivity.startService(intent);
                     }
 
                     private void startWorkoutDetailActivity() {
@@ -503,6 +507,36 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
     private long getCurrentWorkoutId() throws SQLException {
         List<Workout> workouts = workoutDao.queryForAll();
         return workouts.get(workouts.size() - 1).getId();
+    }
+
+    @OnClick(R.id.button_stopwatch_selectsport)
+    public void displaySelectSportDialog(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(thisFragmentActivity);
+        builder.setTitle("Select sport")
+                .setItems(R.array.sportactivities, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int position) {
+                userSelectedSportActivity = position;
+                switch (position) {
+                    case 0:
+                        Log.i(TAG, "Sport activity set to running");
+                        selectSportButton.setBackground(thisFragmentActivity.getDrawable(R.drawable.ic_launcher_foreground));
+                        break;
+                    case 1:
+                        Log.i(TAG, "Sport activity set to walking");
+                        selectSportButton.setBackground(thisFragmentActivity.getDrawable(R.drawable.ic_directions_walk_blue_24dp));
+                        break;
+                    case 2:
+                        Log.i(TAG, "Sport activity set to cycling");
+                        selectSportButton.setBackground(thisFragmentActivity.getDrawable(R.drawable.ic_motorcycle_blue_24dp));
+                        break;
+                    default:
+                        Log.e(TAG, "Sport activity set to running because of unexpected behavior");
+                        selectSportButton.setBackground(thisFragmentActivity.getDrawable(R.drawable.ic_launcher_foreground));
+                        break;
+                }
+            }
+        });
+        builder.show();
     }
 
     public interface OnFragmentInteractionListener {

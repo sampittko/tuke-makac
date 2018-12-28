@@ -31,17 +31,30 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
         if (convertView == null)
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.adapter_history, parent, false);
         Workout currentWorkout = workouts.get(workouts.size() - position - 1);
-        setIcon(convertView);
+        setIcon(convertView, currentWorkout.getSportActivity());
         setTitle(convertView, currentWorkout);
         setDate(convertView, currentWorkout);
         setSportActivity(convertView, position);
         return convertView;
     }
 
-    // TODO workout icon
-    private void setIcon(View convertView) {
+    // TODO user set workout icon
+    private void setIcon(View convertView, int sportActivity) {
         ImageView iconImageView = convertView.findViewById(R.id.imageview_history_icon);
-        iconImageView.setImageResource(R.drawable.ic_launcher_foreground);
+        switch (sportActivity) {
+            case 0:
+                iconImageView.setImageResource(R.drawable.ic_launcher_foreground);
+                break;
+            case 1:
+                iconImageView.setImageResource(R.drawable.ic_directions_walk_blue_24dp);
+                break;
+            case 2:
+                iconImageView.setImageResource(R.drawable.ic_motorcycle_blue_24dp);
+                break;
+            default:
+                iconImageView.setImageResource(R.drawable.ic_launcher_foreground);
+                break;
+        }
     }
 
     private void setTitle(View convertView, Workout currentWorkout) {
