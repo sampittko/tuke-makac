@@ -165,7 +165,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         }
     }
     private void mapEntitiesVisibilityCheck() {
-        if (finalPositionList == null || finalPositionList.size() == 1 && finalPositionList.get(0).size() < 2) {
+        if (currentGpsPoints.size() <= 1) {
             getSupportFragmentManager().beginTransaction().hide(mapFragment).commit();
             showMapButton.setVisibility(View.GONE);
             showMapTextView.setVisibility(View.GONE);
@@ -316,12 +316,11 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
     }
 
     private LatLng getStartPoint() throws IndexOutOfBoundsException {
-        return new LatLng(finalPositionList.get(0).get(0).getLatitude(), finalPositionList.get(0).get(0).getLongitude());
+        return new LatLng(currentGpsPoints.get(0).getLatitude(), currentGpsPoints.get(0).getLongitude());
     }
 
     private LatLng getEndPoint() {
-        List<Location> lastLocationList = finalPositionList.get(finalPositionList.size() - 1);
-        return new LatLng(lastLocationList.get(lastLocationList.size() - 1).getLatitude(), lastLocationList.get(lastLocationList.size() - 1).getLongitude());
+        return new LatLng(currentGpsPoints.get(currentGpsPoints.size() - 1).getLatitude(), currentGpsPoints.get(currentGpsPoints.size() - 1).getLongitude());
     }
 
     @OnClick({ R.id.button_workoutdetail_emailshare, R.id.button_workoutdetail_fbsharebtn, R.id.button_workoutdetail_twittershare, R.id.button_workoutdetail_gplusshare })
