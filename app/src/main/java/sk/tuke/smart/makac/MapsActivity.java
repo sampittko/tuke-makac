@@ -91,18 +91,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void renderRoute() {
         IconGenerator startEndIconGenerator = new IconGenerator(this);
         startEndIconGenerator.setTextAppearance(R.style.iconGenText);
-        startEndIconGenerator.setColor(R.color.design_default_color_primary_dark);
+        startEndIconGenerator.setColor(R.color.design_default_color_primary);
 
         IconGenerator breaksIconGenerator = new IconGenerator(this);
-        breaksIconGenerator.setTextAppearance(R.style.iconGenText);
-        breaksIconGenerator.setColor(R.color.design_default_color_primary);
 
         LatLng currentLatLng;
         Location previousLocation = null;
         boolean startCreated = false;
         int locationListIndex = 1;
         int finalPositionListIndex = 0;
-        int continue_offset = 0;
 
         for (List<Location> locationList : finalPositionList) {
             PolylineOptions polylineOptions = new PolylineOptions().clickable(false);
@@ -110,12 +107,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             for (Location currentLocation : locationList) {
                 currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
                 if (startCreated && locationListIndex == 1) {
-                    if (currentLocation.distanceTo(previousLocation) <= 100) {
+                    if (currentLocation.distanceTo(previousLocation) <= 100)
                         polylineOptions.add(new LatLng(previousLocation.getLatitude(), previousLocation.getLongitude()));
-                        continue_offset++;
+                    else {
+                        int continueNumber = finalPositionListIndex - 1;
+                        addNewMarker(currentLatLng, breaksIconGenerator, "Continue " + continueNumber);
                     }
-                    else
-                        addNewMarker(currentLatLng, breaksIconGenerator, "Continue " + (locationListIndex + continue_offset));
                 }
                 else if (!startCreated) {
                     addNewMarker(currentLatLng, startEndIconGenerator, "START");
