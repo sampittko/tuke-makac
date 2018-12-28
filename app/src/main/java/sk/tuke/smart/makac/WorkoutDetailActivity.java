@@ -61,6 +61,8 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
 
     private AlertDialog alertDialog;
 
+    private boolean titleUpdated;
+
     private Workout currentWorkout;
 
     private List<GpsPoint> currentGpsPoints;
@@ -81,9 +83,12 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
 
     private GoogleMap mMap;
 
+    private Intent intent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        intent = getIntent();
         databaseSetup();
         initializeLayout();
         retrieveWorkoutValues();
@@ -225,7 +230,10 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
                 deleteWorkout();
                 break;
             case android.R.id.home:
-                setResult(Workout.CLOSE_RESULT);
+                if (intent.getIntExtra(IntentHelper.DATA_HISTORY_REQUEST, 0) != 0)
+                    setResult(Workout.UPDATE_RESULT);
+                else
+                    setResult(Workout.CLOSE_RESULT);
                 finish();
                 break;
             default:
@@ -378,6 +386,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
                     updateWorkoutTitle(editText.getText().toString());
                     dialogInterface.dismiss();
                     alertDialog.dismiss();
+                    titleUpdated = true;
                 }
             })
             .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

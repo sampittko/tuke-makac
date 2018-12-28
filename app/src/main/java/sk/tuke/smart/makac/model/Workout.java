@@ -22,6 +22,8 @@ public class Workout {
     public static final int statusDeleted= 3;
     // workout delete request code
     public static final int HISTORY_REQUEST = 404;
+    // workout update result code
+    public static final int UPDATE_RESULT = 480604;
     // workout delete result code
     public static final int DELETE_RESULT = 1337;
     // stopwatch fragment request code

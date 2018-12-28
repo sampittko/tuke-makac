@@ -16,10 +16,12 @@ import sk.tuke.smart.makac.model.Workout;
 
 public class HistoryListAdapter extends ArrayAdapter<String> {
     private List<Workout> workouts;
+    private List<String> stringifiedWorkouts;
 
     public HistoryListAdapter(Context context, int resource, List<String> stringifiedWorkouts, List<Workout> workouts) {
         super(context, resource, stringifiedWorkouts);
         this.workouts = workouts;
+        this.stringifiedWorkouts = stringifiedWorkouts;
     }
 
     @NonNull
@@ -28,7 +30,7 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.adapter_history, parent, false);
         }
-        Workout currentWorkout = workouts.get(position);
+        Workout currentWorkout = workouts.get(workouts.size() - position - 1);
         setIcon(convertView);
         setTitle(convertView, currentWorkout);
         setDate(convertView, currentWorkout);
@@ -57,5 +59,10 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
         String workout = getItem(position);
         TextView sportActivityTextView = convertView.findViewById(R.id.textview_history_sportactivity);
         sportActivityTextView.setText(workout);
+    }
+
+    @Override
+    public String getItem(int position) {
+        return stringifiedWorkouts.get(getCount() - position - 1);
     }
 }

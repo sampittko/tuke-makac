@@ -118,6 +118,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
                 long workoutId = getWorkoutId(view);
                 Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
                 intent.putExtra(IntentHelper.DATA_WORKOUT_ID, workoutId);
+                intent.putExtra(IntentHelper.DATA_HISTORY_REQUEST, Workout.HISTORY_REQUEST);
                 startActivityForResult(intent, Workout.HISTORY_REQUEST);
             }
 
@@ -135,6 +136,10 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Workout.HISTORY_REQUEST && resultCode == Workout.DELETE_RESULT)
             removeWorkoutFromList(data);
+        else if (requestCode == Workout.HISTORY_REQUEST && resultCode == Workout.UPDATE_RESULT)
+            renderList();
+
+        Log.i(TAG, "" + resultCode);
     }
 
     private void removeWorkoutFromList(Intent data) {

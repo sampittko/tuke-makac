@@ -17,6 +17,7 @@ public final class IntentHelper {
     public static final String DATA_WORKOUT_ID = "workoutId";
     public static final String DATA_WORKOUT_TITLE = "workoutTitle";
     public static final String DATA_SERVICE_STATE = "state";
+    public static final String DATA_HISTORY_REQUEST = "historyRequest";
 
     public static final int STATE_STOPPED = 1;
     public static final int STATE_RUNNING = 2;
