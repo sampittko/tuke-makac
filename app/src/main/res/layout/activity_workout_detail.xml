@@ -13,8 +13,19 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="150dp" />
+    <TextView
+        android:id="@+id/textview_workoutdetail_map_missing"
+        android:layout_width="match_parent"
+        android:text="@string/textview_workoutdetail_mapdatamissing"
+        android:gravity="center_vertical"
+        android:textAlignment="center"
+        android:textStyle="italic"
+        android:visibility="gone"
+        android:textSize="18sp"
+        android:layout_height="150dp"
+        android:paddingBottom="35dp"/>
     <LinearLayout
-        app:layout_constraintTop_toTopOf="@id/constraintlayout_workoutdetail_content"
+        app:layout_constraintTop_toTopOf="@id/fragment_workoutdetail_map"
         android:layout_marginTop="92dp"
         android:baselineAligned="false"
         android:id="@+id/headingpack"

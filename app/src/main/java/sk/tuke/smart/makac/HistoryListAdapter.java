@@ -60,6 +60,8 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
             else
                 dateTimeTextView.setText(MainHelper.sToDate(new Date().getTime()));
         }
+        else
+            dateTimeTextView.setText(MainHelper.sToDate(currentWorkout.getCreated().getTime()));
     }
 
     private void setSportActivity(View convertView, int position) {

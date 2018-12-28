@@ -55,6 +55,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
     @BindView(R.id.textview_workoutdetail_valuedistance) public TextView valueDistanceTextView;
     @BindView(R.id.textview_workoutdetail_valueavgpace) public TextView valueAvgPaceTextView;
     @BindView(R.id.textview_workoutdetail_labelshowmap) public TextView showMapTextView;
+    @BindView(R.id.textview_workoutdetail_map_missing) public TextView mapMissingTextView;
     @BindView(R.id.button_workoutdetail_showmap) public Button showMapButton;
 
     @BindString(R.string.share_message) public String shareMessage;
@@ -99,7 +100,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
     private void initializeLayout() {
         setContentView(R.layout.activity_workout_detail);
         ButterKnife.bind(this);
-        setTitle(R.string.workout_review);
+        setTitle(R.string.textview_workoutdetail_activitytitle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_workoutdetail_map);
@@ -162,11 +163,15 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
                 else
                     activityDateTextView.setText(MainHelper.sToDate(new Date().getTime()));
             }
+            else
+                activityDateTextView.setText(MainHelper.sToDate(workoutDate.getTime()));
         }
     }
     private void mapEntitiesVisibilityCheck() {
         if (currentGpsPoints.size() <= 1) {
             getSupportFragmentManager().beginTransaction().hide(mapFragment).commit();
+            mapFragment.getView().setVisibility(View.GONE);
+            mapMissingTextView.setVisibility(View.VISIBLE);
             showMapButton.setVisibility(View.GONE);
             showMapTextView.setVisibility(View.GONE);
         }

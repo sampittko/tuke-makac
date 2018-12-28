@@ -43,7 +43,8 @@
     <string name="textview_workoutdetail_labeldistance">Distance</string>
     <string name="textview_workoutdetail_labelavgpace">Average pace</string>
     <string name="textview_workoutdetail_labelsocialshare">Social share</string>
-    <string name="workout_review">Workout review</string>
+    <string name="textview_workoutdetail_activitytitle">Workout review</string>
+    <string name="textview_workoutdetail_mapdatamissing">Map data are missing</string>
 
     <!-- NAVIGATION -->
     <string name="menu_workout">Workout</string>
