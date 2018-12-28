@@ -199,13 +199,6 @@ public class ActiveWorkoutMapActivity extends FragmentActivity implements OnMapR
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(true);
-        } else {
-            Toast.makeText(this, "Permissions for GPS are missing", Toast.LENGTH_SHORT).show();
-        }
-
         if (initialLatLng == null) {
             getInitialLatLng();
             if (initialLatLng == null) {
