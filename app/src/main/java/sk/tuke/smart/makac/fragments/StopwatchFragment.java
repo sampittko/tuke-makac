@@ -57,7 +57,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
     @BindView(R.id.textview_stopwatch_pace) public TextView paceTextView;
     @BindView(R.id.textview_stopwatch_calories) public TextView caloriesTextView;
     @BindView(R.id.textview_stopwatch_distanceunit) public TextView distanceUnitTextView;
-    @BindView(R.id.textview_stopwatch_unitpace) public TextView paceUnitTextview;
+    @BindView(R.id.textview_stopwatch_unitpace) public TextView paceUnitTextView;
     @BindView(R.id.button_stopwatch_selectsport) public Button selectSportButton;
 
     @BindDrawable(R.drawable.ic_pause_circle_filled_green) public Drawable pauseDrawable;
@@ -90,9 +90,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
     private SharedPreferences userShPr;
     private SharedPreferences appShPr;
 
-    private boolean unitChanged;
-
-    private boolean locationChecked;
+    private boolean unitChanged, locationChecked;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -241,6 +239,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_stopwatch, container, false);
         ButterKnife.bind(this, view);
+        setUnits();
         performWorkoutRecoveryCheck();
         return view;
     }
@@ -430,15 +429,19 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
             distanceRenderer(distance);
             paceRenderer(pace);
         }
+        setUnits();
+        unitChanged = false;
+    }
+
+    private void setUnits() {
         if (currentDistanceUnit == SportActivities.UNIT_KILOMETERS) {
             distanceUnitTextView.setText(R.string.all_labeldistanceunitkilometers);
-            paceUnitTextview.setText(R.string.textview_stopwatch_unitpace);
+            paceUnitTextView.setText(R.string.textview_stopwatch_unitpace);
         }
         else {
             distanceUnitTextView.setText(R.string.all_labeldistanceunitmiles);
-            paceUnitTextview.setText(R.string.textview_stopwatch_unitpace_min_mi);
+            paceUnitTextView.setText(R.string.textview_stopwatch_unitpace_min_mi);
         }
-        unitChanged = false;
     }
 
     private void durationRenderer(long broadcastIntentDuration) {

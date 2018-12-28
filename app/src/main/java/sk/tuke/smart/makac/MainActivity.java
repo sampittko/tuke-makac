@@ -64,10 +64,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        thisActivity = this;
-        Stetho.initializeWithDefaults(this);
+        initializeVariables();
         databaseSetup();
         initializeLayout();
+    }
+
+    private void initializeVariables() {
+        thisActivity = this;
+        Stetho.initializeWithDefaults(this);
         userShPr = getSharedPreferences(getString(R.string.usershpr), Context.MODE_PRIVATE);
         appShPr = getSharedPreferences(getString(R.string.appshpr), Context.MODE_PRIVATE);
     }

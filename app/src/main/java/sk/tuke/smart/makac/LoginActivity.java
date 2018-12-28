@@ -73,8 +73,8 @@ public class LoginActivity extends AppCompatActivity implements DatabaseConnecti
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         userShPr = getSharedPreferences(getString(R.string.usershpr), Context.MODE_PRIVATE);
-        initializeLayout();
         thisActivity = this;
+        initializeLayout();
         configureGoogleSignIn();
         databaseSetup();
     }

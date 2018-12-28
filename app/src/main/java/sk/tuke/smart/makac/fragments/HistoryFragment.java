@@ -66,9 +66,9 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
         super.onCreate(savedInstanceState);
         thisFragmentActivity = getActivity();
         thisFragmentActivity.setTitle(R.string.menu_history);
+        userShPr = thisFragmentActivity.getSharedPreferences(getString(R.string.usershpr), Context.MODE_PRIVATE);
         setHasOptionsMenu(true);
         databaseSetup();
-        userShPr = thisFragmentActivity.getSharedPreferences(getString(R.string.usershpr), Context.MODE_PRIVATE);
         createClearHistoryAlertDialog();
     }
 
