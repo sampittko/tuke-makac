@@ -289,7 +289,6 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         try {
             currentWorkout.setStatus(Workout.statusDeleted);
             workoutDao.update(currentWorkout);
-            gpsPointDao.delete(currentGpsPoints);
             Log.i(TAG, "Workout data deleted");
             Intent data = new Intent();
             data.putExtra(IntentHelper.DATA_WORKOUT_TITLE, currentWorkout.getTitle());
