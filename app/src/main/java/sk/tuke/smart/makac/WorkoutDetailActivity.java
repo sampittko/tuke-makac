@@ -82,6 +82,8 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
     private Date workoutDate, workoutLastUpdate;
     private String workoutTitle;
 
+    private int currentDistanceUnit;
+
     private SupportMapFragment mapFragment;
 
     private GoogleMap mMap;
@@ -93,13 +95,18 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        intent = getIntent();
-        appShPr = getSharedPreferences(getString(R.string.appshpr), Context.MODE_PRIVATE);
+        initializeVariables();
         databaseSetup();
         initializeLayout();
         retrieveWorkoutValues();
         renderValues();
         mapEntitiesVisibilityCheck();
+    }
+
+    private void initializeVariables() {
+        intent = getIntent();
+        appShPr = getSharedPreferences(getString(R.string.appshpr), Context.MODE_PRIVATE);
+        currentDistanceUnit = appShPr.getInt(getString(R.string.appshpr_unit), Integer.valueOf(getString(R.string.appshpr_unit_default)));
     }
 
     private void initializeLayout() {
@@ -145,7 +152,6 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         }
     }
 
-    // TODO unit switch
     private void renderValues() {
         try {
             workoutTitleTextView.setText(workoutTitle);
@@ -154,18 +160,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
             valueDurationTextView.setText(MainHelper.formatDuration(MainHelper.msToS(duration)));
             String caloriesString = MainHelper.formatCalories(totalCalories) + " kcal";
             valueCaloriesTextView.setText(caloriesString);
-            String distanceString;
-            String avgPaceString;
-            if (appShPr.getInt(getString(R.string.appshpr_unit), Integer.valueOf(getString(R.string.appshpr_unit_default))) == SportActivities.UNIT_KILOMETERS) {
-                distanceString = MainHelper.formatDistance(distance) + " km";
-                avgPaceString = MainHelper.formatPace(avgPace) + " min/km";
-            }
-            else {
-                distanceString = MainHelper.formatDistanceMiles(distance) + " mi";
-                avgPaceString = MainHelper.formatPaceMiles(avgPace) + " min/mi";
-            }
-            valueDistanceTextView.setText(distanceString);
-            valueAvgPaceTextView.setText(avgPaceString);
+            renderUnitDependentValues();
         }
         catch (NullPointerException e) {
             e.printStackTrace();
@@ -201,6 +196,37 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkForUnitChange();
+    }
+
+    private void checkForUnitChange() {
+        int newUnit = appShPr.getInt(getString(R.string.appshpr_unit), Integer.valueOf(getString(R.string.appshpr_unit_default)));
+        if (currentDistanceUnit != newUnit) {
+            currentDistanceUnit = newUnit;
+            renderUnitDependentValues();
+            Log.i(TAG, "Unit dependent values re-rendered after unit change");
+            Toast.makeText(this, "Units changed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void renderUnitDependentValues() {
+        String distanceString;
+        String avgPaceString;
+        if (currentDistanceUnit == SportActivities.UNIT_KILOMETERS) {
+            distanceString = MainHelper.formatDistance(distance) + " km";
+            avgPaceString = MainHelper.formatPace(avgPace) + " min/km";
+        }
+        else {
+            distanceString = MainHelper.formatDistanceMiles(distance) + " mi";
+            avgPaceString = MainHelper.formatPaceMiles(avgPace) + " min/mi";
+        }
+        valueDistanceTextView.setText(distanceString);
+        valueAvgPaceTextView.setText(avgPaceString);
     }
 
     @Override

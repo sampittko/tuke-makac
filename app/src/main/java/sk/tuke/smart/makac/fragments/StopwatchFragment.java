@@ -307,7 +307,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
         if (currentDistanceUnit != newUnit) {
             unitChanged = true;
             currentDistanceUnit = newUnit;
-            reRenderUnitDependentValues();
+            renderUnitDependentValues();
             Log.i(TAG, "Unit dependent values re-rendered after unit change");
             Toast.makeText(thisFragmentActivity, "Units changed", Toast.LENGTH_SHORT).show();
         }
@@ -425,7 +425,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
         caloriesRenderer(totalCalories);
     }
 
-    private void reRenderUnitDependentValues() {
+    private void renderUnitDependentValues() {
         if (duration > 0) {
             distanceRenderer(distance);
             paceRenderer(pace);
