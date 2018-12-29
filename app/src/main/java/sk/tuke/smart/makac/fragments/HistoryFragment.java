@@ -249,9 +249,6 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
                 workoutDao.update(currentWorkout);
             }
 
-            List<GpsPoint> allGpsPoints = gpsPointDao.queryForAll();
-            gpsPointDao.delete(allGpsPoints);
-
             renderList();
 
             Toast.makeText(thisFragmentActivity, "All workouts deleted", Toast.LENGTH_SHORT).show();
