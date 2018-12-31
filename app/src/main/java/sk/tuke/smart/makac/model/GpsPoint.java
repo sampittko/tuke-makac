@@ -9,6 +9,8 @@ import java.util.Date;
 
 @DatabaseTable
 public class GpsPoint {
+    public static String COLUMN_WORKOUTID = "workout_id";
+
     @DatabaseField(generatedId = true, unique = true)
     private long id;
     /**

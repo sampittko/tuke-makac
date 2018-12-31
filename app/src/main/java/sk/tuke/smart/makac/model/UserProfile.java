@@ -5,6 +5,8 @@ import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable
 public class UserProfile {
+    public static String COLUMN_USERID = "user_id";
+
     @DatabaseField(generatedId = true, unique = true)
     private long id;
     /**

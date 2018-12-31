@@ -16,9 +16,6 @@
     <string name="usershpr_usersignedin">userSignedIn</string>
     <string name="usershpr_usersignedin_default">false</string>
 
-    <!-- DATABASE -->
-    <string name="database_workout_id">workout_id</string>
-
     <!-- STOPWATCH FRAGMENT -->
     <string name="textview_stopwatch_labelduration">Duration</string>
     <string name="textview_stopwatch_duration">0:00:00</string>
@@ -87,7 +84,7 @@
     <string name="height_hint">183.7</string>
     <string name="height_unit">cm</string>
 
-    <!-- ACTIVEWORKOUTMAP ACTIVITY -->
+    <!-- ACTIVE WORKOUT MAP ACTIVITY -->
     <string name="title_activity_active_workout_map">Map</string>
     <string name="button_activeworkoutmap_back">Back to Workout</string>
 

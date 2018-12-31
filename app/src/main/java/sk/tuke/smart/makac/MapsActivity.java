@@ -62,7 +62,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void retrieveVariables() {
         try {
             long currentWorkoutId = getIntent().getLongExtra(IntentHelper.DATA_WORKOUT_ID, -1);
-            List<GpsPoint> gpsPoints = gpsPointDao.queryForEq("workout_id", currentWorkoutId);
+            List<GpsPoint> gpsPoints = gpsPointDao.queryForEq(GpsPoint.COLUMN_WORKOUTID, currentWorkoutId);
             finalPositionList = MainHelper.getFinalPositionList(gpsPoints);
         }
         catch (SQLException e) {

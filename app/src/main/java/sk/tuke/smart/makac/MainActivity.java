@@ -151,12 +151,12 @@ public class MainActivity extends AppCompatActivity
 
     private void setUnknownUser() throws SQLException {
         try {
-            List<User> offlineUsers = userDao.queryForEq("accType", User.ACC_TYPE_OFFLINE);
+            List<User> offlineUsers = userDao.queryForEq(User.COLUMN_ACCTYPE, User.ACCTYPE_OFFLINE);
             currentUser = offlineUsers.get(0);
             Log.i(TAG, "Unknown user exists");
         }
         catch (IndexOutOfBoundsException e) {
-            currentUser = new User(0, "0");
+            currentUser = new User(User.ACCTYPE_OFFLINE, User.ACCTYPE_OFFLINE_ACCID);
             userDao.create(currentUser);
             Log.i(TAG, "Unknown user created");
         }
@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity
 
     private void updateSharedPreferencesForOfflineUser() {
         SharedPreferences.Editor userShPrEditor = userShPr.edit();
-        userShPrEditor.putBoolean(getString(R.string.usershpr_usersignedin), false);
+        userShPrEditor.putBoolean(getString(R.string.usershpr_usersignedin), Boolean.valueOf(getString(R.string.usershpr_usersignedin_default)));
         userShPrEditor.putLong(getString(R.string.usershpr_userid), currentUser.getId());
         userShPrEditor.apply();
     }

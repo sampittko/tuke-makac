@@ -140,7 +140,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
             totalCalories = currentWorkout.getTotalCalories();
             avgPace = currentWorkout.getPaceAvg();
             distance = currentWorkout.getDistance();
-            currentGpsPoints = gpsPointDao.queryForEq(getString(R.string.database_workout_id), currentWorkoutId);
+            currentGpsPoints = gpsPointDao.queryForEq(GpsPoint.COLUMN_WORKOUTID, currentWorkoutId);
             finalPositionList = MainHelper.getFinalPositionList(currentGpsPoints);
             workoutDate = currentWorkout.getCreated();
             workoutLastUpdate = currentWorkout.getLastUpdate();

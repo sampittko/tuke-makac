@@ -282,14 +282,14 @@ public class LoginActivity extends AppCompatActivity implements DatabaseConnecti
     }
 
     private void setUnknownUser() throws SQLException {
-        List<User> offlineUsers = userDao.queryForEq("accType", User.ACC_TYPE_OFFLINE);
+        List<User> offlineUsers = userDao.queryForEq(User.COLUMN_ACCTYPE, User.ACCTYPE_OFFLINE);
         currentUser = offlineUsers.get(0);
         Log.i(TAG, "Unknown user exists");
     }
 
     private void setUnknownUserProfile() throws SQLException {
         try {
-            List<UserProfile> offlineUserProfiles = userProfileDao.queryForEq("user_id", currentUser.getId());
+            List<UserProfile> offlineUserProfiles = userProfileDao.queryForEq(UserProfile.COLUMN_USERID, currentUser.getId());
             currentUserProfile = offlineUserProfiles.get(0);
             Log.i(TAG, "Unknown user profile exists");
         }
@@ -310,12 +310,12 @@ public class LoginActivity extends AppCompatActivity implements DatabaseConnecti
 
     private void setGoogleUser() throws SQLException {
         try {
-            List<User> users = userDao.queryForEq("accId", String.valueOf(account.getId()));
+            List<User> users = userDao.queryForEq(User.COLUMN_ACCID, String.valueOf(account.getId()));
             currentUser = users.get(0);
             Log.i(TAG, "Google user exists");
         }
         catch (IndexOutOfBoundsException e) {
-            currentUser = new User(User.ACC_TYPE_GOOGLE, String.valueOf(account.getId()));
+            currentUser = new User(User.ACCTYPE_GOOGLE, String.valueOf(account.getId()));
             userDao.create(currentUser);
             Log.i(TAG, "Google user created");
         }
@@ -323,7 +323,7 @@ public class LoginActivity extends AppCompatActivity implements DatabaseConnecti
 
     private void setGoogleUserProfile() throws SQLException {
         try {
-            List<UserProfile> userProfiles = userProfileDao.queryForEq("user_id", currentUser.getId());
+            List<UserProfile> userProfiles = userProfileDao.queryForEq(UserProfile.COLUMN_USERID, currentUser.getId());
             currentUserProfile = userProfiles.get(0);
             Log.i(TAG, "Google user profile exists");
         }

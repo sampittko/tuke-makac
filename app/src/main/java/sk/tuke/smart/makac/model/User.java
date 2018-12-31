@@ -5,8 +5,11 @@ import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable
 public class User {
-    public static int ACC_TYPE_OFFLINE = 0;
-    public static int ACC_TYPE_GOOGLE = 1;
+    public static String COLUMN_ACCTYPE = "accType";
+    public static String COLUMN_ACCID = "accId";
+    public static int ACCTYPE_OFFLINE = 0;
+    public static String ACCTYPE_OFFLINE_ACCID = "0";
+    public static int ACCTYPE_GOOGLE = 1;
 
     @DatabaseField(generatedId = true, unique = true)
     private long id;
