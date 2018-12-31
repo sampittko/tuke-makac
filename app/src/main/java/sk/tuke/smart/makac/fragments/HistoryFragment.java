@@ -31,13 +31,14 @@ import butterknife.ButterKnife;
 import sk.tuke.smart.makac.DatabaseConnection;
 import sk.tuke.smart.makac.HistoryListAdapter;
 import sk.tuke.smart.makac.R;
+import sk.tuke.smart.makac.UnitChange;
 import sk.tuke.smart.makac.WorkoutDetailActivity;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.model.GpsPoint;
 import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 
-public class HistoryFragment extends Fragment implements DatabaseConnection {
+public class HistoryFragment extends Fragment implements DatabaseConnection, UnitChange {
     @BindView(R.id.textview_history_noHistoryData) public TextView noHistoryDataTextView;
     @BindView(R.id.listview_history_workouts) public ListView workoutsListView;
 
@@ -119,7 +120,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection {
         checkForUnitChange();
     }
 
-    private void checkForUnitChange() {
+    public void checkForUnitChange() {
         int newUnit = appShPr.getInt(getString(R.string.appshpr_unit), Integer.valueOf(getString(R.string.appshpr_unit_default)));
         if (currentDistanceUnit != newUnit) {
             currentDistanceUnit = newUnit;

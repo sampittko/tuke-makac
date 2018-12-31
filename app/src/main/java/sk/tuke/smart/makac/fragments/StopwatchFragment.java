@@ -40,6 +40,7 @@ import butterknife.OnClick;
 import sk.tuke.smart.makac.ActiveWorkoutMapActivity;
 import sk.tuke.smart.makac.DatabaseConnection;
 import sk.tuke.smart.makac.R;
+import sk.tuke.smart.makac.UnitChange;
 import sk.tuke.smart.makac.WorkoutDetailActivity;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
@@ -49,7 +50,7 @@ import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 import sk.tuke.smart.makac.services.TrackerService;
 
-public class StopwatchFragment extends Fragment implements DatabaseConnection {
+public class StopwatchFragment extends Fragment implements DatabaseConnection, UnitChange {
     @BindView(R.id.button_stopwatch_start) public Button startWorkoutButton;
     @BindView(R.id.button_stopwatch_endworkout) public Button endWorkoutButton;
     @BindView(R.id.textview_stopwatch_duration) public TextView durationTextView;
@@ -302,7 +303,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
         Log.i(TAG, "Receiver registered");
     }
 
-    private void checkForUnitChange() {
+    public void checkForUnitChange() {
         int newUnit = appShPr.getInt(getString(R.string.appshpr_unit), Integer.valueOf(getString(R.string.appshpr_unit_default)));
         if (currentDistanceUnit != newUnit) {
             unitChanged = true;
@@ -556,7 +557,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection {
     public void displaySelectSportDialog(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(thisFragmentActivity);
         builder.setTitle("Select sport")
-                .setItems(R.array.sportactivities, new DialogInterface.OnClickListener() {
+                .setItems(R.array.stringarray_stopwatch_sportactivities, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int position) {
                 userSelectedSportActivity = position;
                 switch (position) {

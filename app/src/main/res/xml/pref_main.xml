@@ -1,15 +1,15 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="GENERAL SETTINGS">
         <SwitchPreference
-            android:defaultValue="true"
-            android:key="gps"
+            android:defaultValue="@string/appshpr_gps_default"
+            android:key="@string/appshpr_gps"
             android:summary="@string/pref_description_gps_checking"
             android:title="@string/pref_title_gps_checking" />
         <ListPreference
-            android:defaultValue="1"
+            android:defaultValue="@string/appshpr_unit_default"
             android:entries="@array/pref_list_titles_unit"
             android:entryValues="@array/pref_list_values_unit"
-            android:key="unit"
+            android:key="@string/appshpr_unit"
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"
             android:title="@string/pref_title_unit" />

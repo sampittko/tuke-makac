@@ -48,7 +48,7 @@ import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 import sk.tuke.smart.makac.settings.SettingsActivity;
 
-public class WorkoutDetailActivity extends AppCompatActivity implements OnMapReadyCallback, DatabaseConnection {
+public class WorkoutDetailActivity extends AppCompatActivity implements OnMapReadyCallback, DatabaseConnection, UnitChange {
     @BindView(R.id.textview_workoutdetail_workouttitle) public TextView workoutTitleTextView;
     @BindView(R.id.textview_workoutdetail_sportactivity) public TextView sportActivityTextView;
     @BindView(R.id.textview_workoutdetail_activitydate) public TextView activityDateTextView;
@@ -140,7 +140,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
             totalCalories = currentWorkout.getTotalCalories();
             avgPace = currentWorkout.getPaceAvg();
             distance = currentWorkout.getDistance();
-            currentGpsPoints = gpsPointDao.queryForEq("workout_id", currentWorkoutId);
+            currentGpsPoints = gpsPointDao.queryForEq(getString(R.string.database_workout_id), currentWorkoutId);
             finalPositionList = MainHelper.getFinalPositionList(currentGpsPoints);
             workoutDate = currentWorkout.getCreated();
             workoutLastUpdate = currentWorkout.getLastUpdate();
@@ -199,12 +199,12 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         checkForUnitChange();
     }
 
-    private void checkForUnitChange() {
+    public void checkForUnitChange() {
         int newUnit = appShPr.getInt(getString(R.string.appshpr_unit), Integer.valueOf(getString(R.string.appshpr_unit_default)));
         if (currentDistanceUnit != newUnit) {
             currentDistanceUnit = newUnit;
@@ -374,10 +374,10 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
     private void createShareAlertDialog() {
         String shareMessage = this.shareMessage;
         shareMessage = shareMessage
-                .replace("WORKOUT_TYPE", SportActivities.getSportActivityStringFromInt(sportActivity).toLowerCase())
-                .replace("DISTANCE", MainHelper.formatDistance(distance)
-                        .replace("UNIT", "km")
-                        .replace("DURATION", MainHelper.formatDuration(MainHelper.msToS(duration))));
+            .replace(getString(R.string.alertdialog_workoutdetail_share_result_target_workouttype), SportActivities.getSportActivityStringFromInt(sportActivity).toLowerCase())
+            .replace(getString(R.string.alertdialog_workoutdetail_share_result_target_distance), currentDistanceUnit == SportActivities.UNIT_KILOMETERS ? MainHelper.formatDistance(distance) : MainHelper.formatDistanceMiles(distance)
+            .replace(getString(R.string.alertdialog_workoutdetail_share_result_target_unit), currentDistanceUnit == SportActivities.UNIT_KILOMETERS ? getString(R.string.all_labeldistanceunitkilometers) : getString(R.string.all_labeldistanceunitmiles))
+            .replace(getString(R.string.alertdialog_workoutdetail_share_result_target_duration), MainHelper.formatDuration(MainHelper.msToS(duration))));
 
         EditText editText = new EditText(this);
         editText.setText(shareMessage);
@@ -387,7 +387,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         AlertDialog.Builder alertDialogBuilderShare = new AlertDialog.Builder(this);
         alertDialogBuilderShare
             .setView(editText)
-            .setTitle("Share results")
+            .setTitle(getString(R.string.alertdialog_workoutdetail_share_result))
             .setPositiveButton(R.string.share, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -420,7 +420,7 @@ public class WorkoutDetailActivity extends AppCompatActivity implements OnMapRea
         AlertDialog.Builder alertDialogBuilderTitle = new AlertDialog.Builder(this);
         alertDialogBuilderTitle
             .setView(editText)
-            .setTitle("Edit workout title")
+            .setTitle(getString(R.string.alertdialog_workoutdetail_edit_workout_title))
             .setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
