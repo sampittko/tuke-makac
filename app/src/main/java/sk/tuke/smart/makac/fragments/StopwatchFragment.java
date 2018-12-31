@@ -209,6 +209,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection, U
     public void databaseSetup() {
         try {
             DatabaseHelper databaseHelper = OpenHelperManager.getHelper(thisFragmentActivity, DatabaseHelper.class);
+            // line that needs to be run after database scheme upgrade
             // databaseHelper.onUpgrade(databaseHelper.getWritableDatabase(), databaseHelper.getConnectionSource(), 4, 5);
             workoutDao = databaseHelper.workoutDao();
             gpsPointDao = databaseHelper.gpsPointDao();
@@ -274,7 +275,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection, U
 
     private void retrievePositions() {
         try {
-            List<GpsPoint> gpsPoints = gpsPointDao.queryForEq("workout_id", getCurrentWorkoutId());
+            List<GpsPoint> gpsPoints = gpsPointDao.queryForEq(GpsPoint.COLUMN_WORKOUTID, getCurrentWorkoutId());
             ArrayList<List<Location>> finalPositionList = MainHelper.getFinalPositionList(gpsPoints);
             if (finalPositionList.size() == 0)
                 Log.i(TAG, "There are no positions to retrieve");

@@ -193,7 +193,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
 
     private void renderList() {
         try {
-            List<Workout> endedWorkouts = workoutDao.queryForEq("status", Workout.statusEnded);
+            List<Workout> endedWorkouts = workoutDao.queryForEq(Workout.COLUMN_STATUS, Workout.statusEnded);
             if (endedWorkouts.size() > 0)
                 renderHistoryItems(endedWorkouts);
             else {
@@ -239,7 +239,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
 
     public void clearWorkoutHistory() {
         try {
-            List<Workout> allEndedWorkouts = workoutDao.queryForEq("status", Workout.statusEnded);
+            List<Workout> allEndedWorkouts = workoutDao.queryForEq(Workout.COLUMN_STATUS, Workout.statusEnded);
             if (allEndedWorkouts.size() == 0) {
                 Toast.makeText(thisFragmentActivity, "No workout to delete", Toast.LENGTH_SHORT).show();
                 return;

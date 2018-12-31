@@ -10,6 +10,8 @@ import sk.tuke.smart.makac.helpers.SportActivities;
 
 @DatabaseTable
 public class Workout {
+    public static final String COLUMN_STATUS = "status";
+
     // initial status of workout
     public static final int statusUnknown = 0;
     // ended workout
