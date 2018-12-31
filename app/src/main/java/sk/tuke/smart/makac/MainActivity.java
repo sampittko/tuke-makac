@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity
 
     private void updateSharedPreferencesForOfflineUser() {
         SharedPreferences.Editor userShPrEditor = userShPr.edit();
-        userShPrEditor.putBoolean(getString(R.string.usershpr_usersignedin), Boolean.valueOf(getString(R.string.usershpr_usersignedin_default)));
+        userShPrEditor.putBoolean(getString(R.string.usershpr_usersignedin), false);
         userShPrEditor.putLong(getString(R.string.usershpr_userid), currentUser.getId());
         userShPrEditor.apply();
     }
