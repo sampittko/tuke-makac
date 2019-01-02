@@ -56,7 +56,8 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
 
     private int currentDistanceUnit;
 
-    private AlertDialog.Builder alertDialogBuilder;
+    private AlertDialog.Builder alertDialogBuilderHistory;
+    private AlertDialog.Builder alertDialogBuilderDeleted;
 
     public HistoryFragment() {
     }
@@ -73,6 +74,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
         thisFragmentActivity.setTitle(R.string.menu_history);
         databaseSetup();
         createClearHistoryAlertDialog();
+        createClearDeletedAlertDialog();
     }
 
     private void initializeVariables() {
@@ -95,13 +97,32 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
     }
 
     private void createClearHistoryAlertDialog() {
-        alertDialogBuilder = new AlertDialog.Builder(thisFragmentActivity);
-        alertDialogBuilder.setTitle("Clear history")
+        alertDialogBuilderHistory = new AlertDialog.Builder(thisFragmentActivity);
+        alertDialogBuilderHistory.setTitle("Clear history")
                 .setMessage("Do you really want to clear workout history?")
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         clearUserWorkoutHistory();
+                        dialogInterface.dismiss();
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+    }
+
+    private void createClearDeletedAlertDialog() {
+        alertDialogBuilderDeleted = new AlertDialog.Builder(thisFragmentActivity);
+        alertDialogBuilderDeleted.setTitle("Clear deleted workouts")
+                .setMessage("Do you really want to delete these workouts forever?")
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        performPermanentDelete();
                         dialogInterface.dismiss();
                     }
                 })
@@ -154,11 +175,14 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (thisFragmentActivity.getTitle().equals(getString(R.string.menu_history)))
+        if (thisFragmentActivity.getTitle().equals(getString(R.string.menu_history))) {
             inflater.inflate(R.menu.show_deleted, menu);
-        else if (thisFragmentActivity.getTitle().equals(getString(R.string.history_workoutsbin)))
+            inflater.inflate(R.menu.clear_history, menu);
+        }
+        else if (thisFragmentActivity.getTitle().equals(getString(R.string.history_workoutsbin))) {
             inflater.inflate(R.menu.show_ended, menu);
-        inflater.inflate(R.menu.clear_history, menu);
+            inflater.inflate(R.menu.clear_deleted, menu);
+        }
         if (userShPr.getBoolean(getString(R.string.usershpr_usersignedin), Boolean.valueOf(getString(R.string.usershpr_usersignedin_default))))
             inflater.inflate(R.menu.sync_with_server, menu);
     }
@@ -245,7 +269,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
     }
 
     public void displayClearHistoryAlertDialog() {
-        AlertDialog alertDialog = alertDialogBuilder.create();
+        AlertDialog alertDialog = alertDialogBuilderHistory.create();
         alertDialog.show();
 
         Log.i(TAG, "Alert dialog is now visible.");
@@ -314,6 +338,37 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
         }
 
         return filteredUserWorkouts;
+    }
+
+    public void displayClearDeletedAlertDialog() {
+        AlertDialog alertDialog = alertDialogBuilderDeleted.create();
+        alertDialog.show();
+
+        Log.i(TAG, "Alert dialog is now visible.");
+    }
+
+    private void performPermanentDelete() {
+        try {
+            List<Workout> userDeletedWorkouts = getFilteredUserWorkouts(Workout.statusDeleted);
+            if (userDeletedWorkouts.size() == 0) {
+                Toast.makeText(thisFragmentActivity, "No workout to delete", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // DELETE ALL GPS POINTS ASSOCIATED WITH WORKOUTS
+            for (Workout workout : userDeletedWorkouts)
+                gpsPointDao.delete(gpsPointDao.queryForEq(GpsPoint.COLUMN_WORKOUTID, workout.getId()));
+
+            workoutDao.delete(userDeletedWorkouts);
+
+            renderList(new ArrayList<Workout>());
+
+            Toast.makeText(thisFragmentActivity, "All workouts were permanentally deleted", Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "All workouts were permanentally deleted");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public interface OnFragmentInteractionListener {}
