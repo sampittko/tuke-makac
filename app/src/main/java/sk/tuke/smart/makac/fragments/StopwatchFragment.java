@@ -596,15 +596,13 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection, U
     public void displayDeletePendingAlertDialog() {
         AlertDialog.Builder alertDialogBuilderPendingDelete = new AlertDialog.Builder(thisFragmentActivity);
         alertDialogBuilderPendingDelete
-                .setTitle("Delete pending workout")
-                .setMessage("Do you really want to delete this workout?")
+                .setTitle("Reset workout data")
+                .setMessage("Do you really want to reset all workout counters?")
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         stopTrackerService();
                         deletePendingWorkout();
-                        Log.i(TAG, "Pending workout deleted");
-                        Toast.makeText(thisFragmentActivity, "Pending workout deleted", Toast.LENGTH_SHORT).show();
                         alertDialog.dismiss();
                         mListener.onWorkoutStopped();
                     }
@@ -626,13 +624,13 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection, U
         thisFragmentActivity.startService(intent);
     }
 
-    // TODO Workout.statusDeleted fix
     private void deletePendingWorkout() {
         try {
             Workout pendingWorkout = workoutDao.queryForId(getCurrentWorkoutId());
-            pendingWorkout.setStatus(Workout.statusDeleted);
-            workoutDao.update(pendingWorkout);
-            Log.i(TAG, "Pending workout data deleted");
+            gpsPointDao.delete(gpsPointDao.queryForEq(GpsPoint.COLUMN_WORKOUTID, pendingWorkout.getId()));
+            workoutDao.delete(pendingWorkout);
+            Toast.makeText(thisFragmentActivity, "Workout reset", Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "Workout reset");
         }
         catch (SQLException e) {
             e.printStackTrace();
