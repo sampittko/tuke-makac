@@ -265,6 +265,8 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection, U
     public void performWorkoutRecovery() {
         workoutStarted = true;
         workoutPaused = false;
+        menuInvalidated = true;
+        thisFragmentActivity.invalidateOptionsMenu();
         toggleRecordingHandler(getView());
         renderValues(MainHelper.msToS(lastWorkout.getDuration()), lastWorkout.getDistance(), lastWorkout.getPaceAvg(), lastWorkout.getTotalCalories());
         retrievePositions();
@@ -590,6 +592,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection, U
         builder.show();
     }
 
+    // TODO StopwatchFragment NullPointerException after open and close on Settings
     public void displayDeletePendingAlertDialog() {
         AlertDialog.Builder alertDialogBuilderPendingDelete = new AlertDialog.Builder(thisFragmentActivity);
         alertDialogBuilderPendingDelete
@@ -623,6 +626,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection, U
         thisFragmentActivity.startService(intent);
     }
 
+    // TODO Workout.statusDeleted fix
     private void deletePendingWorkout() {
         try {
             Workout pendingWorkout = workoutDao.queryForId(getCurrentWorkoutId());
