@@ -198,16 +198,16 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
 
     private void renderList() {
         try {
-            renderList(getFilteredUserWorkouts(Workout.statusEnded));
+            renderList(getFilteredUserWorkouts(Workout.statusEnded), R.layout.adapter_history);
         }
         catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private void renderList(List<Workout> workouts) {
+    private void renderList(List<Workout> workouts, int resource) {
         if (workouts.size() > 0) {
-            renderHistoryItems(workouts);
+            renderHistoryItems(workouts, resource);
             setVisibility(View.GONE, View.VISIBLE);
         }
         else {
@@ -222,26 +222,56 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
         workoutsListView.setVisibility(workoutsVisibility);
     }
 
-    private void renderHistoryItems(List<Workout> workouts) {
-        HistoryListAdapter historyListAdapter = new HistoryListAdapter(thisFragmentActivity, R.layout.adapter_history, getStringifiedWorkouts(workouts), workouts);
+    private void renderHistoryItems(List<Workout> workouts, int resource) {
+        HistoryListAdapter historyListAdapter = new HistoryListAdapter(thisFragmentActivity, resource, getStringifiedWorkouts(workouts), workouts);
         workoutsListView.setAdapter(historyListAdapter);
-        workoutsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                long workoutId = getWorkoutId(view);
-                Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
-                intent.putExtra(IntentHelper.DATA_WORKOUT_ID, workoutId);
-                intent.putExtra(IntentHelper.DATA_HISTORY_REQUEST, Workout.HISTORY_REQUEST);
-                startActivityForResult(intent, Workout.HISTORY_REQUEST);
-            }
+        if (resource == R.layout.adapter_history) {
+            workoutsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    long workoutId = getWorkoutId(view);
+                    Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
+                    intent.putExtra(IntentHelper.DATA_WORKOUT_ID, workoutId);
+                    intent.putExtra(IntentHelper.DATA_HISTORY_REQUEST, Workout.HISTORY_REQUEST);
+                    startActivityForResult(intent, Workout.HISTORY_REQUEST);
+                }
 
-            private long getWorkoutId(View view) {
-                ViewGroup viewGroup1 = (ViewGroup) view;
-                ViewGroup viewGroup2 = (ViewGroup) viewGroup1.getChildAt(1);
-                TextView workoutTitleTextView = (TextView) viewGroup2.getChildAt(0);
-                return Long.valueOf(workoutTitleTextView.getTag().toString());
-            }
-        });
+                private long getWorkoutId(View view) {
+                    ViewGroup viewGroup1 = (ViewGroup) view;
+                    ViewGroup viewGroup2 = (ViewGroup) viewGroup1.getChildAt(1);
+                    TextView workoutTitleTextView = (TextView) viewGroup2.getChildAt(0);
+                    return Long.valueOf(workoutTitleTextView.getTag().toString());
+                }
+            });
+        }
+        else {
+            workoutsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    renewWorkout(getWorkoutId(view));
+                }
+
+                private long getWorkoutId(View view) {
+                    ViewGroup viewGroup1 = (ViewGroup) view;
+                    ViewGroup viewGroup2 = (ViewGroup) viewGroup1.getChildAt(0);
+                    TextView workoutTitleTextView = (TextView) viewGroup2.getChildAt(1);
+                    return Long.valueOf(workoutTitleTextView.getTag().toString());
+                }
+
+                private void renewWorkout(long workoutId) {
+                    try {
+                        Workout clickedWorkout = workoutDao.queryForId(workoutId);
+                        clickedWorkout.setStatus(Workout.statusEnded);
+                        workoutDao.update(clickedWorkout);
+                        Toast.makeText(thisFragmentActivity, clickedWorkout.getTitle() + " renewed", Toast.LENGTH_SHORT).show();
+                        showDeletedWorkouts();
+                    }
+                    catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
         Log.i(TAG, "Workouts displayed successfully");
     }
 
@@ -290,7 +320,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
 
             renderList();
 
-            Toast.makeText(thisFragmentActivity, "All workouts deleted", Toast.LENGTH_SHORT).show();
+            Toast.makeText(thisFragmentActivity, "All workouts were deleted", Toast.LENGTH_SHORT).show();
             Log.i(TAG, "All workouts deleted");
         }
         catch (SQLException e) {
@@ -302,7 +332,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
         try {
             thisFragmentActivity.setTitle(R.string.history_workoutsbin);
             thisFragmentActivity.invalidateOptionsMenu();
-            renderList(getFilteredUserWorkouts(Workout.statusDeleted));
+            renderList(getFilteredUserWorkouts(Workout.statusDeleted), R.layout.adapter_history_bin);
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -361,7 +391,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
 
             workoutDao.delete(userDeletedWorkouts);
 
-            renderList(new ArrayList<Workout>());
+            renderList(new ArrayList<Workout>(), R.layout.adapter_history_bin);
 
             Toast.makeText(thisFragmentActivity, "All workouts were permanentally deleted", Toast.LENGTH_SHORT).show();
             Log.i(TAG, "All workouts were permanentally deleted");

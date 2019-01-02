@@ -251,9 +251,8 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection, U
 
     private void performWorkoutRecoveryCheck() {
         try {
-            long workoutsCount = workoutDao.countOf();
-            if (workoutsCount != 0) {
-                List<Workout> userWorkouts = workoutDao.queryForEq(Workout.COLUMN_USERID, getCurrentUserId());
+            List<Workout> userWorkouts = workoutDao.queryForEq(Workout.COLUMN_USERID, getCurrentUserId());
+            if (userWorkouts.size() != 0) {
                 lastWorkout = userWorkouts.get(userWorkouts.size() - 1);
                 int lastWorkoutStatus = lastWorkout.getStatus();
                 if (lastWorkoutStatus == Workout.statusPaused || lastWorkoutStatus == Workout.statusUnknown)

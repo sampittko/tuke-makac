@@ -18,18 +18,20 @@ import sk.tuke.smart.makac.model.Workout;
 public class HistoryListAdapter extends ArrayAdapter<String> {
     private List<Workout> workouts;
     private List<String> stringifiedWorkouts;
+    private boolean isBin;
 
     public HistoryListAdapter(Context context, int resource, List<String> stringifiedWorkouts, List<Workout> workouts) {
         super(context, resource, stringifiedWorkouts);
         this.workouts = workouts;
         this.stringifiedWorkouts = stringifiedWorkouts;
+        isBin = resource == R.layout.adapter_history_bin;
     }
 
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         if (convertView == null)
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.adapter_history, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(!isBin ? R.layout.adapter_history : R.layout.adapter_history_bin, parent, false);
         Workout currentWorkout = workouts.get(workouts.size() - position - 1);
         setIcon(convertView, currentWorkout.getSportActivity());
         setTitle(convertView, currentWorkout);
@@ -39,7 +41,11 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
     }
 
     private void setIcon(View convertView, int sportActivity) {
-        ImageView iconImageView = convertView.findViewById(R.id.imageview_history_icon);
+        ImageView iconImageView;
+        if (!isBin)
+            iconImageView = convertView.findViewById(R.id.imageview_history_icon);
+        else
+            iconImageView = convertView.findViewById(R.id.imageview_history_icon_bin);
         switch (sportActivity) {
             case 0:
                 iconImageView.setImageResource(R.drawable.ic_launcher_foreground);
@@ -57,13 +63,21 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
     }
 
     private void setTitle(View convertView, Workout currentWorkout) {
-        TextView titleTextView = convertView.findViewById(R.id.textview_history_title);
+        TextView titleTextView;
+        if (!isBin)
+            titleTextView = convertView.findViewById(R.id.textview_history_title);
+        else
+            titleTextView = convertView.findViewById(R.id.textview_history_title_bin);
         titleTextView.setText(currentWorkout.getTitle());
         titleTextView.setTag(currentWorkout.getId());
     }
 
     private void setDate(View convertView, Workout currentWorkout) {
-        TextView dateTimeTextView = convertView.findViewById(R.id.textview_history_datetime);
+        TextView dateTimeTextView;
+        if (!isBin)
+            dateTimeTextView = convertView.findViewById(R.id.textview_history_datetime);
+        else
+            dateTimeTextView = convertView.findViewById(R.id.textview_history_datetime_bin);
         // fix for test where NullPointerException occured in case of calling getTime() on workoutDate
         if (currentWorkout.getCreated() == null) {
             if (currentWorkout.getLastUpdate() != null)
@@ -77,7 +91,11 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
 
     private void setSportActivity(View convertView, int position) {
         String workout = getItem(position);
-        TextView sportActivityTextView = convertView.findViewById(R.id.textview_history_sportactivity);
+        TextView sportActivityTextView;
+        if (!isBin)
+            sportActivityTextView = convertView.findViewById(R.id.textview_history_sportactivity);
+        else
+            sportActivityTextView = convertView.findViewById(R.id.textview_history_sportactivity_bin);
         sportActivityTextView.setText(workout);
     }
 
