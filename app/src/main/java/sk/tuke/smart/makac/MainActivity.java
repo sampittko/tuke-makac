@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_workout:
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.main_replaceable, StopwatchFragment.newInstance())
+                        .replace(R.id.main_replaceable, StopwatchFragment.newInstance(), "StopwatchFragment")
                         .commit();
                 break;
             case R.id.nav_history:
@@ -289,6 +289,10 @@ public class MainActivity extends AppCompatActivity
             case R.id.action_renew_deleted:
                 HistoryFragment historyFragment5 = (HistoryFragment) getSupportFragmentManager().findFragmentByTag("HistoryFragment");
                 historyFragment5.displayRenewDeletedAlertDialog();
+                break;
+            case R.id.action_delete_pending:
+                StopwatchFragment stopwatchFragment2 = (StopwatchFragment) getSupportFragmentManager().findFragmentByTag("StopwatchFragment");
+                stopwatchFragment2.displayDeletePendingAlertDialog();
                 break;
             default:
                 throw new UnsupportedOperationException();

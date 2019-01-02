@@ -70,9 +70,10 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection, U
 
     private final String TAG = "StopwatchFragment";
 
-    private boolean workoutStarted, workoutPaused;
+    private boolean workoutStarted, workoutPaused, menuInvalidated;
 
     private AlertDialog.Builder alertDialogBuilder;
+    private AlertDialog alertDialog;
 
     private double distance, pace, calories, totalCalories, latestBiggestNonZeroCalories;
 
@@ -163,13 +164,6 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection, U
                         dialogInterface.dismiss();
                     }
 
-                    private void stopTrackerService() {
-                        Intent intent = new Intent(thisFragmentActivity, TrackerService.class);
-                        intent.putExtra(IntentHelper.DATA_WORKOUT_SPORT_ACTIVITY, userSelectedSportActivity);
-                        intent.setAction(IntentHelper.ACTION_STOP);
-                        thisFragmentActivity.startService(intent);
-                    }
-
                     private void startWorkoutDetailActivity() {
                         try {
                             Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
@@ -227,6 +221,8 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection, U
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         if (userShPr.getBoolean(getString(R.string.usershpr_usersignedin), Boolean.valueOf(getString(R.string.usershpr_usersignedin_default))))
             inflater.inflate(R.menu.sync_with_server, menu);
+        if (menuInvalidated)
+            inflater.inflate(R.menu.delete_pending, menu);
     }
 
     @Override
@@ -375,6 +371,10 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection, U
                 toggleRecording(false, false, IntentHelper.ACTION_PAUSE, true, false);
         }
         else {
+            if (!menuInvalidated) {
+                menuInvalidated = true;
+                thisFragmentActivity.invalidateOptionsMenu();
+            }
             checkForGpsChecking();
             toggleRecording(true, true, IntentHelper.ACTION_START, false, true);
         }
@@ -588,6 +588,51 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection, U
             }
         });
         builder.show();
+    }
+
+    public void displayDeletePendingAlertDialog() {
+        AlertDialog.Builder alertDialogBuilderPendingDelete = new AlertDialog.Builder(thisFragmentActivity);
+        alertDialogBuilderPendingDelete
+                .setTitle("Delete pending workout")
+                .setMessage("Do you really want to delete this workout?")
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        stopTrackerService();
+                        deletePendingWorkout();
+                        Log.i(TAG, "Pending workout deleted");
+                        Toast.makeText(thisFragmentActivity, "Pending workout deleted", Toast.LENGTH_SHORT).show();
+                        alertDialog.dismiss();
+                        mListener.onWorkoutStopped();
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        alertDialog.dismiss();
+                    }
+                });
+        alertDialog = alertDialogBuilderPendingDelete.create();
+        alertDialog.show();
+    }
+
+    private void stopTrackerService() {
+        Intent intent = new Intent(thisFragmentActivity, TrackerService.class);
+        intent.putExtra(IntentHelper.DATA_WORKOUT_SPORT_ACTIVITY, userSelectedSportActivity);
+        intent.setAction(IntentHelper.ACTION_STOP);
+        thisFragmentActivity.startService(intent);
+    }
+
+    private void deletePendingWorkout() {
+        try {
+            Workout pendingWorkout = workoutDao.queryForId(getCurrentWorkoutId());
+            pendingWorkout.setStatus(Workout.statusDeleted);
+            workoutDao.update(pendingWorkout);
+            Log.i(TAG, "Pending workout data deleted");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public interface OnFragmentInteractionListener {

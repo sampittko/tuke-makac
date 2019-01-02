@@ -10,7 +10,6 @@ import sk.tuke.smart.makac.helpers.SportActivities;
 
 @DatabaseTable
 public class Workout {
-    public static final String COLUMN_STATUS = "status";
     public static final String COLUMN_USERID = "user_id";
 
     // initial status of workout
@@ -20,7 +19,7 @@ public class Workout {
     // paused workout
     public static final int statusPaused = 2;
     // deleted workout
-    public static final int statusDeleted= 3;
+    public static final int statusDeleted = 3;
     // workout delete request code
     public static final int HISTORY_REQUEST = 404;
     // workout update result code
