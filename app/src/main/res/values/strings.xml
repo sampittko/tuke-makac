@@ -116,6 +116,7 @@
     <string name="historysettings_actioncleardeleted">Clear deleted</string>
     <string name="historysettings_showdeleted">Show deleted</string>
     <string name="historysettings_showended">Show history</string>
+    <string name="historysettings_renewdeleted">Renew deleted</string>
     <string name="history_nohistorydata">No data</string>
     <string name="history_workoutsbin">Deleted workouts</string>
 

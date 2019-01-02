@@ -286,6 +286,10 @@ public class MainActivity extends AppCompatActivity
                 HistoryFragment historyFragment4 = (HistoryFragment) getSupportFragmentManager().findFragmentByTag("HistoryFragment");
                 historyFragment4.displayClearDeletedAlertDialog();
                 break;
+            case R.id.action_renew_deleted:
+                HistoryFragment historyFragment5 = (HistoryFragment) getSupportFragmentManager().findFragmentByTag("HistoryFragment");
+                historyFragment5.displayRenewDeletedAlertDialog();
+                break;
             default:
                 throw new UnsupportedOperationException();
         }

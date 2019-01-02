@@ -58,6 +58,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
 
     private AlertDialog.Builder alertDialogBuilderHistory;
     private AlertDialog.Builder alertDialogBuilderDeleted;
+    private AlertDialog.Builder alertDialogBuilderRenewDeleted;
 
     public HistoryFragment() {
     }
@@ -75,6 +76,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
         databaseSetup();
         createClearHistoryAlertDialog();
         createClearDeletedAlertDialog();
+        createRenewDeletedAlertDialog();
     }
 
     private void initializeVariables() {
@@ -134,6 +136,25 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
                 });
     }
 
+    private void createRenewDeletedAlertDialog() {
+        alertDialogBuilderRenewDeleted = new AlertDialog.Builder(thisFragmentActivity);
+        alertDialogBuilderRenewDeleted.setTitle("Renew deleted workouts")
+                .setMessage("Do you really want to renew these workouts?")
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        performWorkoutsRenewal();
+                        dialogInterface.dismiss();
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -181,6 +202,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
         }
         else if (thisFragmentActivity.getTitle().equals(getString(R.string.history_workoutsbin))) {
             inflater.inflate(R.menu.show_ended, menu);
+            inflater.inflate(R.menu.renew_deleted, menu);
             inflater.inflate(R.menu.clear_deleted, menu);
         }
         if (userShPr.getBoolean(getString(R.string.usershpr_usersignedin), Boolean.valueOf(getString(R.string.usershpr_usersignedin_default))))
@@ -246,9 +268,33 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
         }
         else {
             workoutsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                AlertDialog alertDialog;
+
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    renewWorkout(getWorkoutId(view));
+                    displayRenewalAlertDialog(view);
+                }
+
+                private void displayRenewalAlertDialog(final View view) {
+                    final AlertDialog.Builder alertDialogBuilderWorkoutRenewal = new AlertDialog.Builder(thisFragmentActivity);
+                    alertDialogBuilderWorkoutRenewal
+                            .setTitle("Renew deleted workout")
+                            .setMessage("Do you really want to renew this workout?")
+                            .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    renewWorkout(getWorkoutId(view));
+                                    alertDialog.dismiss();
+                                }
+                            })
+                            .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    alertDialog.dismiss();
+                                }
+                            });
+                    alertDialog = alertDialogBuilderWorkoutRenewal.create();
+                    alertDialog.show();
                 }
 
                 private long getWorkoutId(View view) {
@@ -395,6 +441,37 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
 
             Toast.makeText(thisFragmentActivity, "All workouts were permanentally deleted", Toast.LENGTH_SHORT).show();
             Log.i(TAG, "All workouts were permanentally deleted");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void displayRenewDeletedAlertDialog() {
+        AlertDialog alertDialog = alertDialogBuilderRenewDeleted.create();
+        alertDialog.show();
+
+        Log.i(TAG, "Alert dialog is now visible.");
+    }
+
+    private void performWorkoutsRenewal() {
+        try {
+            List<Workout> userDeletedWorkouts = getFilteredUserWorkouts(Workout.statusDeleted);
+            if (userDeletedWorkouts.size() == 0) {
+                Toast.makeText(thisFragmentActivity, "No workout to renew", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // UPDATE WORKOUT STATUSES OF ALL WORKOUTS TO ENDED
+            for (Workout workout : userDeletedWorkouts) {
+                workout.setStatus(Workout.statusEnded);
+                workoutDao.update(workout);
+            }
+
+            renderList(new ArrayList<Workout>(), R.layout.adapter_history_bin);
+
+            Toast.makeText(thisFragmentActivity, "All workouts were renewed", Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "All workouts were renewed");
         }
         catch (SQLException e) {
             e.printStackTrace();
