@@ -7,6 +7,7 @@ import com.j256.ormlite.table.DatabaseTable;
 public class User {
     public static String COLUMN_ACCTYPE = "accType";
     public static String COLUMN_ACCID = "accId";
+    public static String COLUMN_ID = "id";
     public static int ACCTYPE_OFFLINE = 0;
     public static String ACCTYPE_OFFLINE_ACCID = "0";
     public static int ACCTYPE_GOOGLE = 1;

@@ -42,6 +42,7 @@ import sk.tuke.smart.makac.DatabaseConnection;
 import sk.tuke.smart.makac.R;
 import sk.tuke.smart.makac.UnitChange;
 import sk.tuke.smart.makac.WorkoutDetailActivity;
+import sk.tuke.smart.makac.WorkoutRecovery;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
 import sk.tuke.smart.makac.helpers.SportActivities;
@@ -50,7 +51,7 @@ import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 import sk.tuke.smart.makac.services.TrackerService;
 
-public class StopwatchFragment extends Fragment implements DatabaseConnection, UnitChange {
+public class StopwatchFragment extends Fragment implements DatabaseConnection, UnitChange, WorkoutRecovery {
     @BindView(R.id.button_stopwatch_start) public Button startWorkoutButton;
     @BindView(R.id.button_stopwatch_endworkout) public Button endWorkoutButton;
     @BindView(R.id.textview_stopwatch_duration) public TextView durationTextView;
@@ -90,6 +91,8 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection, U
 
     private SharedPreferences userShPr;
     private SharedPreferences appShPr;
+
+    private Workout lastWorkout;
 
     private boolean unitChanged, locationChecked;
 
@@ -250,11 +253,11 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection, U
         try {
             long workoutsCount = workoutDao.countOf();
             if (workoutsCount != 0) {
-                List<Workout> workouts = workoutDao.queryForAll();
-                Workout lastWorkout = workouts.get(workouts.size() - 1);
+                List<Workout> userWorkouts = workoutDao.queryForEq(Workout.COLUMN_USERID, getCurrentUserId());
+                lastWorkout = userWorkouts.get(userWorkouts.size() - 1);
                 int lastWorkoutStatus = lastWorkout.getStatus();
                 if (lastWorkoutStatus == Workout.statusPaused || lastWorkoutStatus == Workout.statusUnknown)
-                    performWorkoutRecovery(lastWorkout);
+                    performWorkoutRecovery();
             }
             else
                 Log.i(TAG, "Skipping recovery check because of empty local workout database table");
@@ -264,7 +267,7 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection, U
         }
     }
 
-    private void performWorkoutRecovery(Workout lastWorkout) {
+    public void performWorkoutRecovery() {
         workoutStarted = true;
         workoutPaused = false;
         toggleRecordingHandler(getView());
@@ -550,8 +553,12 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection, U
     }
 
     private long getCurrentWorkoutId() throws SQLException {
-        List<Workout> workouts = workoutDao.queryForAll();
-        return workouts.get(workouts.size() - 1).getId();
+        List<Workout> userWorkouts = workoutDao.queryForEq(Workout.COLUMN_USERID, getCurrentUserId());
+        return userWorkouts.get(userWorkouts.size() - 1).getId();
+    }
+
+    private long getCurrentUserId() {
+        return userShPr.getLong(getString(R.string.usershpr_userid), Long.valueOf(getString(R.string.usershpr_userid_default)));
     }
 
     @OnClick(R.id.button_stopwatch_selectsport)

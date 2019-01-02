@@ -27,17 +27,20 @@ import java.util.List;
 
 import sk.tuke.smart.makac.DatabaseConnection;
 import sk.tuke.smart.makac.R;
+import sk.tuke.smart.makac.WorkoutRecovery;
 import sk.tuke.smart.makac.exceptions.InsufficientDistanceException;
 import sk.tuke.smart.makac.exceptions.NotEnoughLocationsException;
+import sk.tuke.smart.makac.exceptions.WeightNotSetException;
 import sk.tuke.smart.makac.helpers.IntentHelper;
 import sk.tuke.smart.makac.helpers.MainHelper;
 import sk.tuke.smart.makac.helpers.SportActivities;
 import sk.tuke.smart.makac.model.GpsPoint;
+import sk.tuke.smart.makac.model.User;
 import sk.tuke.smart.makac.model.UserProfile;
 import sk.tuke.smart.makac.model.Workout;
 import sk.tuke.smart.makac.model.config.DatabaseHelper;
 
-public class TrackerService extends Service implements LocationListener, DatabaseConnection {
+public class TrackerService extends Service implements LocationListener, DatabaseConnection, WorkoutRecovery {
     private final double SESSION_DIFF_LIMIT = 100;
     private final IBinder mBinder = new LocalBinder();
     private final String TAG = "TrackerService";
@@ -66,6 +69,7 @@ public class TrackerService extends Service implements LocationListener, Databas
     private Dao<GpsPoint, Long> gpsPointDao;
     private Dao<Workout, Long> workoutDao;
     private Dao<UserProfile, Long> userProfileDao;
+    private Dao<User, Long> userDao;
 
     private LocationManager locationManager;
 
@@ -142,6 +146,7 @@ public class TrackerService extends Service implements LocationListener, Databas
             gpsPointDao = databaseHelper.gpsPointDao();
             workoutDao = databaseHelper.workoutDao();
             userProfileDao = databaseHelper.userProfileDao();
+            userDao = databaseHelper.userDao();
             Log.i(TAG, "Local database is ready");
         }
         catch (SQLException e) {
@@ -191,17 +196,21 @@ public class TrackerService extends Service implements LocationListener, Databas
 
     private void setWeightAccordingToCurrentUser() {
         try {
-            List<UserProfile> userProfiles = userProfileDao.queryForEq(UserProfile.COLUMN_USERID, userShPr.getLong(getString(R.string.usershpr_userid), Long.valueOf(getString(R.string.usershpr_userid_default))));
-            UserProfile currentUserProfile = userProfiles.get(0);
-            if (currentUserProfile.getWeight() <= 0)
-                throw new IndexOutOfBoundsException();
-            weight = currentUserProfile.getWeight();
-            Log.i(TAG, "User weight " + weight + "kg set");
+            List<UserProfile> userProfiles = userProfileDao.queryForEq(UserProfile.COLUMN_USERID, getCurrentUserId());
+            if (userProfiles.size() != 0) {
+                UserProfile currentUserProfile = userProfiles.get(0);
+                if (currentUserProfile.getWeight() <= 0)
+                    throw new WeightNotSetException();
+                weight = currentUserProfile.getWeight();
+                Log.i(TAG, "User weight " + weight + "kg set");
+            }
+            else
+                throw new WeightNotSetException();
         }
         catch (SQLException e) {
             e.printStackTrace();
         }
-        catch (IndexOutOfBoundsException e) {
+        catch (WeightNotSetException e) {
             weight = UserProfile.DEFAULT_WEIGHT;
             Log.i(TAG, "Default weight set");
         }
@@ -209,31 +218,43 @@ public class TrackerService extends Service implements LocationListener, Databas
 
     private void createNewWorkout() {
         try {
-            List<Workout> workouts = workoutDao.queryForAll();
-            long workoutId;
+            long currentUserId = getCurrentUserId();
+            List<User> users = userDao.queryForEq(User.COLUMN_ID, currentUserId);
+            List<Workout> userWorkouts = workoutDao.queryForEq(Workout.COLUMN_USERID, currentUserId);
+            List<Workout> allWorkouts = workoutDao.queryForAll();
+
+            long workoutId, visibleWorkoutId;
             String workoutTitle;
 
-            if (workouts.size() == 0)
+            // UNIQUE ID
+            if (allWorkouts.size() == 0)
                 workoutId = 1;
             else
-                workoutId = workouts.get(workouts.size() - 1).getId() + 1;
+                workoutId = allWorkouts.get(allWorkouts.size() - 1).getId() + 1;
 
-            workoutTitle = "Workout " + workoutId;
+            // VISIBLE ID
+            if (userWorkouts.size() == 0)
+                visibleWorkoutId = 1;
+            else
+                visibleWorkoutId = userWorkouts.get(userWorkouts.size() - 1).getVisibleId() + 1;
+
+            workoutTitle = "Workout " + visibleWorkoutId;
             pendingWorkout = new Workout(workoutTitle, sportActivity);
+            pendingWorkout.setId(workoutId);
+            pendingWorkout.setVisibleId(visibleWorkoutId);
             pendingWorkout.setCreated(new Date());
+            pendingWorkout.setUser(users.get(0));
 
-            try {
-                workoutDao.create(pendingWorkout);
-                Log.i(TAG, "Workout with ID " + workoutId + " created");
-            }
-            catch (SQLException e) {
-                e.printStackTrace();
-            }
+            workoutDao.create(pendingWorkout);
         }
         catch(SQLException e) {
             e.printStackTrace();
             throw new UnsupportedOperationException();
         }
+    }
+
+    private long getCurrentUserId() {
+        return userShPr.getLong(getString(R.string.usershpr_userid), Long.valueOf(getString(R.string.usershpr_userid_default)));
     }
 
     private void performContinueAction() {
@@ -264,10 +285,10 @@ public class TrackerService extends Service implements LocationListener, Databas
         Log.i(TAG, "Service paused");
     }
 
-    private void performWorkoutRecovery() {
+    public void performWorkoutRecovery() {
         try {
-            List<Workout> workouts = workoutDao.queryForAll();
-            pendingWorkout = workouts.get(workouts.size() - 1);
+            List<Workout> userWorkouts = workoutDao.queryForEq(Workout.COLUMN_USERID, getCurrentUserId());
+            pendingWorkout = userWorkouts.get(userWorkouts.size() - 1);
             previousCalories = pendingWorkout.getTotalCalories();
             distance = pendingWorkout.getDistance();
             duration = pendingWorkout.getDuration();

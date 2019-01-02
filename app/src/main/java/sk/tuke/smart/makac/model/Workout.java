@@ -11,6 +11,7 @@ import sk.tuke.smart.makac.helpers.SportActivities;
 @DatabaseTable
 public class Workout {
     public static final String COLUMN_STATUS = "status";
+    public static final String COLUMN_USERID = "user_id";
 
     // initial status of workout
     public static final int statusUnknown = 0;
@@ -62,6 +63,8 @@ public class Workout {
     private int sportActivity;
     @DatabaseField
     private Date lastUpdate;
+    @DatabaseField
+    private long visibleId;
 
     public Workout() {
 
@@ -76,7 +79,7 @@ public class Workout {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -158,6 +161,14 @@ public class Workout {
 
     public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
+    }
+
+    public long getVisibleId() {
+        return visibleId;
+    }
+
+    public void setVisibleId(long visibleId) {
+        this.visibleId = visibleId;
     }
 
     public String toString(int distanceUnit) {
