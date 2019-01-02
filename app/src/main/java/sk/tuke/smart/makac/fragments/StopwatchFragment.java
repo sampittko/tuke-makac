@@ -592,7 +592,6 @@ public class StopwatchFragment extends Fragment implements DatabaseConnection, U
         builder.show();
     }
 
-    // TODO StopwatchFragment NullPointerException after open and close on Settings
     public void displayDeletePendingAlertDialog() {
         AlertDialog.Builder alertDialogBuilderPendingDelete = new AlertDialog.Builder(thisFragmentActivity);
         alertDialogBuilderPendingDelete
