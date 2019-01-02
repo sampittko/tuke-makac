@@ -101,7 +101,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        clearWorkoutHistory();
+                        clearUserWorkoutHistory();
                         dialogInterface.dismiss();
                     }
                 })
@@ -130,8 +130,8 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
         }
     }
 
-    private void renderHistoryItems(List<Workout> endedWorkouts) {
-        HistoryListAdapter historyListAdapter = new HistoryListAdapter(thisFragmentActivity, R.layout.adapter_history, getStringifiedWorkouts(endedWorkouts), endedWorkouts);
+    private void renderHistoryItems(List<Workout> userEndedWorkouts) {
+        HistoryListAdapter historyListAdapter = new HistoryListAdapter(thisFragmentActivity, R.layout.adapter_history, getStringifiedWorkouts(userEndedWorkouts), userEndedWorkouts);
         workoutsListView.setAdapter(historyListAdapter);
         workoutsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -193,9 +193,10 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
 
     private void renderList() {
         try {
-            List<Workout> endedWorkouts = workoutDao.queryForEq(Workout.COLUMN_STATUS, Workout.statusEnded);
-            if (endedWorkouts.size() > 0)
-                renderHistoryItems(endedWorkouts);
+            List<Workout> userEndedWorkouts = getUserEndedWorkouts();
+
+            if (userEndedWorkouts.size() > 0)
+                renderHistoryItems(userEndedWorkouts);
             else {
                 noHistoryDataTextView.setVisibility(View.VISIBLE);
                 workoutsListView.setVisibility(View.GONE);
@@ -237,15 +238,15 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
         Log.i(TAG, "Alert dialog is now visible.");
     }
 
-    public void clearWorkoutHistory() {
+    public void clearUserWorkoutHistory() {
         try {
-            List<Workout> allEndedWorkouts = workoutDao.queryForEq(Workout.COLUMN_STATUS, Workout.statusEnded);
-            if (allEndedWorkouts.size() == 0) {
+            List<Workout> userEndedWorkouts = getUserEndedWorkouts();
+            if (userEndedWorkouts.size() == 0) {
                 Toast.makeText(thisFragmentActivity, "No workout to delete", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            for (Workout currentWorkout : allEndedWorkouts) {
+            for (Workout currentWorkout : userEndedWorkouts) {
                 currentWorkout.setStatus(Workout.statusDeleted);
                 workoutDao.update(currentWorkout);
             }
@@ -258,6 +259,19 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
         catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private List<Workout> getUserEndedWorkouts() throws SQLException {
+        long currentUserId = userShPr.getLong(getString(R.string.usershpr_userid), Long.valueOf(getString(R.string.usershpr_userid_default)));
+        List<Workout> userWorkouts = workoutDao.queryForEq(Workout.COLUMN_USERID, currentUserId);
+        List<Workout> userEndedWorkouts = new ArrayList<>();
+
+        for (Workout workout : userWorkouts) {
+            if (workout.getStatus() == Workout.statusEnded)
+                userEndedWorkouts.add(workout);
+        }
+
+        return userEndedWorkouts;
     }
 
     public interface OnFragmentInteractionListener {}
