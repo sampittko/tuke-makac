@@ -130,29 +130,6 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
         }
     }
 
-    private void renderHistoryItems(List<Workout> userEndedWorkouts) {
-        HistoryListAdapter historyListAdapter = new HistoryListAdapter(thisFragmentActivity, R.layout.adapter_history, getStringifiedWorkouts(userEndedWorkouts), userEndedWorkouts);
-        workoutsListView.setAdapter(historyListAdapter);
-        workoutsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                long workoutId = getWorkoutId(view);
-                Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
-                intent.putExtra(IntentHelper.DATA_WORKOUT_ID, workoutId);
-                intent.putExtra(IntentHelper.DATA_HISTORY_REQUEST, Workout.HISTORY_REQUEST);
-                startActivityForResult(intent, Workout.HISTORY_REQUEST);
-            }
-
-            private long getWorkoutId(View view) {
-                ViewGroup viewGroup1 = (ViewGroup) view;
-                ViewGroup viewGroup2 = (ViewGroup) viewGroup1.getChildAt(1);
-                TextView workoutTitleTextView = (TextView) viewGroup2.getChildAt(0);
-                return Long.valueOf(workoutTitleTextView.getTag().toString());
-            }
-        });
-        Log.i(TAG, "Workouts displayed successfully");
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Workout.HISTORY_REQUEST && resultCode == Workout.DELETE_RESULT)
@@ -177,6 +154,10 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (thisFragmentActivity.getTitle().equals(getString(R.string.menu_history)))
+            inflater.inflate(R.menu.show_deleted, menu);
+        else if (thisFragmentActivity.getTitle().equals(getString(R.string.history_workoutsbin)))
+            inflater.inflate(R.menu.show_ended, menu);
         inflater.inflate(R.menu.clear_history, menu);
         if (userShPr.getBoolean(getString(R.string.usershpr_usersignedin), Boolean.valueOf(getString(R.string.usershpr_usersignedin_default))))
             inflater.inflate(R.menu.sync_with_server, menu);
@@ -193,19 +174,51 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
 
     private void renderList() {
         try {
-            List<Workout> userEndedWorkouts = getUserEndedWorkouts();
-
-            if (userEndedWorkouts.size() > 0)
-                renderHistoryItems(userEndedWorkouts);
-            else {
-                noHistoryDataTextView.setVisibility(View.VISIBLE);
-                workoutsListView.setVisibility(View.GONE);
-                Log.i(TAG, "There is no data to display");
-            }
+            renderList(getFilteredUserWorkouts(Workout.statusEnded));
         }
         catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private void renderList(List<Workout> workouts) {
+        if (workouts.size() > 0) {
+            renderHistoryItems(workouts);
+            setVisibility(View.GONE, View.VISIBLE);
+        }
+        else {
+            setVisibility(View.VISIBLE, View.GONE);
+            Toast.makeText(thisFragmentActivity, "No workouts present", Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "There is no data to display");
+        }
+    }
+
+    private void setVisibility(int noHistoryDataVisibility, int workoutsVisibility) {
+        noHistoryDataTextView.setVisibility(noHistoryDataVisibility);
+        workoutsListView.setVisibility(workoutsVisibility);
+    }
+
+    private void renderHistoryItems(List<Workout> workouts) {
+        HistoryListAdapter historyListAdapter = new HistoryListAdapter(thisFragmentActivity, R.layout.adapter_history, getStringifiedWorkouts(workouts), workouts);
+        workoutsListView.setAdapter(historyListAdapter);
+        workoutsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                long workoutId = getWorkoutId(view);
+                Intent intent = new Intent(thisFragmentActivity, WorkoutDetailActivity.class);
+                intent.putExtra(IntentHelper.DATA_WORKOUT_ID, workoutId);
+                intent.putExtra(IntentHelper.DATA_HISTORY_REQUEST, Workout.HISTORY_REQUEST);
+                startActivityForResult(intent, Workout.HISTORY_REQUEST);
+            }
+
+            private long getWorkoutId(View view) {
+                ViewGroup viewGroup1 = (ViewGroup) view;
+                ViewGroup viewGroup2 = (ViewGroup) viewGroup1.getChildAt(1);
+                TextView workoutTitleTextView = (TextView) viewGroup2.getChildAt(0);
+                return Long.valueOf(workoutTitleTextView.getTag().toString());
+            }
+        });
+        Log.i(TAG, "Workouts displayed successfully");
     }
 
     @Override
@@ -240,7 +253,7 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
 
     public void clearUserWorkoutHistory() {
         try {
-            List<Workout> userEndedWorkouts = getUserEndedWorkouts();
+            List<Workout> userEndedWorkouts = getFilteredUserWorkouts(Workout.statusEnded);
             if (userEndedWorkouts.size() == 0) {
                 Toast.makeText(thisFragmentActivity, "No workout to delete", Toast.LENGTH_SHORT).show();
                 return;
@@ -261,17 +274,46 @@ public class HistoryFragment extends Fragment implements DatabaseConnection, Uni
         }
     }
 
-    private List<Workout> getUserEndedWorkouts() throws SQLException {
+    public void showDeletedWorkouts() {
+        try {
+            thisFragmentActivity.setTitle(R.string.history_workoutsbin);
+            thisFragmentActivity.invalidateOptionsMenu();
+            renderList(getFilteredUserWorkouts(Workout.statusDeleted));
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void showEndedWorkouts() {
+        thisFragmentActivity.setTitle(R.string.menu_history);
+        thisFragmentActivity.invalidateOptionsMenu();
+        renderList();
+    }
+
+    private List<Workout> getFilteredUserWorkouts(int workoutStatus) throws SQLException {
         long currentUserId = userShPr.getLong(getString(R.string.usershpr_userid), Long.valueOf(getString(R.string.usershpr_userid_default)));
         List<Workout> userWorkouts = workoutDao.queryForEq(Workout.COLUMN_USERID, currentUserId);
-        List<Workout> userEndedWorkouts = new ArrayList<>();
+        List<Workout> filteredUserWorkouts = new ArrayList<>();
 
-        for (Workout workout : userWorkouts) {
-            if (workout.getStatus() == Workout.statusEnded)
-                userEndedWorkouts.add(workout);
+        switch (workoutStatus) {
+            case Workout.statusEnded:
+                for (Workout workout : userWorkouts) {
+                    if (workout.getStatus() == Workout.statusEnded)
+                        filteredUserWorkouts.add(workout);
+                }
+                break;
+            case Workout.statusDeleted:
+                for (Workout workout : userWorkouts) {
+                    if (workout.getStatus() == Workout.statusDeleted)
+                        filteredUserWorkouts.add(workout);
+                }
+                break;
+            default:
+                break;
         }
 
-        return userEndedWorkouts;
+        return filteredUserWorkouts;
     }
 
     public interface OnFragmentInteractionListener {}

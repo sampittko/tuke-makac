@@ -271,8 +271,16 @@ public class MainActivity extends AppCompatActivity
                 Log.e(TAG, "Sync not implemetned");
                 break;
             case R.id.action_clear_history:
-                HistoryFragment historyFragment = (HistoryFragment) getSupportFragmentManager().findFragmentByTag("HistoryFragment");
-                historyFragment.displayClearHistoryAlertDialog();
+                HistoryFragment historyFragment1 = (HistoryFragment) getSupportFragmentManager().findFragmentByTag("HistoryFragment");
+                historyFragment1.displayClearHistoryAlertDialog();
+                break;
+            case R.id.action_show_deleted:
+                HistoryFragment historyFragment2 = (HistoryFragment) getSupportFragmentManager().findFragmentByTag("HistoryFragment");
+                historyFragment2.showDeletedWorkouts();
+                break;
+            case R.id.action_show_ended:
+                HistoryFragment historyFragment3 = (HistoryFragment) getSupportFragmentManager().findFragmentByTag("HistoryFragment");
+                historyFragment3.showEndedWorkouts();
                 break;
             default:
                 throw new UnsupportedOperationException();
